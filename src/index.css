@@ -1,0 +1,248 @@
+@import "tailwindcss";
+@custom-variant dark (&:where(.dark, .dark *));
+
+@layer base {
+  *,
+  *::before,
+  *::after {
+    box-sizing: border-box;
+  }
+
+  :root {
+    --font-sans: 'Plus Jakarta Sans', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    --font-urdu: 'Noto Nastaliq Urdu', 'Plus Jakarta Sans', system-ui, sans-serif;
+    --font-mono: 'JetBrains Mono', ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+    -webkit-text-size-adjust: 100%;
+    text-size-adjust: 100%;
+  }
+
+  html,
+  body,
+  #root {
+    width: 100%;
+    max-width: 100%;
+    min-width: 0;
+    margin: 0;
+    padding: 0;
+  }
+
+  body {
+    font-family: var(--font-sans);
+  }
+
+  [dir="rtl"] {
+    font-family: var(--font-urdu), var(--font-sans);
+  }
+
+  [dir="rtl"] input,
+  [dir="rtl"] textarea,
+  [dir="rtl"] select {
+    text-align: right;
+  }
+
+  [dir="rtl"] input[type="email"],
+  [dir="rtl"] input[type="url"],
+  [dir="rtl"] input[type="number"],
+  [dir="rtl"] input[type="password"],
+  [dir="rtl"] input[type="tel"],
+  [dir="rtl"] code,
+  [dir="rtl"] pre {
+    direction: ltr;
+    text-align: left;
+  }
+
+  /* Accessible keyboard focus indicator */
+  :focus-visible {
+    outline: 2px solid #1d4ed8;
+    outline-offset: 2px;
+  }
+}
+
+.scrollbar-none {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+
+.scrollbar-none::-webkit-scrollbar {
+  display: none;
+}
+
+/* Respect user motion sensitivity preferences */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+
+/* Print styling for tools, reports, outputs, and Resume/CV generation */
+@media print {
+  @page {
+    size: auto;
+    margin: 14mm 12mm;
+  }
+
+  /* Universal chrome and navigation hide */
+  nav,
+  header,
+  footer,
+  aside,
+  .no-print,
+  [data-no-print="true"],
+  .reader-mode-toolbar,
+  #social-share-section,
+  #tool-rating-section {
+    display: none !important;
+  }
+
+  /* Root print defaults: pure white background, unclipped multi-page flow, crisp readable text */
+  html,
+  body,
+  #root {
+    background: #ffffff !important;
+    color: #0f172a !important;
+    height: auto !important;
+    min-height: 0 !important;
+    overflow: visible !important;
+    font-size: 11pt;
+    line-height: 1.5;
+    margin: 0 !important;
+    padding: 0 !important;
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
+  }
+
+  body * {
+    visibility: hidden;
+  }
+
+  /* Ensure collapsed mobile preview wrappers around printable targets remain laid out in print */
+  body:has(#printable-resume-area) *:has(#printable-resume-area),
+  body[data-printing-custom-target="true"] *:has([data-print-active-target="true"]) {
+    display: block !important;
+    max-height: none !important;
+    overflow: visible !important;
+  }
+
+  /* 1. Custom Scoped Target Element (when <Print targetId="..." /> or targetRef targets a sub-container) */
+  body[data-printing-custom-target="true"] [data-print-active-target="true"],
+  body[data-printing-custom-target="true"] [data-print-active-target="true"] * {
+    visibility: visible;
+  }
+
+  body[data-printing-custom-target="true"] [data-print-active-target="true"] {
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 100% !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    box-shadow: none !important;
+    border: none !important;
+    background: #ffffff !important;
+    color: #0f172a !important;
+  }
+
+  /* 2. Resume Builder preview printing */
+  body:not([data-printing-custom-target="true"]):has(#printable-resume-area) #printable-resume-area,
+  body:not([data-printing-custom-target="true"]):has(#printable-resume-area) #printable-resume-area * {
+    visibility: visible;
+  }
+
+  body:not([data-printing-custom-target="true"]):has(#printable-resume-area) #printable-resume-area {
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 100% !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    box-shadow: none !important;
+    border: none !important;
+    background: white !important;
+    color: black !important;
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
+  }
+
+  body:has(#printable-resume-area) .tool-print-header,
+  body:has(#printable-resume-area) .tool-print-footer {
+    display: none !important;
+  }
+
+  /* 3. Tool Workspace Output printing for all other tools */
+  body:not([data-printing-custom-target="true"]):not(:has(#printable-resume-area)) #tool-workspace-content,
+  body:not([data-printing-custom-target="true"]):not(:has(#printable-resume-area)) #tool-workspace-content *,
+  body.printing-tool-workspace:not([data-printing-custom-target="true"]):not(:has(#printable-resume-area)) #tool-workspace-content,
+  body.printing-tool-workspace:not([data-printing-custom-target="true"]):not(:has(#printable-resume-area)) #tool-workspace-content * {
+    visibility: visible;
+  }
+
+  body:not([data-printing-custom-target="true"]):not(:has(#printable-resume-area)) #tool-workspace-content,
+  body.printing-tool-workspace:not([data-printing-custom-target="true"]):not(:has(#printable-resume-area)) #tool-workspace-content {
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 100% !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    box-shadow: none !important;
+    border: none !important;
+    background: transparent !important;
+    color: #0f172a !important;
+  }
+
+  /* Clean formatting for report cards, result boxes, and tables in print */
+  #tool-workspace-content .bg-slate-900,
+  #tool-workspace-content .dark\:bg-slate-900,
+  #tool-workspace-content .bg-slate-950,
+  #tool-workspace-content .dark\:bg-slate-950,
+  #tool-workspace-content .bg-slate-800,
+  #tool-workspace-content .dark\:bg-slate-800 {
+    background-color: #ffffff !important;
+    color: #0f172a !important;
+    border-color: #cbd5e1 !important;
+    box-shadow: none !important;
+  }
+
+  #tool-workspace-content .text-white,
+  #tool-workspace-content .dark\:text-white {
+    color: #0f172a !important;
+  }
+
+  #tool-workspace-content .text-slate-400,
+  #tool-workspace-content .text-slate-300,
+  #tool-workspace-content .dark\:text-slate-400,
+  #tool-workspace-content .dark\:text-slate-300 {
+    color: #334155 !important;
+  }
+
+  /* Page break rules for clean multi-page outputs */
+  #tool-workspace-content section,
+  #tool-workspace-content article,
+  #tool-workspace-content table,
+  #tool-workspace-content tr,
+  #tool-workspace-content .break-inside-avoid {
+    break-inside: avoid;
+    page-break-inside: avoid;
+  }
+}
+
+/* Custom scrollbar */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+::-webkit-scrollbar-thumb {
+  background: rgba(148, 163, 184, 0.4);
+  border-radius: 9999px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: rgba(148, 163, 184, 0.7);
+}

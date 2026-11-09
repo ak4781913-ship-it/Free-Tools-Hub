@@ -1,0 +1,6 @@
+{
+  "name": "FreeTools Hub",
+  "description": "Smart Tools. Simple Solutions. Always Within Reach. Free CV generator, UAE gratuity calculator, AI prompt builders, and everyday utilities.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}

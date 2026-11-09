@@ -1,0 +1,45 @@
+# AbbasPro FreeTools Hub - URL Redirects & SPA Fallback for Cloudflare Pages & Netlify
+
+# 301 Permanent Redirects for Canonical Tool Slugs
+/tools/resume-builder          /tools/cv-maker                     301
+/tools/cv-builder              /tools/cv-maker                     301
+/tools/resume-maker            /tools/cv-maker                     301
+/tools/uae-gratuity            /tools/uae-gratuity-calculator      301
+/tools/gratuity-calculator     /tools/uae-gratuity-calculator      301
+/tools/dubai-salary-calculator /tools/uae-salary-calculator        301
+/tools/uae-salary              /tools/uae-salary-calculator        301
+/tools/gemini-photo-prompt     /tools/ai-photo-prompt-generator    301
+/tools/photo-prompt-generator  /tools/ai-photo-prompt-generator    301
+/tools/ai-video-prompt         /tools/ai-video-prompt-generator    301
+/tools/video-prompt-generator  /tools/ai-video-prompt-generator    301
+/tools/markdown-live-editor    /tools/markdown-editor              301
+/tools/seo-analyzer            /tools/seo-page-analyzer            301
+/tools/page-analyzer           /tools/seo-page-analyzer            301
+/tools/meta-tag-generator      /tools/seo-meta-generator           301
+/tools/character-counter       /tools/word-counter                 301
+/tools/case-converter          /tools/text-case-converter          301
+/tools/compress-image          /tools/image-compressor             301
+/tools/photo-compressor        /tools/image-compressor             301
+/tools/qr-generator            /tools/qr-code-generator            301
+/tools/qr-maker                /tools/qr-code-generator            301
+/tools/qrcode-generator        /tools/qr-code-generator            301
+/tools/color-converter         /tools/color-picker                 301
+/tools/palette-generator       /tools/color-picker                 301
+/tools/mortgage-calculator     /tools/loan-calculator              301
+/tools/emi-calculator          /tools/loan-calculator              301
+/tools/loan-emi-calculator     /tools/loan-calculator              301
+/tools/forex-converter         /tools/currency-converter           301
+/tools/bitcoin-converter       /tools/crypto-converter             301
+/tools/sale-calculator         /tools/discount-calculator          301
+/tools/strong-password-generator /tools/password-generator         301
+/tools/password-checker        /tools/password-strength            301
+/tools/days-between-dates      /tools/date-difference              301
+/tools/time-zone-converter     /tools/timezone-converter           301
+/tools/world-clock             /tools/timezone-converter           301
+/tools/json-validator          /tools/json-formatter               301
+/tools/json-beautifier         /tools/json-formatter               301
+/tools/base64-encoder          /tools/base64-converter             301
+/tools/base64-decoder          /tools/base64-converter             301
+
+# SPA fallback: Send all other requests to index.html with 200 OK
+/* /index.html 200

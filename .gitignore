@@ -1,0 +1,15 @@
+node_modules/
+build/
+dist/
+dev-dist/
+coverage/
+.DS_Store
+*.log
+.env*
+!.env.example
+
+# Netlify & Cloudflare temporary build and cache directories
+.netlify/
+.wrangler/
+.cloudflare/
+.cache/

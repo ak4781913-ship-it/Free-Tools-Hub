@@ -1,0 +1,78 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>FreeTools Hub – Free CV Generator, UAE Gratuity, AI Prompts & Utilities</title>
+    <meta name="theme-color" content="#1d4ed8" />
+    <meta name="robots" content="index, follow" />
+    <meta name="mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="default" />
+    <meta name="apple-mobile-web-app-title" content="FreeTools Hub" />
+    <link rel="icon" type="image/svg+xml" href="/icon.svg" />
+    <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
+    <meta
+      name="description"
+      content="Free online CV & resume generator, UAE monthly salary & gratuity calculators, AI image & video prompt builders, technical SEO analyzer, image compressor, QR maker, and browser utilities."
+    />
+    <meta property="og:type" content="website" />
+    <meta property="og:site_name" content="FreeTools Hub" />
+    <meta property="og:title" content="FreeTools Hub – Free CV Generator, UAE Gratuity, AI Prompts & Utilities" />
+    <meta
+      property="og:description"
+      content="Free online CV & resume generator, UAE monthly salary & gratuity calculators, AI image & video prompt builders, image compressor, QR code generator, and privacy-first utilities."
+    />
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content="FreeTools Hub – Free CV Generator, UAE Gratuity, AI Prompts & Utilities" />
+    <meta
+      name="twitter:description"
+      content="Smart Tools. Simple Solutions. Always Within Reach. Free client-side CV maker, UAE salary & gratuity calculators, AI prompt generators, and web utilities."
+    />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=Noto+Nastaliq+Urdu:wght@400;700&family=JetBrains+Mono:wght@400;500;600&display=swap"
+      rel="stylesheet"
+    />
+    <script type="application/ld+json">
+      {
+        "@context": "https://schema.org",
+        "@type": "WebSite",
+        "name": "FreeTools Hub",
+        "alternateName": ["AbbasPro FreeTools Hub", "Free Tools Hub"],
+        "description": "Free online CV and Resume Generator, UAE Salary & Gratuity Calculators, AI Image & Video Prompt Generators, and client-side productivity utilities."
+      }
+    </script>
+    <script>
+      (function() {
+        try {
+          var saved = localStorage.getItem('freetools_hub_theme');
+          var prefersDark = window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
+          if (saved === 'dark' || (!saved && prefersDark)) {
+            document.documentElement.classList.add('dark');
+            document.documentElement.style.colorScheme = 'dark';
+          } else {
+            document.documentElement.classList.remove('dark');
+            document.documentElement.style.colorScheme = 'light';
+          }
+
+          var savedLang = localStorage.getItem('freetools_hub_lang');
+          if (savedLang === 'ur') {
+            document.documentElement.dir = 'rtl';
+            document.documentElement.lang = 'ur';
+            document.documentElement.classList.add('rtl');
+          } else {
+            document.documentElement.dir = 'ltr';
+            document.documentElement.lang = 'en';
+            document.documentElement.classList.remove('rtl');
+          }
+        } catch (e) {}
+      })();
+    </script>
+  </head>
+  <body class="bg-slate-50 text-slate-900 dark:bg-slate-950 dark:text-slate-100 antialiased min-h-screen selection:bg-blue-600/20 selection:text-blue-700">
+    <div id="root"></div>
+    <script type="module" src="/src/main.tsx"></script>
+  </body>
+</html>

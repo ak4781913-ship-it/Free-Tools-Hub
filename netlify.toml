@@ -1,0 +1,280 @@
+[build]
+  command = "npm run build"
+  publish = "dist"
+  functions = "netlify/functions"
+
+[functions]
+  node_bundler = "esbuild"
+
+# 301 Permanent Redirects for legacy tool aliases
+[[redirects]]
+  from = "/tools/resume-builder"
+  to = "/tools/cv-maker"
+  status = 301
+  force = true
+
+[[redirects]]
+  from = "/tools/cv-builder"
+  to = "/tools/cv-maker"
+  status = 301
+  force = true
+
+[[redirects]]
+  from = "/tools/resume-maker"
+  to = "/tools/cv-maker"
+  status = 301
+  force = true
+
+[[redirects]]
+  from = "/tools/uae-gratuity"
+  to = "/tools/uae-gratuity-calculator"
+  status = 301
+  force = true
+
+[[redirects]]
+  from = "/tools/gratuity-calculator"
+  to = "/tools/uae-gratuity-calculator"
+  status = 301
+  force = true
+
+[[redirects]]
+  from = "/tools/dubai-salary-calculator"
+  to = "/tools/uae-salary-calculator"
+  status = 301
+  force = true
+
+[[redirects]]
+  from = "/tools/uae-salary"
+  to = "/tools/uae-salary-calculator"
+  status = 301
+  force = true
+
+[[redirects]]
+  from = "/tools/gemini-photo-prompt"
+  to = "/tools/ai-photo-prompt-generator"
+  status = 301
+  force = true
+
+[[redirects]]
+  from = "/tools/photo-prompt-generator"
+  to = "/tools/ai-photo-prompt-generator"
+  status = 301
+  force = true
+
+[[redirects]]
+  from = "/tools/ai-video-prompt"
+  to = "/tools/ai-video-prompt-generator"
+  status = 301
+  force = true
+
+[[redirects]]
+  from = "/tools/video-prompt-generator"
+  to = "/tools/ai-video-prompt-generator"
+  status = 301
+  force = true
+
+[[redirects]]
+  from = "/tools/markdown-live-editor"
+  to = "/tools/markdown-editor"
+  status = 301
+  force = true
+
+[[redirects]]
+  from = "/tools/seo-analyzer"
+  to = "/tools/seo-page-analyzer"
+  status = 301
+  force = true
+
+[[redirects]]
+  from = "/tools/page-analyzer"
+  to = "/tools/seo-page-analyzer"
+  status = 301
+  force = true
+
+[[redirects]]
+  from = "/tools/meta-tag-generator"
+  to = "/tools/seo-meta-generator"
+  status = 301
+  force = true
+
+[[redirects]]
+  from = "/tools/character-counter"
+  to = "/tools/word-counter"
+  status = 301
+  force = true
+
+[[redirects]]
+  from = "/tools/case-converter"
+  to = "/tools/text-case-converter"
+  status = 301
+  force = true
+
+[[redirects]]
+  from = "/tools/compress-image"
+  to = "/tools/image-compressor"
+  status = 301
+  force = true
+
+[[redirects]]
+  from = "/tools/photo-compressor"
+  to = "/tools/image-compressor"
+  status = 301
+  force = true
+
+[[redirects]]
+  from = "/tools/qr-generator"
+  to = "/tools/qr-code-generator"
+  status = 301
+  force = true
+
+[[redirects]]
+  from = "/tools/qr-maker"
+  to = "/tools/qr-code-generator"
+  status = 301
+  force = true
+
+[[redirects]]
+  from = "/tools/qrcode-generator"
+  to = "/tools/qr-code-generator"
+  status = 301
+  force = true
+
+[[redirects]]
+  from = "/tools/color-converter"
+  to = "/tools/color-picker"
+  status = 301
+  force = true
+
+[[redirects]]
+  from = "/tools/palette-generator"
+  to = "/tools/color-picker"
+  status = 301
+  force = true
+
+[[redirects]]
+  from = "/tools/mortgage-calculator"
+  to = "/tools/loan-calculator"
+  status = 301
+  force = true
+
+[[redirects]]
+  from = "/tools/emi-calculator"
+  to = "/tools/loan-calculator"
+  status = 301
+  force = true
+
+[[redirects]]
+  from = "/tools/loan-emi-calculator"
+  to = "/tools/loan-calculator"
+  status = 301
+  force = true
+
+[[redirects]]
+  from = "/tools/forex-converter"
+  to = "/tools/currency-converter"
+  status = 301
+  force = true
+
+[[redirects]]
+  from = "/tools/bitcoin-converter"
+  to = "/tools/crypto-converter"
+  status = 301
+  force = true
+
+[[redirects]]
+  from = "/tools/sale-calculator"
+  to = "/tools/discount-calculator"
+  status = 301
+  force = true
+
+[[redirects]]
+  from = "/tools/strong-password-generator"
+  to = "/tools/password-generator"
+  status = 301
+  force = true
+
+[[redirects]]
+  from = "/tools/password-checker"
+  to = "/tools/password-strength"
+  status = 301
+  force = true
+
+[[redirects]]
+  from = "/tools/days-between-dates"
+  to = "/tools/date-difference"
+  status = 301
+  force = true
+
+[[redirects]]
+  from = "/tools/time-zone-converter"
+  to = "/tools/timezone-converter"
+  status = 301
+  force = true
+
+[[redirects]]
+  from = "/tools/world-clock"
+  to = "/tools/timezone-converter"
+  status = 301
+  force = true
+
+[[redirects]]
+  from = "/tools/json-validator"
+  to = "/tools/json-formatter"
+  status = 301
+  force = true
+
+[[redirects]]
+  from = "/tools/json-beautifier"
+  to = "/tools/json-formatter"
+  status = 301
+  force = true
+
+[[redirects]]
+  from = "/tools/base64-encoder"
+  to = "/tools/base64-converter"
+  status = 301
+  force = true
+
+[[redirects]]
+  from = "/tools/base64-decoder"
+  to = "/tools/base64-converter"
+  status = 301
+  force = true
+
+# Route API endpoints to Netlify Functions
+[[redirects]]
+  from = "/api/analyze-seo"
+  to = "/.netlify/functions/analyze-seo"
+  status = 200
+
+# Client-side SPA routing fallback
+[[redirects]]
+  from = "/*"
+  to = "/index.html"
+  status = 200
+
+# Global Security & Performance Headers
+[[headers]]
+  for = "/*"
+  [headers.values]
+    X-Content-Type-Options = "nosniff"
+    Referrer-Policy = "strict-origin-when-cross-origin"
+    Permissions-Policy = "camera=(self), microphone=(), geolocation=()"
+    X-Frame-Options = "SAMEORIGIN"
+
+# Long-term Immutable Caching for Fingerprinted Static Assets
+[[headers]]
+  for = "/assets/*"
+  [headers.values]
+    Cache-Control = "public, max-age=31536000, immutable"
+
+# Service Worker & Web App Manifest: always revalidate
+[[headers]]
+  for = "/sw.js"
+  [headers.values]
+    Cache-Control = "public, max-age=0, must-revalidate"
+
+[[headers]]
+  for = "/manifest.webmanifest"
+  [headers.values]
+    Cache-Control = "public, max-age=0, must-revalidate"
