@@ -5,16 +5,19 @@
   "type": "module",
   "scripts": {
     "dev": "tsx server.ts",
-    "build": "vite build",
+    "build": "vite build && tsx scripts/prerenderSeo.ts",
     "start": "node server.ts",
     "preview": "vite preview",
     "clean": "rm -rf dist server.js",
     "lint": "tsc --noEmit"
   },
   "dependencies": {
+    "@neslinesli93/qpdf-wasm": "^0.3.1",
+    "@pdfsmaller/pdf-encrypt-lite": "^1.2.0",
     "@tailwindcss/vite": "^4.3.3",
     "@vitejs/plugin-react": "^6.1.1",
     "d3": "^7.9.0",
+    "docx": "^9.15.3",
     "dotenv": "^17.2.3",
     "express": "^4.21.2",
     "html-to-image": "^1.11.13",
@@ -23,12 +26,17 @@
     "jspdf": "^4.2.1",
     "jszip": "^3.10.2",
     "lucide-react": "^0.546.0",
+    "mammoth": "^1.13.0",
     "marked": "^18.1.1",
+    "pdf-lib": "^1.17.1",
+    "pdfjs-dist": "^6.5.438",
     "qrcode": "^1.5.4",
     "react": "^19.0.1",
     "react-dom": "^19.0.1",
     "recharts": "^3.10.1",
-    "vite": "^8.3.0"
+    "tesseract.js": "^7.0.0",
+    "vite": "^8.3.0",
+    "xlsx": "^0.18.5"
   },
   "devDependencies": {
     "@types/d3": "^7.4.3",

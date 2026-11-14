@@ -1,0 +1,113 @@
+/**
+ * @license
+ * SPDX-License-Identifier: Apache-2.0
+ */
+
+import React from 'react';
+import {
+  ArrowUpDown,
+  Combine,
+  CopyPlus,
+  Droplets,
+  Eye,
+  FileCheck2,
+  FileCode2,
+  FileImage,
+  FileOutput,
+  FilePlus2,
+  FileSearch,
+  FileText,
+  FileType2,
+  Files,
+  GalleryVerticalEnd,
+  Hash,
+  Image,
+  ImageDown,
+  ImageMinus,
+  ImagePlus,
+  Images,
+  Info,
+  Layers,
+  ListOrdered,
+  Lock,
+  Minimize2,
+  Move,
+  PanelTop,
+  PenTool,
+  Presentation,
+  Printer,
+  RotateCw,
+  ScanText,
+  Scissors,
+  Search,
+  Sheet,
+  ShieldAlert,
+  Shrink,
+  SlidersHorizontal,
+  Sparkles,
+  Stamp,
+  Table2,
+  Trash2,
+  Type,
+  Unlock,
+  Wrench,
+} from 'lucide-react';
+
+const PDF_ICON_MAP: Record<string, React.ElementType> = {
+  ArrowUpDown,
+  Combine,
+  CopyPlus,
+  Droplets,
+  Eye,
+  FileCheck2,
+  FileCode2,
+  FileImage,
+  FileOutput,
+  FilePlus2,
+  FileSearch,
+  FileText,
+  FileType2,
+  Files,
+  GalleryVerticalEnd,
+  Hash,
+  Image,
+  ImageDown,
+  ImageMinus,
+  ImagePlus,
+  Images,
+  Info,
+  Layers,
+  ListOrdered,
+  Lock,
+  Minimize2,
+  Move,
+  PanelTop,
+  PenTool,
+  Presentation,
+  Printer,
+  RotateCw,
+  ScanText,
+  Scissors,
+  Search,
+  Sheet,
+  ShieldAlert,
+  Shrink,
+  SlidersHorizontal,
+  Sparkles,
+  Stamp,
+  Table2,
+  Trash2,
+  Type,
+  Unlock,
+  Wrench,
+};
+
+interface PdfIconProps {
+  name?: string;
+  className?: string;
+}
+
+export const PdfIcon: React.FC<PdfIconProps> = ({ name, className = 'w-5 h-5' }) => {
+  const Icon = (name && PDF_ICON_MAP[name]) || FileText;
+  return <Icon className={className} aria-hidden="true" />;
+};

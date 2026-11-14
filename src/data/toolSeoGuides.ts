@@ -477,4 +477,22 @@ export const TOOL_SEO_GUIDES: Record<string, ToolSeoGuide> = {
     limitationsAndAssumptions:
       'Base64 is a binary-to-text encoding scheme, NOT encryption — anyone can decode a Base64 string, so never use it alone to protect secrets. Large binary files are processed in local browser memory.',
   },
+  'pdf-tools-suite': {
+    whatItDoes:
+      'Provides 43 privacy-first, client-side PDF tools across 7 categories directly in your browser: PDF conversions (Word .docx, Excel .xlsx, JPG, PNG, TXT), document-to-PDF creation (JPG, PNG, WebP, .docx, .xlsx/.csv, .pptx, TXT), page organization (merge, split, extract, delete, rotate, reorder, duplicate, separate packets), lossless and quality-tuned compression, interactive canvas editing (text, images, page numbers, watermarks, headers/footers), real 256-bit AES password protection & authorized decryption, and advanced utilities (OCR for scanned PDFs, full-text search, viewer, metadata editor, batch page counter, print, and repair).',
+    whoCanUseIt:
+      'Office professionals, students, HR & finance teams, UAE residents preparing official documents, developers, and anyone handling sensitive PDFs who requires strict zero-upload browser privacy.',
+    howToUse: [
+      'Choose any of the 43 PDF tools from the category grid or use the quick search bar inside the suite.',
+      'Drop or select your PDF, image, Word, Excel, PowerPoint, or text file(s) — files are validated locally via extension and header signatures.',
+      'Configure tool options such as page ranges, compression quality, interactive canvas overlays, OCR language, or authorized passwords.',
+      'Run the tool locally and preview the result inline or download single files or a combined ZIP archive.',
+    ],
+    requiredInputs:
+      'Valid PDF documents (%PDF- signature), raster images (JPG, PNG, WebP), OpenXML documents (.docx, .xlsx, .pptx), CSV, or UTF-8 text files up to 100 MB per file (250 MB batch limit).',
+    expectedResults:
+      'Authentic downloadable .pdf, .docx, .xlsx, .png, .jpg, .txt, .csv, or .zip files, plus live compression size savings, OCR confidence metrics, and encryption verification.',
+    limitationsAndAssumptions:
+      'All processing runs locally inside browser WebAssembly and Canvas without server uploads. Scanned image-only PDFs require OCR before exporting editable text. Authorized PDF decryption strictly requires the valid password and never cracks unknown passwords. Complex PowerPoint SmartArt, Excel VBA macros, or legacy binary .doc/.ppt formats are simplified or excluded.',
+  },
 };

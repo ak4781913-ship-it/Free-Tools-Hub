@@ -264,6 +264,8 @@ function getDefaultToolName(toolId: string): string {
       return 'AI Video Production Script';
     case 'gemini-photo-prompt':
       return 'Photo Prompt Studio';
+    case 'pdf-tools-suite':
+      return 'Complete PDF Tools Suite';
     default:
       return 'Online Utility';
   }

@@ -63,6 +63,7 @@ const DEVELOPMENT_TOOL_IDS = new Set([
 ]);
 
 const PRODUCTIVITY_TOOL_IDS = new Set([
+  'pdf-tools-suite',
   'resume-builder',
   'unit-converter',
   'timezone-converter',

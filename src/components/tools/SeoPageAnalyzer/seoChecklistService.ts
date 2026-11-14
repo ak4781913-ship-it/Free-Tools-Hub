@@ -145,15 +145,23 @@ export function computeSeoChecklist(result: SeoAnalysisResult): SeoChecklistSumm
       category: 'content',
       categoryLabel: 'Content Structure',
       categoryLabelUrdu: 'مواد کی ساخت',
-      severity: 'critical',
+      severity: result.isClientRenderedSpa ? 'warning' : 'critical',
       isMissing: true,
-      isCritical: true,
+      isCritical: !result.isClientRenderedSpa,
       currentValue: null,
-      statusMessage: 'No <h1> heading tag found in page HTML',
-      statusMessageUrdu: 'صفحے کے کوڈ میں کوئی <h1> ٹیگ نہیں ملا',
-      seoImpact: 'Search engine crawlers rely heavily on the primary H1 to establish the core topical relevance of the document.',
+      statusMessage: result.isClientRenderedSpa
+        ? 'No <h1> in initial HTML shell (Client-Side SPA)'
+        : 'No <h1> heading tag found in page HTML',
+      statusMessageUrdu: result.isClientRenderedSpa
+        ? 'ابتدائی ایچ ٹی ایم ایل میں H1 نہیں ملا (کلائنٹ ایس پی اے)'
+        : 'صفحے کے کوڈ میں کوئی <h1> ٹیگ نہیں ملا',
+      seoImpact: result.isClientRenderedSpa
+        ? 'Non-JavaScript crawlers and basic scrapers will not see an H1 heading because it is rendered client-side by JavaScript.'
+        : 'Search engine crawlers rely heavily on the primary H1 to establish the core topical relevance of the document.',
       seoImpactUrdu: 'گوگل کرالر صفحے کے بنیادی موضوع کو سمجھنے کے لیے H1 پر بہت زیادہ انحصار کرتے ہیں۔',
-      recommendation: 'Add exactly one semantic <h1> element prominently near the top of the main body content.',
+      recommendation: result.isClientRenderedSpa
+        ? 'Implement Static Prerendering (SSG) or Server-Side Rendering (SSR) so the primary <h1> is present in initial HTML for all crawlers.'
+        : 'Add exactly one semantic <h1> element prominently near the top of the main body content.',
       recommendationUrdu: 'صفحے کے شروع میں ایک واضح اور معنی خیز <h1> ٹیگ لازماً شامل کریں۔',
       fixSnippet: `<h1>${result.meta.title.content?.split(/[-|–]/)[0]?.trim() || 'Your Primary Page Title Here'}</h1>`,
     });

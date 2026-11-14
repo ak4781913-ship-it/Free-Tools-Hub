@@ -2,3 +2,4 @@ User-agent: *
 Allow: /
 Disallow: /api/
 
+Sitemap: https://freetoolshub1.netlify.app/sitemap.xml

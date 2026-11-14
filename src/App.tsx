@@ -135,6 +135,9 @@ const Base64ConverterTool = lazy(() =>
 const ColorPickerTool = lazy(() =>
   import('./components/tools/ColorPicker/ColorPickerTool').then((m) => ({ default: m.ColorPickerTool }))
 );
+const PdfToolsSuiteTool = lazy(() =>
+  import('./components/tools/PdfToolsSuite/PdfToolsSuiteTool').then((m) => ({ default: m.PdfToolsSuiteTool }))
+);
 
 const TRUST_PATHS = new Set(['/about', '/contact', '/privacy', '/terms', '/disclaimer']);
 
@@ -849,6 +852,7 @@ const MainApp: React.FC = () => {
               {activeToolDef.id === 'json-formatter' && <JsonFormatterTool />}
               {activeToolDef.id === 'base64-converter' && <Base64ConverterTool />}
               {activeToolDef.id === 'color-picker' && <ColorPickerTool />}
+              {activeToolDef.id === 'pdf-tools-suite' && <PdfToolsSuiteTool />}
             </Suspense>
           </ToolPageLayout>
         )}
@@ -866,7 +870,7 @@ const MainApp: React.FC = () => {
               <p className="text-xs sm:text-sm text-slate-600 dark:text-slate-400 max-w-md mx-auto leading-relaxed">
                 {language === 'ur'
                   ? 'مطلوبہ یو آر ایل کے لیے کوئی صفحہ یا ٹول نہیں ملا۔ براہ کرم تمام ٹولز ڈائرکٹری دیکھیں۔'
-                  : 'The page or utility you requested may have moved or does not exist at this URL. Use the directory below to open any of our 27 free tools.'}
+                  : `The page or utility you requested may have moved or does not exist at this URL. Use the directory below to open any of our ${TOOLS_LIST.length} free tools.`}
               </p>
             </div>
             <div className="flex items-center justify-center gap-3 pt-2 flex-wrap">

@@ -2,183 +2,190 @@
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   <!-- Core Static Pages -->
   <url>
-    <loc>https://freetoolshub.com/</loc>
+    <loc>https://freetoolshub1.netlify.app/</loc>
     <changefreq>daily</changefreq>
     <priority>1.0</priority>
   </url>
   <url>
-    <loc>https://freetoolshub.com/tools</loc>
+    <loc>https://freetoolshub1.netlify.app/tools</loc>
     <changefreq>daily</changefreq>
     <priority>0.9</priority>
   </url>
   <url>
-    <loc>https://freetoolshub.com/about</loc>
+    <loc>https://freetoolshub1.netlify.app/about</loc>
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
-    <loc>https://freetoolshub.com/contact</loc>
+    <loc>https://freetoolshub1.netlify.app/contact</loc>
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
-    <loc>https://freetoolshub.com/privacy</loc>
+    <loc>https://freetoolshub1.netlify.app/privacy</loc>
     <changefreq>yearly</changefreq>
     <priority>0.5</priority>
   </url>
   <url>
-    <loc>https://freetoolshub.com/terms</loc>
+    <loc>https://freetoolshub1.netlify.app/terms</loc>
     <changefreq>yearly</changefreq>
     <priority>0.5</priority>
   </url>
   <url>
-    <loc>https://freetoolshub.com/disclaimer</loc>
+    <loc>https://freetoolshub1.netlify.app/disclaimer</loc>
     <changefreq>yearly</changefreq>
     <priority>0.5</priority>
   </url>
 
   <!-- Career & Financial Tools -->
   <url>
-    <loc>https://freetoolshub.com/tools/cv-maker</loc>
+    <loc>https://freetoolshub1.netlify.app/tools/cv-maker</loc>
     <changefreq>weekly</changefreq>
     <priority>0.9</priority>
   </url>
   <url>
-    <loc>https://freetoolshub.com/tools/uae-gratuity-calculator</loc>
+    <loc>https://freetoolshub1.netlify.app/tools/uae-gratuity-calculator</loc>
     <changefreq>weekly</changefreq>
     <priority>0.9</priority>
   </url>
   <url>
-    <loc>https://freetoolshub.com/tools/uae-salary-calculator</loc>
+    <loc>https://freetoolshub1.netlify.app/tools/uae-salary-calculator</loc>
     <changefreq>weekly</changefreq>
     <priority>0.9</priority>
   </url>
   <url>
-    <loc>https://freetoolshub.com/tools/loan-calculator</loc>
+    <loc>https://freetoolshub1.netlify.app/tools/loan-calculator</loc>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://freetoolshub.com/tools/currency-converter</loc>
+    <loc>https://freetoolshub1.netlify.app/tools/currency-converter</loc>
     <changefreq>hourly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://freetoolshub.com/tools/crypto-converter</loc>
+    <loc>https://freetoolshub1.netlify.app/tools/crypto-converter</loc>
     <changefreq>hourly</changefreq>
     <priority>0.8</priority>
   </url>
 
   <!-- AI & Content Creation -->
   <url>
-    <loc>https://freetoolshub.com/tools/ai-photo-prompt-generator</loc>
+    <loc>https://freetoolshub1.netlify.app/tools/ai-photo-prompt-generator</loc>
     <changefreq>weekly</changefreq>
     <priority>0.9</priority>
   </url>
   <url>
-    <loc>https://freetoolshub.com/tools/ai-video-prompt-generator</loc>
+    <loc>https://freetoolshub1.netlify.app/tools/ai-video-prompt-generator</loc>
     <changefreq>weekly</changefreq>
     <priority>0.9</priority>
   </url>
   <url>
-    <loc>https://freetoolshub.com/tools/markdown-editor</loc>
+    <loc>https://freetoolshub1.netlify.app/tools/markdown-editor</loc>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://freetoolshub.com/tools/seo-page-analyzer</loc>
+    <loc>https://freetoolshub1.netlify.app/tools/seo-page-analyzer</loc>
     <changefreq>weekly</changefreq>
     <priority>0.9</priority>
   </url>
   <url>
-    <loc>https://freetoolshub.com/tools/seo-meta-generator</loc>
+    <loc>https://freetoolshub1.netlify.app/tools/seo-meta-generator</loc>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://freetoolshub.com/tools/word-counter</loc>
+    <loc>https://freetoolshub1.netlify.app/tools/word-counter</loc>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://freetoolshub.com/tools/text-case-converter</loc>
+    <loc>https://freetoolshub1.netlify.app/tools/text-case-converter</loc>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
 
   <!-- Graphics & Media Tools -->
   <url>
-    <loc>https://freetoolshub.com/tools/image-compressor</loc>
+    <loc>https://freetoolshub1.netlify.app/tools/image-compressor</loc>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://freetoolshub.com/tools/qr-code-generator</loc>
+    <loc>https://freetoolshub1.netlify.app/tools/qr-code-generator</loc>
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://freetoolshub.com/tools/color-picker</loc>
+    <loc>https://freetoolshub1.netlify.app/tools/color-picker</loc>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
 
   <!-- Everyday & Math Calculators -->
   <url>
-    <loc>https://freetoolshub.com/tools/percentage-calculator</loc>
+    <loc>https://freetoolshub1.netlify.app/tools/percentage-calculator</loc>
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
-    <loc>https://freetoolshub.com/tools/discount-calculator</loc>
+    <loc>https://freetoolshub1.netlify.app/tools/discount-calculator</loc>
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
-    <loc>https://freetoolshub.com/tools/unit-converter</loc>
+    <loc>https://freetoolshub1.netlify.app/tools/unit-converter</loc>
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
-    <loc>https://freetoolshub.com/tools/age-calculator</loc>
+    <loc>https://freetoolshub1.netlify.app/tools/age-calculator</loc>
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
-    <loc>https://freetoolshub.com/tools/date-difference</loc>
+    <loc>https://freetoolshub1.netlify.app/tools/date-difference</loc>
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
-    <loc>https://freetoolshub.com/tools/bmi-calculator</loc>
+    <loc>https://freetoolshub1.netlify.app/tools/bmi-calculator</loc>
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
-    <loc>https://freetoolshub.com/tools/timezone-converter</loc>
+    <loc>https://freetoolshub1.netlify.app/tools/timezone-converter</loc>
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>
   </url>
 
   <!-- Developer & Security Utilities -->
   <url>
-    <loc>https://freetoolshub.com/tools/password-generator</loc>
+    <loc>https://freetoolshub1.netlify.app/tools/password-generator</loc>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://freetoolshub.com/tools/password-strength</loc>
+    <loc>https://freetoolshub1.netlify.app/tools/password-strength</loc>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://freetoolshub.com/tools/json-formatter</loc>
+    <loc>https://freetoolshub1.netlify.app/tools/json-formatter</loc>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://freetoolshub.com/tools/base64-converter</loc>
+    <loc>https://freetoolshub1.netlify.app/tools/base64-converter</loc>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
+  </url>
+
+  <!-- PDF & Document Suite -->
+  <url>
+    <loc>https://freetoolshub1.netlify.app/tools/pdf-tools-suite</loc>
+    <changefreq>weekly</changefreq>
+    <priority>0.9</priority>
   </url>
 </urlset>

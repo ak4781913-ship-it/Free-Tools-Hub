@@ -3,6 +3,7 @@ import { useLanguage } from '../../context/LanguageContext';
 import { useToast } from '../../context/ToastContext';
 import { ShieldCheck, MessageSquare, Keyboard, Printer, RefreshCw } from 'lucide-react';
 import { getPrintHistory, subscribeToPrintHistory } from '../../utils/printHistoryTracking';
+import { TOOLS_LIST } from '../../data/tools';
 
 interface FooterProps {
   onNavigate: (viewId: string) => void;
@@ -128,11 +129,20 @@ export const Footer: React.FC<FooterProps> = ({
               </li>
               <li>
                 <a
+                  href="/tools/pdf-tools-suite"
+                  onClick={(e) => handleLinkClick('/tools/pdf-tools-suite', e)}
+                  className="hover:text-blue-700 dark:hover:text-blue-400 transition-colors"
+                >
+                  PDF Tools Suite (43 Tools)
+                </a>
+              </li>
+              <li>
+                <a
                   href="/tools"
                   onClick={(e) => handleLinkClick('/tools', e)}
                   className="font-semibold text-blue-700 dark:text-blue-400 hover:underline"
                 >
-                  Browse All 27 Tools →
+                  Browse All {TOOLS_LIST.length} Tools →
                 </a>
               </li>
             </ul>

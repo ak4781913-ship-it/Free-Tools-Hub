@@ -223,6 +223,12 @@ export interface SeoAnalysisResult {
   // Keyword Density Analysis & Occurrences
   keywords: KeywordAnalysisData;
 
+  // Audit Scope & Rendering Detection
+  auditScope: string;
+  isClientRenderedSpa: boolean;
+  isRedirectResponse: boolean;
+  renderingLimitationNote?: string;
+
   // Generated Clean Head Fix Code
   generatedFixHeadCode: string;
 }

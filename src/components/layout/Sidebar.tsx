@@ -115,8 +115,8 @@ export const Sidebar: React.FC<SidebarProps> = ({
       label: 'PDF & Documents',
       labelUrdu: 'پی ڈی ایف اور دستاویزات',
       icon: FileText,
-      path: '/tools/cv-maker',
-      toolIds: ['resume-builder', 'markdown-editor'],
+      path: '/tools/pdf-tools-suite',
+      toolIds: ['pdf-tools-suite', 'resume-builder', 'markdown-editor'],
     },
     {
       id: 'calculators',

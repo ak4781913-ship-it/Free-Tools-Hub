@@ -720,6 +720,22 @@ export const SeoPageAnalyzerTool: React.FC = () => {
             </div>
           </div>
 
+          {/* Audit Scope & Architecture Clarification Banner */}
+          <div className="p-3.5 rounded-xl bg-slate-100 dark:bg-slate-900 border border-slate-200 dark:border-slate-800 flex items-start sm:items-center justify-between gap-3 text-xs text-slate-600 dark:text-slate-400">
+            <div className="flex items-center gap-2 flex-wrap">
+              <span className="px-2 py-0.5 rounded font-mono font-bold text-[10px] uppercase bg-slate-200 dark:bg-slate-800 text-slate-700 dark:text-slate-300 shrink-0">
+                Audit Scope: HTML Source Only
+              </span>
+              <span>
+                {result.isClientRenderedSpa
+                  ? 'Client-Side SPA detected (<div id="root">). Dynamic DOM elements rendered via client-side JavaScript are not simulated. Static Prerendering (SSG) is recommended for basic crawlers.'
+                  : result.isRedirectResponse
+                  ? 'Notice: Evaluated an intermediate HTTP 301/302 redirect. Audit the final HTTPS URL directly to inspect the destination page.'
+                  : 'Audited initial server-delivered HTML document (JavaScript execution disabled).'}
+              </span>
+            </div>
+          </div>
+
           {/* Missing Critical SEO Elements Notice Banner */}
           {checklistSummary && checklistSummary.criticalMissingCount > 0 && (
             <div className="p-4 rounded-2xl bg-rose-50 dark:bg-rose-950/30 border border-rose-300 dark:border-rose-900/60 flex flex-col sm:flex-row sm:items-center justify-between gap-3 text-xs shadow-xs animate-in fade-in duration-200">

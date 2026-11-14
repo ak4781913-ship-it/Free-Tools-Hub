@@ -36,6 +36,7 @@ const EXPLICIT_ACTION_TOOLS = new Set<string>([
   'seo-page-analyzer',
   'image-compressor',
   'text-case-converter',
+  'pdf-tools-suite',
 ]);
 
 /**

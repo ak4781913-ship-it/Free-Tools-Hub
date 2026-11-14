@@ -36,6 +36,42 @@ export function parseAndAnalyzeSeo({
   const resolvedFinalUrl = finalUrl || normalizedUrl;
   const isHttps = normalizedUrl.startsWith('https://');
 
+  // Detect unredirected HTTP 301/302 plaintext response
+  const trimmedHtml = html.trim();
+  const isRedirectResponse =
+    trimmedHtml.startsWith('Redirecting to') ||
+    (trimmedHtml.length < 300 && /Redirecting to https?:\/\//i.test(trimmedHtml)) ||
+    Boolean(doc.title && /301 Moved|302 Found/i.test(doc.title));
+
+  if (isRedirectResponse) {
+    issues.push({
+      id: 'http-redirect-evaluated',
+      category: 'security',
+      severity: 'critical',
+      title: 'Intermediate HTTP Redirect Response Evaluated',
+      description: 'The audit analyzed an HTTP 301/302 redirect response ("Redirecting to...") rather than the destination page.',
+      impact: 'Missing metadata, headings, and internal links in this report are caused by evaluating a redirect message. Audits on redirect stubs do not reflect destination page SEO.',
+      recommendation: 'Audit the final destination URL directly with HTTPS to inspect the real page.',
+    });
+  }
+
+  // Detect Client-Side Rendered (CSR / SPA) application shells
+  const hasSpaRoot = Boolean(doc.querySelector('#root, #app, #__next, [data-reactroot]'));
+  const hasModuleScripts = doc.querySelectorAll('script[type="module"], script[src*="assets/"], script[src*="static/js/"]').length > 0;
+  const isClientRenderedSpa = hasSpaRoot && hasModuleScripts;
+
+  if (isClientRenderedSpa) {
+    issues.push({
+      id: 'spa-client-rendered',
+      category: 'performance',
+      severity: 'info',
+      title: 'Client-Side Single Page Application (SPA) Detected',
+      description: 'The page contains a client application root (<div id="root">). Headings, links, and content are rendered dynamically in the browser via JavaScript.',
+      impact: 'Basic crawlers and social scrapers without JavaScript only see the initial HTML shell. Modern Googlebot renders JavaScript, but static prerendering improves crawl speed and guarantees rich social preview cards.',
+      recommendation: 'Use Static Prerendering (SSG) or Server-Side Rendering (SSR) for key landing and tool pages so crawlers receive complete HTML immediately.',
+    });
+  }
+
   // ==========================================
   // 1. META TAGS AUDIT
   // ==========================================
@@ -1155,6 +1191,11 @@ export function parseAndAnalyzeSeo({
     issues,
     internalLinksReport,
     keywords: keywordAnalysis,
+    auditScope: 'Raw HTML Source Audit (JavaScript Execution Not Simulated)',
+    isClientRenderedSpa,
+    isRedirectResponse,
+    renderingLimitationNote:
+      'This audit reflects the initial server-delivered HTML document. Dynamic elements rendered by client-side JavaScript (e.g. React/Vue hydration) require Static Prerendering (SSG) for discovery by basic search crawlers.',
     generatedFixHeadCode,
   };
 }

@@ -6,6 +6,7 @@ import {
   Image as ImageIcon,
   Video,
   Code,
+  FileText,
   ArrowRight,
 } from 'lucide-react';
 import { TOOLS_LIST } from '../../data/tools';
@@ -92,6 +93,17 @@ export const CategoryCardsSection: React.FC<CategoryCardsSectionProps> = ({
       count: Object.values(TOOL_ROUTES).filter((r) => r.categoryGroup === 'video-content').length,
       gradient: 'from-purple-500/10 to-indigo-500/10 dark:from-purple-950/40 dark:to-indigo-950/40',
       iconColor: 'text-purple-600 dark:text-purple-400 bg-purple-50 dark:bg-purple-950/60',
+    },
+    {
+      id: 'pdf-tools',
+      name: 'PDF Tools Suite',
+      nameUrdu: 'پی ڈی ایف ٹولز سوٹ',
+      description: 'Convert, merge, split, compress, edit, encrypt, OCR, and repair PDFs locally.',
+      descriptionUrdu: '43 براؤزر بیسڈ پی ڈی ایف ٹولز: کنورٹ، مرج، اسپلٹ، کمپریس، ایڈٹ، پاس ورڈ اور او سی آر۔',
+      icon: FileText,
+      count: Object.values(TOOL_ROUTES).filter((r) => r.categoryGroup === 'pdf-tools').length,
+      gradient: 'from-blue-600/10 to-slate-500/10 dark:from-blue-950/40 dark:to-slate-950/40',
+      iconColor: 'text-blue-700 dark:text-blue-300 bg-blue-50 dark:bg-blue-950/60',
     },
     {
       id: 'other-utilities',

@@ -9,8 +9,8 @@ export const StatsCards: React.FC = () => {
   const isUrdu = language === 'ur';
 
   // Accurate project statistics directly calculated from actual existing data:
-  const totalTools = TOOLS_LIST.length; // 27 real tools
-  const totalCategories = CATEGORY_GROUPS.length; // 6 core groups (or 9 distinct workflow families)
+  const totalTools = TOOLS_LIST.length;
+  const totalCategories = CATEGORY_GROUPS.length;
   const freeToolsCount = totalTools; // 100% free browser tools
 
   // Recently added tools: Tools marked featured or newer additions (e.g. AI Prompt generators, SEO Page Analyzer, Markdown Editor)

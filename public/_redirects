@@ -40,6 +40,10 @@
 /tools/json-beautifier         /tools/json-formatter               301
 /tools/base64-encoder          /tools/base64-converter             301
 /tools/base64-decoder          /tools/base64-converter             301
+/tools/pdf-tools               /tools/pdf-tools-suite              301
+/tools/pdf-suite               /tools/pdf-tools-suite              301
+/tools/pdf-editor              /tools/pdf-tools-suite              301
+/tools/pdf-converter           /tools/pdf-tools-suite              301
 
 # SPA fallback: Send all other requests to index.html with 200 OK
 /* /index.html 200

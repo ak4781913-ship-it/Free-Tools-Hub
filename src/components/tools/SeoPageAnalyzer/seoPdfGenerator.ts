@@ -76,8 +76,11 @@ export function generateSeoReportPDF(result: SeoAnalysisResult): jsPDF {
   // Header Subtitle
   doc.setTextColor(199, 210, 254); // Indigo 200
   doc.setFont('helvetica', 'normal');
-  doc.setFontSize(8);
-  doc.text('Comprehensive Technical SEO, Meta Tags, Heading Hierarchy & Performance Benchmarks', marginX + 6, currentY + 16);
+  doc.setFontSize(7.5);
+  const auditScopeText = result.isClientRenderedSpa
+    ? 'Raw HTML Source Audit (JS Disabled) • Architecture: Client-Side SPA'
+    : 'Raw HTML Source Audit (JS Execution Disabled) • On-Page Technical Benchmarks';
+  doc.text(auditScopeText, marginX + 6, currentY + 16);
 
   // Right-aligned Metadata
   doc.setTextColor(203, 213, 225); // Slate 300

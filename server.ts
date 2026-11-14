@@ -49,6 +49,7 @@ const CANONICAL_TOOL_SLUGS: Record<string, string[]> = {
   'timezone-converter': ['time-zone-converter', 'world-clock'],
   'json-formatter': ['json-validator', 'json-beautifier'],
   'base64-converter': ['base64-encoder', 'base64-decoder'],
+  'pdf-tools-suite': ['pdf-tools', 'pdf-suite', 'pdf-editor', 'pdf-converter'],
 };
 
 const CANONICAL_STATIC_PATHS = new Set([
@@ -105,14 +106,14 @@ function classifyAppRoute(pathname: string): {
 
 const ROUTE_SEO_MAP: Record<string, { title: string; description: string }> = {
   '/': {
-    title: 'FreeTools Hub – Free CV Generator, UAE Gratuity, AI Prompts & Utilities',
+    title: 'FreeTools Hub – Free Online Tools & UAE Calculators',
     description:
-      'Free online CV & resume generator, UAE monthly salary & gratuity calculators, AI image & video prompt builders, technical SEO analyzer, image compressor, QR maker, and browser utilities.',
+      'FreeTools Hub offers 28 free privacy-first online tools, including a PDF Tools Suite, ATS CV maker, UAE gratuity & salary calculators, AI prompt generators, and SEO utilities.',
   },
   '/tools': {
-    title: 'All 27 Free Online Tools & Calculators | FreeTools Hub',
+    title: 'All 28 Free Online Tools & Calculators | FreeTools Hub',
     description:
-      'Browse the complete FreeTools Hub directory: ATS CV builder, UAE monthly salary & gratuity calculators, AI image & video prompt generators, SEO analyzer, and developer utilities.',
+      'Browse the complete FreeTools Hub directory: PDF Tools Suite (43 tools), ATS CV builder, UAE monthly salary & gratuity calculators, AI prompt generators, SEO analyzer, and developer utilities.',
   },
   '/about': {
     title: 'About FreeTools Hub – Architecture, Mission & Privacy | AbbasPro',
@@ -273,6 +274,11 @@ const ROUTE_SEO_MAP: Record<string, { title: string; description: string }> = {
     title: 'Base64 Encoder & Decoder – Text and Image Converter | FreeTools Hub',
     description:
       'Convert plain text and images to Base64 strings with UTF-8 compliance, URL-safe toggle, syntax checking, and instant file downloads.',
+  },
+  '/tools/pdf-tools-suite': {
+    title: 'PDF Tools Suite – 43 Free Client-Side PDF Converters, Organizers, Editor & Security | FreeTools Hub',
+    description:
+      'Complete browser-based PDF Tools Suite with 43 utilities: convert PDF to Word/Excel/JPG/PNG/TXT, merge, split, compress, edit, OCR, watermark, encrypt, and unlock PDFs locally.',
   },
 };
 
@@ -917,6 +923,18 @@ async function startServer() {
         return;
       }
       const routeInfo = classifyAppRoute(req.originalUrl);
+      if (routeInfo.status === 301 && routeInfo.redirectTo) {
+        res.redirect(301, routeInfo.redirectTo);
+        return;
+      }
+
+      const cleanPath = normalizePathname(req.originalUrl);
+      const prerenderedSubPath = path.join(distDir, cleanPath.replace(/^\//, ''), 'index.html');
+      if (cleanPath !== '/' && fs.existsSync(prerenderedSubPath)) {
+        res.status(200).set({ 'Content-Type': 'text/html; charset=utf-8' }).sendFile(prerenderedSubPath);
+        return;
+      }
+
       const rawHtml = fs.readFileSync(indexHtmlPath, 'utf-8');
       const seoHtml = injectRouteSeoIntoHtml(rawHtml, req.originalUrl, routeInfo.status);
       res

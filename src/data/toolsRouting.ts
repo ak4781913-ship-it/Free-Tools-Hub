@@ -3,6 +3,7 @@ import { ToolDefinition } from '../types';
 
 export type ToolCategoryGroup =
   | 'ai-tools'
+  | 'pdf-tools'
   | 'photo-image'
   | 'video-content'
   | 'career-cv'
@@ -69,6 +70,14 @@ export const CATEGORY_GROUPS: {
     description: 'Scene-by-scene directorial video scripts, live markdown writer, and text analyzers.',
     descriptionUrdu: 'ویڈیو پرامپٹس، مارک ڈاؤن ایڈیٹر، الفاظ کاؤنٹر اور ایس ای او تجزیہ۔',
     iconName: 'Video',
+  },
+  {
+    id: 'pdf-tools',
+    name: 'PDF Tools Suite',
+    nameUrdu: 'پی ڈی ایف ٹولز سوٹ',
+    description: '43 client-side PDF tools: convert, merge, split, compress, edit, encrypt, OCR, and repair.',
+    descriptionUrdu: '43 براؤزر بیسڈ پی ڈی ایف ٹولز: کنورٹ، مرج، اسپلٹ، کمپریس، ایڈٹ، پاس ورڈ اور او سی آر۔',
+    iconName: 'FileText',
   },
   {
     id: 'other-utilities',
@@ -469,6 +478,22 @@ export const TOOL_ROUTES: Record<string, ToolRouteConfig> = {
     seoDescription: 'Convert plain text and images to Base64 strings with UTF-8 compliance, URL-safe toggle, syntax checking, and instant file downloads.',
     tips: [
       { title: 'Data URI', desc: 'Generate ready-to-paste CSS background-image and HTML img src data URIs for web assets.' },
+    ],
+  },
+  'pdf-tools-suite': {
+    id: 'pdf-tools-suite',
+    primarySlug: 'pdf-tools-suite',
+    primaryPath: '/tools/pdf-tools-suite',
+    aliases: ['pdf-tools-suite', 'pdf-tools', 'pdf-suite', 'pdf-editor', 'pdf-converter'],
+    categoryGroup: 'pdf-tools',
+    categoryGroupLabel: 'PDF Tools Suite',
+    categoryGroupLabelUrdu: 'پی ڈی ایف ٹولز سوٹ',
+    seoTitle: 'PDF Tools Suite – 43 Free Privacy-First Browser PDF Tools | FreeTools Hub',
+    seoDescription: 'Convert PDF to Word/Excel/Images, merge, split, compress, edit, password-protect, unlock, OCR, search, and repair PDFs 100% locally inside your browser.',
+    tips: [
+      { title: '100% Local Privacy', desc: 'All PDF conversions, compression, encryption, and OCR run inside your browser without uploading files to external servers.' },
+      { title: 'Interactive Editor', desc: 'Drag and resize text boxes, stamps, watermarks, headers, and page numbers visually before exporting.' },
+      { title: 'Real Encryption & Unlock', desc: 'Protect PDFs with 256-bit AES encryption or unlock authorized files cleanly using your valid password.' },
     ],
   },
 };

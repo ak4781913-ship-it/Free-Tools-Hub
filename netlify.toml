@@ -241,6 +241,30 @@
   status = 301
   force = true
 
+[[redirects]]
+  from = "/tools/pdf-tools"
+  to = "/tools/pdf-tools-suite"
+  status = 301
+  force = true
+
+[[redirects]]
+  from = "/tools/pdf-suite"
+  to = "/tools/pdf-tools-suite"
+  status = 301
+  force = true
+
+[[redirects]]
+  from = "/tools/pdf-editor"
+  to = "/tools/pdf-tools-suite"
+  status = 301
+  force = true
+
+[[redirects]]
+  from = "/tools/pdf-converter"
+  to = "/tools/pdf-tools-suite"
+  status = 301
+  force = true
+
 # Route API endpoints to Netlify Functions
 [[redirects]]
   from = "/api/analyze-seo"
