@@ -142,7 +142,7 @@ export const PdfViewerSearchPrintWorkspace: React.FC<PdfViewerSearchPrintWorkspa
           img { max-width: 100%; max-height: 100%; object-fit: contain; }
         </style>
       </head><body>
-        ${pageImages.map((src) => `<div class="page"><img src="${src}" /></div>`).join('')}
+        ${pageImages.map((src, idx) => `<div class="page"><img src="${src}" alt="PDF Page ${idx + 1}" /></div>`).join('')}
       </body></html>`);
       doc.close();
 

@@ -10,6 +10,7 @@ import { FavoritesProvider, useFavorites } from './context/FavoritesContext';
 import { ToastProvider } from './context/ToastContext';
 import { TOOLS_LIST } from './data/tools';
 import { findToolBySlugOrId, getToolPrimaryPath } from './data/toolsRouting';
+import { getRouteSeoForPath } from './data/seoRegistry';
 import { applyRouteSeo, getSiteBaseUrl } from './utils/seoManager';
 
 // Layout components
@@ -208,6 +209,14 @@ const MainApp: React.FC = () => {
       return undefined;
     }
   });
+  const [directoryQuery, setDirectoryQuery] = useState<string | undefined>(() => {
+    try {
+      const q = new URLSearchParams(window.location.search).get('q');
+      return q || undefined;
+    } catch {
+      return undefined;
+    }
+  });
   const [searchQuery, setSearchQuery] = useState('');
   const [legalModalType, setLegalModalType] = useState<'privacy' | 'terms' | 'disclaimer' | 'contact' | null>(null);
   const [isSearchOpen, setIsSearchOpen] = useState(false);
@@ -263,10 +272,14 @@ const MainApp: React.FC = () => {
       const path = parseCurrentPath();
       setCurrentPath(path);
       try {
-        const cat = new URLSearchParams(window.location.search).get('category');
+        const params = new URLSearchParams(window.location.search);
+        const cat = params.get('category');
+        const q = params.get('q');
         setDirectoryCategory(cat || undefined);
+        setDirectoryQuery(q || undefined);
       } catch {
         setDirectoryCategory(undefined);
+        setDirectoryQuery(undefined);
       }
 
       if (path.startsWith('/tools/') && path !== '/tools') {
@@ -331,13 +344,18 @@ const MainApp: React.FC = () => {
     const fullUrl = targetPath === '/tools' && targetQuery ? `${targetPath}${targetQuery}` : targetPath;
     if (targetPath === '/tools') {
       try {
-        const cat = new URLSearchParams(targetQuery).get('category');
+        const params = new URLSearchParams(targetQuery);
+        const cat = params.get('category');
+        const q = params.get('q');
         setDirectoryCategory(cat || undefined);
+        setDirectoryQuery(q || undefined);
       } catch {
         setDirectoryCategory(undefined);
+        setDirectoryQuery(undefined);
       }
     } else {
       setDirectoryCategory(undefined);
+      setDirectoryQuery(undefined);
     }
 
     try {
@@ -508,181 +526,22 @@ const MainApp: React.FC = () => {
   // Centralized Technical SEO (Title, Meta Description, Canonical, Robots, OpenGraph, Twitter, JSON-LD)
   useEffect(() => {
     const siteBaseUrl = getSiteBaseUrl();
+    const seoTargetPath = isNotFound
+      ? '/404'
+      : isToolPage && activeRouteConfig
+      ? activeRouteConfig.primaryPath
+      : currentPath;
+    const resolvedSeo = getRouteSeoForPath(seoTargetPath, siteBaseUrl);
 
-    if (currentPath === '/') {
-      applyRouteSeo({
-        title: 'FreeTools Hub – Free CV Generator, UAE Gratuity, AI Prompts & Utilities',
-        description:
-          'Free online CV & resume generator, UAE monthly salary & gratuity calculators, AI image & video prompt builders, technical SEO analyzer, image compressor, QR maker, and browser utilities.',
-        canonicalPath: '/',
-        robots: 'index, follow',
-        jsonLd: {
-          '@context': 'https://schema.org',
-          '@type': 'WebApplication',
-          name: 'FreeTools Hub',
-          ...(siteBaseUrl ? { url: `${siteBaseUrl}/` } : {}),
-          applicationCategory: 'UtilitiesApplication',
-          operatingSystem: 'All',
-          description:
-            'Free CV and Resume Generator, UAE Salary & Gratuity Calculators, AI Image & Video Prompt Generators, and client-side productivity utilities.',
-          offers: {
-            '@type': 'Offer',
-            price: '0',
-            priceCurrency: 'USD',
-          },
-        },
-      });
-      return;
-    }
-
-    if (isDirectoryPage) {
-      applyRouteSeo({
-        title: `All ${TOOLS_LIST.length} Free Online Tools & Calculators | FreeTools Hub`,
-        description:
-          'Browse the complete FreeTools Hub directory: ATS CV builder, UAE monthly salary & gratuity calculators, AI image & video prompt generators, SEO analyzer, and developer utilities.',
-        canonicalPath: '/tools',
-        robots: 'index, follow',
-        jsonLd: {
-          '@context': 'https://schema.org',
-          '@type': 'CollectionPage',
-          name: 'All Free Online Tools & Calculators – FreeTools Hub',
-          ...(siteBaseUrl ? { url: `${siteBaseUrl}/tools` } : {}),
-          description:
-            'Complete directory of free browser-based career, UAE payroll & gratuity, AI prompt, image, and developer utilities.',
-        },
-      });
-      return;
-    }
-
-    if (activeTrustPage === 'about') {
-      applyRouteSeo({
-        title: 'About FreeTools Hub – Architecture, Mission & Privacy | AbbasPro',
-        description:
-          'Learn how AbbasPro / FreeTools Hub builds fast, browser-based career, UAE financial, AI prompt, and developer tools with client-side privacy.',
-        canonicalPath: '/about',
-        robots: 'index, follow',
-        jsonLd: {
-          '@context': 'https://schema.org',
-          '@type': 'AboutPage',
-          name: 'About FreeTools Hub',
-          ...(siteBaseUrl ? { url: `${siteBaseUrl}/about` } : {}),
-        },
-      });
-      return;
-    }
-
-    if (activeTrustPage === 'contact') {
-      applyRouteSeo({
-        title: 'Contact & Support – Report a Bug or Request a Tool | FreeTools Hub',
-        description:
-          'Contact AbbasPro / FreeTools Hub to report calculation issues, request new online utilities, or ask technical questions.',
-        canonicalPath: '/contact',
-        robots: 'index, follow',
-        jsonLd: {
-          '@context': 'https://schema.org',
-          '@type': 'ContactPage',
-          name: 'Contact FreeTools Hub',
-          ...(siteBaseUrl ? { url: `${siteBaseUrl}/contact` } : {}),
-        },
-      });
-      return;
-    }
-
-    if (activeTrustPage === 'privacy') {
-      applyRouteSeo({
-        title: 'Privacy Policy – Client-Side Data & Local Storage | FreeTools Hub',
-        description:
-          'Read the FreeTools Hub Privacy Policy explaining how resume drafts, UAE salary inputs, and files stay locally inside your browser.',
-        canonicalPath: '/privacy',
-        robots: 'index, follow',
-      });
-      return;
-    }
-
-    if (activeTrustPage === 'terms') {
-      applyRouteSeo({
-        title: 'Terms of Use – Permitted Usage & Ownership | FreeTools Hub',
-        description:
-          'Review the FreeTools Hub Terms of Use covering free personal and commercial usage, user content ownership, and acceptable conduct.',
-        canonicalPath: '/terms',
-        robots: 'index, follow',
-      });
-      return;
-    }
-
-    if (activeTrustPage === 'disclaimer') {
-      applyRouteSeo({
-        title: 'Legal & Calculator Disclaimer – UAE Labour Law, Finance & Health | FreeTools Hub',
-        description:
-          'Important disclaimers for UAE Gratuity, UAE Salary, Loan EMI, Currency/Crypto, BMI, and AI Prompt calculators on FreeTools Hub.',
-        canonicalPath: '/disclaimer',
-        robots: 'index, follow',
-      });
-      return;
-    }
-
-    if (isToolPage && activeToolDef && activeRouteConfig) {
-      applyRouteSeo({
-        title: activeRouteConfig.seoTitle,
-        description: activeRouteConfig.seoDescription,
-        canonicalPath: activeRouteConfig.primaryPath,
-        robots: 'index, follow',
-        jsonLd: [
-          {
-            '@context': 'https://schema.org',
-            '@type': 'WebApplication',
-            name: activeToolDef.name,
-            ...(siteBaseUrl ? { url: `${siteBaseUrl}${activeRouteConfig.primaryPath}` } : {}),
-            applicationCategory: 'UtilitiesApplication',
-            operatingSystem: 'All',
-            description: activeRouteConfig.seoDescription,
-            offers: {
-              '@type': 'Offer',
-              price: '0',
-              priceCurrency: 'USD',
-            },
-          },
-          ...(siteBaseUrl
-            ? [
-                {
-                  '@context': 'https://schema.org',
-                  '@type': 'BreadcrumbList',
-                  itemListElement: [
-                    {
-                      '@type': 'ListItem',
-                      position: 1,
-                      name: 'Home',
-                      item: `${siteBaseUrl}/`,
-                    },
-                    {
-                      '@type': 'ListItem',
-                      position: 2,
-                      name: 'All Tools',
-                      item: `${siteBaseUrl}/tools`,
-                    },
-                    {
-                      '@type': 'ListItem',
-                      position: 3,
-                      name: activeToolDef.name,
-                      item: `${siteBaseUrl}${activeRouteConfig.primaryPath}`,
-                    },
-                  ],
-                },
-              ]
-            : []),
-        ],
-      });
-      return;
-    }
-
-    if (isNotFound) {
-      applyRouteSeo({
-        title: 'Page Not Found (404) | FreeTools Hub',
-        description: 'The requested page or utility could not be found on FreeTools Hub.',
-        robots: 'noindex, follow',
-      });
-    }
-  }, [currentPath, isDirectoryPage, activeTrustPage, isToolPage, activeToolDef, activeRouteConfig, isNotFound]);
+    applyRouteSeo({
+      title: resolvedSeo.title,
+      description: resolvedSeo.description,
+      canonicalPath: resolvedSeo.canonicalPath,
+      robots: resolvedSeo.robots,
+      ogType: resolvedSeo.ogType,
+      jsonLd: resolvedSeo.jsonLd,
+    });
+  }, [currentPath, isToolPage, activeRouteConfig, isNotFound]);
 
   const toggleReaderMode = () => {
     setIsReaderMode((prev) => {
@@ -807,7 +666,11 @@ const MainApp: React.FC = () => {
 
           {/* Route 2: Dedicated All Tools Directory Page ("/tools") */}
           {isDirectoryPage && (
-            <ToolsDirectoryPage initialCategory={directoryCategory} onNavigateTo={navigateTo} />
+            <ToolsDirectoryPage
+              initialCategory={directoryCategory}
+              initialQuery={directoryQuery}
+              onNavigateTo={navigateTo}
+            />
           )}
 
           {/* Route 3: Dedicated Trust & Legal Pages ("/about", "/contact", "/privacy", "/terms", "/disclaimer") */}

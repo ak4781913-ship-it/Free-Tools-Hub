@@ -1,0 +1,108 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Page Not Found (404) | FreeTools Hub</title>
+    <meta name="description" content="The requested page or tool could not be found on FreeTools Hub. Browse all 28 free online tools and calculators." />
+    <meta name="robots" content="noindex, follow" />
+    <meta name="theme-color" content="#1d4ed8" />
+    <link rel="icon" type="image/svg+xml" href="/icon.svg" />
+    <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
+    <meta property="og:type" content="website" />
+    <meta property="og:site_name" content="FreeTools Hub" />
+    <meta property="og:title" content="Page Not Found (404) | FreeTools Hub" />
+    <meta property="og:description" content="The requested page or tool could not be found on FreeTools Hub. Browse all 28 free online tools and calculators." />
+    <meta property="og:image" content="https://freetoolshub1.netlify.app/og-image.png" />
+    <style>
+      :root { color-scheme: light dark; }
+      body {
+        margin: 0;
+        font-family: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+        background: #f8fafc;
+        color: #0f172a;
+        display: flex;
+        min-height: 100vh;
+        flex-direction: column;
+      }
+      @media (prefers-color-scheme: dark) {
+        body { background: #020617; color: #f8fafc; }
+        .card { background: #0f172a !important; border-color: #1e293b !important; }
+        .muted { color: #94a3b8 !important; }
+        .btn-sec { background: #1e293b !important; color: #e2e8f0 !important; border-color: #334155 !important; }
+      }
+      main {
+        flex: 1;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 2rem 1rem;
+      }
+      .card {
+        max-width: 560px;
+        width: 100%;
+        background: #ffffff;
+        border: 1px solid #e2e8f0;
+        border-radius: 1.25rem;
+        padding: 2.5rem 2rem;
+        text-align: center;
+        box-shadow: 0 10px 25px -5px rgba(15, 23, 42, 0.08);
+      }
+      .badge {
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        width: 4rem;
+        height: 4rem;
+        border-radius: 1rem;
+        background: #eff6ff;
+        color: #1d4ed8;
+        font-weight: 800;
+        font-size: 1.5rem;
+        font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+        margin-bottom: 1.25rem;
+      }
+      h1 { margin: 0 0 0.75rem; font-size: 1.75rem; font-weight: 800; line-height: 1.25; }
+      .muted { color: #475569; font-size: 0.95rem; line-height: 1.6; margin: 0 0 1.75rem; }
+      .actions { display: flex; flex-wrap: wrap; gap: 0.75rem; justify-content: center; }
+      .btn {
+        display: inline-block;
+        padding: 0.7rem 1.25rem;
+        border-radius: 0.75rem;
+        font-size: 0.875rem;
+        font-weight: 700;
+        text-decoration: none;
+      }
+      .btn-pri { background: #1d4ed8; color: #ffffff; }
+      .btn-sec { background: #f1f5f9; color: #1e293b; border: 1px solid #cbd5e1; }
+      .links {
+        margin-top: 2rem;
+        padding-top: 1.25rem;
+        border-top: 1px solid #e2e8f0;
+        font-size: 0.85rem;
+      }
+      .links a { color: #1d4ed8; text-decoration: none; font-weight: 600; margin: 0 0.5rem; }
+    </style>
+  </head>
+  <body>
+    <main>
+      <div class="card">
+        <div class="badge" aria-hidden="true">404</div>
+        <h1>Page or Tool Not Found</h1>
+        <p class="muted">
+          The page you requested may have moved or does not exist at this URL. Explore all 28 free browser-based tools and calculators below.
+        </p>
+        <div class="actions">
+          <a class="btn btn-pri" href="/tools">Browse All 28 Tools</a>
+          <a class="btn btn-sec" href="/">Back to Homepage</a>
+        </div>
+        <nav class="links" aria-label="Popular Tools">
+          <a href="/tools/pdf-tools-suite">PDF Tools Suite</a>
+          <a href="/tools/cv-maker">CV Maker</a>
+          <a href="/tools/uae-gratuity-calculator">UAE Gratuity</a>
+          <a href="/tools/uae-salary-calculator">UAE Salary</a>
+        </nav>
+      </div>
+    </main>
+  </body>
+</html>

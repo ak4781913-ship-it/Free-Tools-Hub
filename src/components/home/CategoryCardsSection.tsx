@@ -145,10 +145,17 @@ export const CategoryCardsSection: React.FC<CategoryCardsSectionProps> = ({
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
         {categories.map((cat) => {
           const Icon = cat.icon;
+          const href = `/tools?category=${cat.id}`;
           return (
-            <div
+            <a
               key={cat.id}
-              onClick={() => onSelectCategory(cat.id)}
+              href={href}
+              onClick={(e) => {
+                if (!e.metaKey && !e.ctrlKey && !e.shiftKey && e.button === 0) {
+                  e.preventDefault();
+                  onSelectCategory(cat.id);
+                }
+              }}
               className="group relative p-5 rounded-2xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 hover:border-blue-500/60 dark:hover:border-blue-500/60 shadow-xs hover:shadow-md transition-all duration-200 cursor-pointer flex flex-col justify-between"
             >
               <div>
@@ -174,7 +181,7 @@ export const CategoryCardsSection: React.FC<CategoryCardsSectionProps> = ({
                 <span>{isUrdu ? 'کیٹیگری کھولیں' : 'View Category'}</span>
                 <ArrowRight className="w-4 h-4 transform group-hover:translate-x-1 transition-transform" />
               </div>
-            </div>
+            </a>
           );
         })}
       </div>

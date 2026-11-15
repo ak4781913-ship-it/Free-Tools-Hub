@@ -1,22 +1,54 @@
 import tailwindcss from '@tailwindcss/vite';
 import react from '@vitejs/plugin-react';
 import path from 'path';
-import { defineConfig } from 'vite';
+import { defineConfig, Plugin } from 'vite';
 import { VitePWA } from 'vite-plugin-pwa';
+
+function injectGoogleVerificationPlugin(): Plugin {
+  return {
+    name: 'inject-google-site-verification',
+    transformIndexHtml(html) {
+      const token = (
+        process.env.VITE_GOOGLE_SITE_VERIFICATION ||
+        process.env.GOOGLE_SITE_VERIFICATION ||
+        ''
+      ).trim();
+      if (!token || /name="google-site-verification"/i.test(html)) {
+        return html;
+      }
+      const escaped = token
+        .replace(/&/g, '&amp;')
+        .replace(/"/g, '&quot;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;');
+      return html.replace(
+        '</head>',
+        `    <meta name="google-site-verification" content="${escaped}" />\n  </head>`
+      );
+    },
+  };
+}
 
 export default defineConfig(() => {
   return {
     plugins: [
       react(),
       tailwindcss(),
+      injectGoogleVerificationPlugin(),
       VitePWA({
         registerType: 'autoUpdate',
-        includeAssets: ['icon.svg', 'apple-touch-icon.png', 'pwa-192x192.png', 'pwa-512x512.png'],
+        includeAssets: [
+          'icon.svg',
+          'apple-touch-icon.png',
+          'pwa-192x192.png',
+          'pwa-512x512.png',
+          'og-image.png',
+        ],
         manifest: {
           id: '/',
           name: 'FreeTools Hub – Free CV Generator, UAE Gratuity, AI Prompts & Utilities',
           short_name: 'FreeTools',
-          description: 'Free CV maker, UAE salary & gratuity calculators, AI image & video prompt builders, and privacy-first online tools that work offline.',
+          description: 'Free PDF Tools Suite (43 tools), ATS CV maker, UAE salary & gratuity calculators, AI prompt builders, and privacy-first online tools that work offline.',
           theme_color: '#1d4ed8',
           background_color: '#0f172a',
           display: 'standalone',
@@ -46,8 +78,15 @@ export default defineConfig(() => {
         workbox: {
           maximumFileSizeToCacheInBytes: 6 * 1024 * 1024, // 6 MB to precache full client bundle
           globPatterns: ['**/*.{js,css,html,ico,png,svg,woff,woff2,json}'],
+          globIgnores: ['**/404.html'],
           navigateFallback: '/index.html',
-          navigateFallbackDenylist: [/^\/api/, /^\/sitemap\.xml$/, /^\/robots\.txt$/],
+          navigateFallbackDenylist: [
+            /^\/api/,
+            /^\/sitemap\.xml$/,
+            /^\/robots\.txt$/,
+            /^\/404\.html$/,
+            /^\/site\.webmanifest$/,
+          ],
           runtimeCaching: [
             {
               urlPattern: /^https:\/\/fonts\.googleapis\.com\/.*/i,

@@ -209,9 +209,9 @@ export const PdfToolsSuiteTool: React.FC = () => {
                   {activeTool.outputFormatLabel}
                 </span>
               </div>
-              <h2 className="mt-0.5 text-lg sm:text-xl font-extrabold text-slate-900 dark:text-white">
+              <h1 className="mt-0.5 text-lg sm:text-xl font-extrabold text-slate-900 dark:text-white">
                 {isUrdu ? activeTool.nameUrdu : activeTool.name}
-              </h2>
+              </h1>
               <p className="mt-1 text-xs sm:text-sm text-slate-600 dark:text-slate-300">
                 {isUrdu ? activeTool.descriptionUrdu : activeTool.description}
               </p>
@@ -238,7 +238,7 @@ export const PdfToolsSuiteTool: React.FC = () => {
               <ShieldCheck className="w-4 h-4 text-emerald-400 shrink-0" />
               <span>{t.badge}</span>
             </div>
-            <h2 className="text-2xl sm:text-3xl font-extrabold tracking-tight">{t.heroTitle}</h2>
+            <h1 className="text-2xl sm:text-3xl font-extrabold tracking-tight">{t.heroTitle}</h1>
             <p className="text-sm sm:text-base text-slate-300 leading-relaxed">{t.heroSubtitle}</p>
           </div>
 

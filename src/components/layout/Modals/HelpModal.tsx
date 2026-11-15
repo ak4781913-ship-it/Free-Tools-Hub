@@ -25,7 +25,7 @@ export const HelpModal: React.FC<HelpModalProps> = ({
       q: isUrdu ? 'کیا تمام ٹولز مفت ہیں؟' : 'Are all AbbasPro tools 100% free?',
       a: isUrdu
         ? 'ہاں! تمام ٹولز بشمول سی وی بلڈر اور یو اے ای گریجویٹی بغیر کسی سبسکرپشن کے مفت ہیں۔'
-        : 'Yes. All 27 tools run completely free in your browser with zero subscription or mandatory sign-up.',
+        : 'Yes. All 28 tools run completely free in your browser with zero subscription or mandatory sign-up.',
     },
     {
       q: isUrdu ? 'میرا ڈیٹا کہاں محفوظ ہوتا ہے؟' : 'Where is my data processed and stored?',
@@ -93,7 +93,7 @@ export const HelpModal: React.FC<HelpModalProps> = ({
             >
               <Compass className="w-4 h-4 text-blue-600 mb-1" />
               <div className="text-xs font-bold text-slate-900 dark:text-white">
-                {isUrdu ? 'ٹولز ڈائرکٹری' : 'All 27 Tools'}
+                {isUrdu ? 'ٹولز ڈائرکٹری' : 'All 28 Tools'}
               </div>
               <div className="text-[11px] text-slate-500">
                 {isUrdu ? 'تمام ٹولز کی فہرست' : 'Browse full directory'}

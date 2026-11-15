@@ -33,6 +33,7 @@ import {
 interface ToolsDirectoryPageProps {
   onNavigateTo: (path: string) => void;
   initialCategory?: string;
+  initialQuery?: string;
 }
 
 export type ToolSortOption = 'recommended' | 'name-asc' | 'name-desc' | 'my-rated';
@@ -40,18 +41,25 @@ export type ToolSortOption = 'recommended' | 'name-asc' | 'name-desc' | 'my-rate
 export const ToolsDirectoryPage: React.FC<ToolsDirectoryPageProps> = ({
   onNavigateTo,
   initialCategory,
+  initialQuery,
 }) => {
   const { language, dir } = useLanguage();
   const { favorites } = useFavorites();
   const isUrdu = language === 'ur';
 
-  const [searchQuery, setSearchQuery] = useState('');
+  const [searchQuery, setSearchQuery] = useState(initialQuery || '');
   const [selectedCategory, setSelectedCategory] = useState<string>(initialCategory || 'all');
   const [sortBy, setSortBy] = useState<ToolSortOption>('recommended');
 
   useEffect(() => {
     setSelectedCategory(initialCategory || 'all');
   }, [initialCategory]);
+
+  useEffect(() => {
+    if (initialQuery !== undefined) {
+      setSearchQuery(initialQuery);
+    }
+  }, [initialQuery]);
 
   // Live map of local user ratings for all tools
   const [ratingsMap, setRatingsMap] = useState<Record<string, ToolRatingData>>(() =>

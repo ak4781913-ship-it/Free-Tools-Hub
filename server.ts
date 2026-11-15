@@ -7,6 +7,18 @@ import fs from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import dotenv from 'dotenv';
+import {
+  DEFAULT_PRODUCTION_URL,
+  OG_IMAGE_ALT,
+  OG_IMAGE_HEIGHT,
+  OG_IMAGE_PATH,
+  OG_IMAGE_WIDTH,
+  classifyPublicRoute,
+  getAllCanonicalSitemapEntries,
+  getRouteSeoForPath,
+  normalizeSeoPathname,
+  sanitizePublicOrigin,
+} from './src/data/seoRegistry';
 
 dotenv.config();
 
@@ -18,347 +30,75 @@ const MAX_HTML_BYTES = 2 * 1024 * 1024; // 2 MB cap
 const MAX_REDIRECTS = 4;
 const FETCH_TIMEOUT_MS = 8500;
 
-/**
- * Canonical tool routes and legacy aliases (kept in sync with src/data/toolsRouting.ts)
- */
-const CANONICAL_TOOL_SLUGS: Record<string, string[]> = {
-  'cv-maker': ['resume-builder', 'cv-builder', 'resume-maker'],
-  'uae-gratuity-calculator': ['uae-gratuity', 'gratuity-calculator'],
-  'uae-salary-calculator': ['dubai-salary-calculator', 'uae-salary'],
-  'ai-photo-prompt-generator': ['gemini-photo-prompt', 'photo-prompt-generator'],
-  'ai-video-prompt-generator': ['ai-video-prompt', 'video-prompt-generator'],
-  'markdown-editor': ['markdown-live-editor'],
-  'seo-page-analyzer': ['seo-analyzer', 'page-analyzer'],
-  'seo-meta-generator': ['meta-tag-generator'],
-  'word-counter': ['character-counter'],
-  'text-case-converter': ['case-converter'],
-  'image-compressor': ['compress-image', 'photo-compressor'],
-  'qr-code-generator': ['qr-generator', 'qr-maker', 'qrcode-generator'],
-  'color-picker': ['color-converter', 'palette-generator'],
-  'loan-calculator': ['mortgage-calculator', 'emi-calculator', 'loan-emi-calculator'],
-  'currency-converter': ['forex-converter'],
-  'crypto-converter': ['bitcoin-converter'],
-  'percentage-calculator': [],
-  'discount-calculator': ['sale-calculator'],
-  'unit-converter': [],
-  'password-generator': ['strong-password-generator'],
-  'password-strength': ['password-checker'],
-  'age-calculator': [],
-  'date-difference': ['days-between-dates'],
-  'bmi-calculator': [],
-  'timezone-converter': ['time-zone-converter', 'world-clock'],
-  'json-formatter': ['json-validator', 'json-beautifier'],
-  'base64-converter': ['base64-encoder', 'base64-decoder'],
-  'pdf-tools-suite': ['pdf-tools', 'pdf-suite', 'pdf-editor', 'pdf-converter'],
-};
-
-const CANONICAL_STATIC_PATHS = new Set([
-  '/',
-  '/tools',
-  '/about',
-  '/contact',
-  '/privacy',
-  '/terms',
-  '/disclaimer',
-]);
-
-const ALIAS_TO_CANONICAL_SLUG = new Map<string, string>();
-for (const [primarySlug, aliases] of Object.entries(CANONICAL_TOOL_SLUGS)) {
-  for (const alias of aliases) {
-    if (alias !== primarySlug) {
-      ALIAS_TO_CANONICAL_SLUG.set(alias.toLowerCase(), primarySlug);
-    }
-  }
-}
-
-function normalizePathname(rawPath: string): string {
-  const withoutQuery = rawPath.split('?')[0].split('#')[0];
-  if (!withoutQuery || withoutQuery === '/') return '/';
-  const trimmed = withoutQuery.endsWith('/') ? withoutQuery.slice(0, -1) : withoutQuery;
-  return trimmed.startsWith('/') ? trimmed : `/${trimmed}`;
-}
-
 function classifyAppRoute(pathname: string): {
   status: 200 | 301 | 404;
   redirectTo?: string;
 } {
-  const clean = normalizePathname(pathname);
-  if (CANONICAL_STATIC_PATHS.has(clean)) {
-    return { status: 200 };
-  }
-
-  if (clean.startsWith('/tools/')) {
-    const slug = clean.slice('/tools/'.length).toLowerCase();
-    if (!slug || slug.includes('/')) {
-      return { status: 404 };
-    }
-    if (Object.prototype.hasOwnProperty.call(CANONICAL_TOOL_SLUGS, slug)) {
-      return { status: 200 };
-    }
-    const mappedCanonical = ALIAS_TO_CANONICAL_SLUG.get(slug);
-    if (mappedCanonical) {
-      return { status: 301, redirectTo: `/tools/${mappedCanonical}` };
-    }
-  }
-
-  return { status: 404 };
+  const result = classifyPublicRoute(pathname);
+  return {
+    status: result.status,
+    redirectTo: result.redirectTo,
+  };
 }
 
-const ROUTE_SEO_MAP: Record<string, { title: string; description: string }> = {
-  '/': {
-    title: 'FreeTools Hub – Free Online Tools & UAE Calculators',
-    description:
-      'FreeTools Hub offers 28 free privacy-first online tools, including a PDF Tools Suite, ATS CV maker, UAE gratuity & salary calculators, AI prompt generators, and SEO utilities.',
-  },
-  '/tools': {
-    title: 'All 28 Free Online Tools & Calculators | FreeTools Hub',
-    description:
-      'Browse the complete FreeTools Hub directory: PDF Tools Suite (43 tools), ATS CV builder, UAE monthly salary & gratuity calculators, AI prompt generators, SEO analyzer, and developer utilities.',
-  },
-  '/about': {
-    title: 'About FreeTools Hub – Architecture, Mission & Privacy | AbbasPro',
-    description:
-      'Learn how AbbasPro / FreeTools Hub builds fast, browser-based career, UAE financial, AI prompt, and developer tools with client-side privacy.',
-  },
-  '/contact': {
-    title: 'Contact & Support – Report a Bug or Request a Tool | FreeTools Hub',
-    description:
-      'Contact AbbasPro / FreeTools Hub to report calculation issues, request new online utilities, or ask technical questions.',
-  },
-  '/privacy': {
-    title: 'Privacy Policy – Client-Side Data & Local Storage | FreeTools Hub',
-    description:
-      'Read the FreeTools Hub Privacy Policy explaining how resume drafts, UAE salary inputs, and files stay locally inside your browser.',
-  },
-  '/terms': {
-    title: 'Terms of Use – Permitted Usage & Ownership | FreeTools Hub',
-    description:
-      'Review the FreeTools Hub Terms of Use covering free personal and commercial usage, user content ownership, and acceptable conduct.',
-  },
-  '/disclaimer': {
-    title: 'Legal & Calculator Disclaimer – UAE Labour Law, Finance & Health | FreeTools Hub',
-    description:
-      'Important disclaimers for UAE Gratuity, UAE Salary, Loan EMI, Currency/Crypto, BMI, and AI Prompt calculators on FreeTools Hub.',
-  },
-  '/tools/cv-maker': {
-    title: 'CV & Resume Maker – Free ATS Professional CV Generator | FreeTools Hub',
-    description:
-      'Create professional, ATS-friendly resumes with live multi-template preview, custom typography, and instant PDF download without login.',
-  },
-  '/tools/uae-gratuity-calculator': {
-    title: 'UAE Gratuity Calculator – End-of-Service Benefit Estimator | FreeTools Hub',
-    description:
-      'Estimate UAE end-of-service gratuity under Federal Decree-Law No. 33 of 2021 with transparent 21-day and 30-day tier breakdowns and PDF export.',
-  },
-  '/tools/uae-salary-calculator': {
-    title: 'UAE Salary Calculator – Monthly & Annual AED Breakdown | FreeTools Hub',
-    description:
-      'Calculate gross and net monthly salary in AED across basic pay, housing, transport allowances, and contractual deductions with daily and annual breakdowns.',
-  },
-  '/tools/ai-photo-prompt-generator': {
-    title: 'Gemini AI Photo Prompt Generator – Studio Photography Prompts | FreeTools Hub',
-    description:
-      'Architect studio-grade photorealistic image prompts for Gemini 2.5, Imagen 3, Midjourney, and Flux with facial identity preservation.',
-  },
-  '/tools/ai-video-prompt-generator': {
-    title: 'AI Video Prompt Generator – Scene-by-Scene Production Scripts | FreeTools Hub',
-    description:
-      'Generate multi-scene cinematic directorial scripts for Google Flow, Runway Gen-3, Sora, and Kling with camera movements and voiceovers.',
-  },
-  '/tools/markdown-editor': {
-    title: 'Markdown Live Editor – Split-Screen Preview & PDF Export | FreeTools Hub',
-    description:
-      'Write and preview GitHub Flavored Markdown with real-time split view, formatting toolbar, live stats, and Vector PDF / HTML export.',
-  },
-  '/tools/seo-page-analyzer': {
-    title: 'SEO Page Analyzer – On-Page Audit & Meta Tags Checker | FreeTools Hub',
-    description:
-      'Audit any web page for missing critical SEO elements, heading hierarchy, OpenGraph social cards, performance scores, and actionable fixes.',
-  },
-  '/tools/seo-meta-generator': {
-    title: 'SEO Meta Tags Generator – Live SERP & Social Previews | FreeTools Hub',
-    description:
-      'Generate optimized title tags, meta descriptions, OpenGraph tags, and Schema.org structured data with live Google SERP simulation.',
-  },
-  '/tools/word-counter': {
-    title: 'Word & Character Counter – Real-Time Text Metrics & PDF Report | FreeTools Hub',
-    description:
-      'Count words, characters, sentences, paragraphs, reading and speaking time in real-time. Export executive PDF readability reports.',
-  },
-  '/tools/text-case-converter': {
-    title: 'Text Case Converter – UPPERCASE, lowercase, Title Case, camelCase | FreeTools Hub',
-    description:
-      'Instantly convert text between UPPERCASE, lowercase, Title Case, Sentence case, camelCase, snake_case, and remove redundant whitespace.',
-  },
-  '/tools/image-compressor': {
-    title: 'Image Compressor – 100% In-Browser PNG & JPEG Compression | FreeTools Hub',
-    description:
-      'Compress PNG, JPG, and WebP images directly in your browser with zero server uploads and privacy-first client processing.',
-  },
-  '/tools/qr-code-generator': {
-    title: 'QR Code Generator – Custom Colored QR Codes with PNG Download | FreeTools Hub',
-    description:
-      'Generate custom colored scannable QR codes for websites, WiFi networks, contact vCards, and text directly in your browser.',
-  },
-  '/tools/color-picker': {
-    title: 'Advanced Color Picker & Palette Studio – HEX, RGB, HSL, CMYK | FreeTools Hub',
-    description:
-      'Pick colors from images with a live magnifier, convert between HEX, RGB, HSL, and CMYK, generate color harmonies, and check WCAG contrast.',
-  },
-  '/tools/loan-calculator': {
-    title: 'Loan & Amortization Calculator – Monthly Repayment Schedule | FreeTools Hub',
-    description:
-      'Calculate fixed-rate monthly loan repayments, total interest payable, and complete annual amortization schedules for personal and mortgage loans.',
-  },
-  '/tools/currency-converter': {
-    title: 'Real-Time Currency Converter – Live Exchange Rates | FreeTools Hub',
-    description:
-      'Convert between 30+ global currencies with real-time exchange rates, inverse currency swapping, and bank transfer fee estimators.',
-  },
-  '/tools/crypto-converter': {
-    title: 'Cryptocurrency Converter – Bitcoin, Ethereum, Solana Rates | FreeTools Hub',
-    description:
-      'Convert between Bitcoin (BTC), Ethereum (ETH), Solana (SOL), and major global fiat currencies (USD, EUR, AED, GBP) with live market feeds.',
-  },
-  '/tools/percentage-calculator': {
-    title: 'Percentage Calculator – Increase, Decrease, Percent of Value | FreeTools Hub',
-    description:
-      'Fast and versatile percentage calculator: compute X% of Y, percentage increase/decrease between numbers, and retail discount savings.',
-  },
-  '/tools/discount-calculator': {
-    title: 'Discount & Sale Price Calculator – Voucher & VAT Savings | FreeTools Hub',
-    description:
-      'Calculate final prices and total savings from percentage discounts, cash vouchers, quantity bundles, and sales tax/VAT.',
-  },
-  '/tools/unit-converter': {
-    title: 'Universal Unit Converter – Metric & Imperial Measurement Conversion | FreeTools Hub',
-    description:
-      'Convert length, weight, temperature, area, volume, speed, and digital data storage with high mathematical precision.',
-  },
-  '/tools/password-generator': {
-    title: 'Strong Password Generator – Cryptographically Secure Passwords | FreeTools Hub',
-    description:
-      'Create unbreakable passwords using browser Crypto API with configurable character sets, length, and entropy ratings.',
-  },
-  '/tools/password-strength': {
-    title: 'Password Strength Checker – Entropy & Brute-Force Crack Time | FreeTools Hub',
-    description:
-      'Analyze password security in real-time with entropy calculation, brute-force crack time estimates, and dictionary leak checks.',
-  },
-  '/tools/age-calculator': {
-    title: 'Age Calculator – Exact Chronological Age & Birthday Countdown | FreeTools Hub',
-    description:
-      'Calculate exact age in years, months, days, hours, and minutes with life milestones and upcoming birthday countdown.',
-  },
-  '/tools/date-difference': {
-    title: 'Date Difference Calculator – Working Days & Weeks Between Dates | FreeTools Hub',
-    description:
-      'Determine total calendar days, working business days (excluding weekends), and weeks between any two calendar dates.',
-  },
-  '/tools/bmi-calculator': {
-    title: 'BMI Calculator – Body Mass Index & Ideal Weight Range (WHO) | FreeTools Hub',
-    description:
-      'Calculate Body Mass Index (BMI) and health category according to WHO guidelines using metric or imperial units.',
-  },
-  '/tools/timezone-converter': {
-    title: 'Time Zone Converter – Global Meeting Planner & Live World Clocks | FreeTools Hub',
-    description:
-      'Convert date and time between global time zones seamlessly with visual day/night indicators and international meeting overlap planner.',
-  },
-  '/tools/json-formatter': {
-    title: 'JSON Formatter & Validator – Prettify, Minify & Tree Viewer | FreeTools Hub',
-    description:
-      'Prettify, validate, minify, and inspect raw JSON data with adjustable indentation, syntax error highlight, and interactive tree viewer.',
-  },
-  '/tools/base64-converter': {
-    title: 'Base64 Encoder & Decoder – Text and Image Converter | FreeTools Hub',
-    description:
-      'Convert plain text and images to Base64 strings with UTF-8 compliance, URL-safe toggle, syntax checking, and instant file downloads.',
-  },
-  '/tools/pdf-tools-suite': {
-    title: 'PDF Tools Suite – 43 Free Client-Side PDF Converters, Organizers, Editor & Security | FreeTools Hub',
-    description:
-      'Complete browser-based PDF Tools Suite with 43 utilities: convert PDF to Word/Excel/JPG/PNG/TXT, merge, split, compress, edit, OCR, watermark, encrypt, and unlock PDFs locally.',
-  },
-};
-
 /**
- * Returns a verified production base URL ONLY when VITE_SITE_URL or SITE_URL
- * is explicitly configured to a real custom domain (never localhost or .run.app preview URLs).
+ * Returns configured production domain or fallback DEFAULT_PRODUCTION_URL.
  */
 function resolveVerifiedProductionDomain(): string {
-  const configured = (process.env.VITE_SITE_URL || process.env.SITE_URL || '').trim();
-  if (!configured || !/^https?:\/\//i.test(configured) || configured.includes('MY_APP_URL')) {
-    return '';
+  const candidates = [
+    process.env.VITE_SITE_URL,
+    process.env.SITE_URL,
+    process.env.URL,
+  ];
+  for (const c of candidates) {
+    const clean = sanitizePublicOrigin(c);
+    if (clean) return clean;
   }
-  try {
-    const parsed = new URL(configured);
-    const host = parsed.hostname.toLowerCase();
-    if (
-      host === 'localhost' ||
-      host === '127.0.0.1' ||
-      host === '0.0.0.0' ||
-      host.endsWith('.run.app') ||
-      host.endsWith('.localhost')
-    ) {
-      return '';
-    }
-    return `${parsed.protocol}//${parsed.host}`.replace(/\/+$/, '');
-  } catch {
-    return '';
-  }
+  return DEFAULT_PRODUCTION_URL;
 }
 
 /**
- * Resolves configurable public site base URL for robots.txt and sitemap.xml
- * without hardcoding a guessed production domain.
+ * Resolves active public site base URL for robots.txt and sitemap.xml.
  */
 function resolveBaseUrl(req: Request): string {
-  const verified = resolveVerifiedProductionDomain();
-  if (verified) {
-    return verified;
+  const configuredEnv = sanitizePublicOrigin(
+    process.env.VITE_SITE_URL || process.env.SITE_URL || process.env.URL || ''
+  );
+  if (configuredEnv) {
+    return configuredEnv;
   }
 
-  const configured = (process.env.APP_URL || '').trim();
-  if (configured && /^https?:\/\//i.test(configured) && !configured.includes('MY_APP_URL')) {
-    return configured.replace(/\/+$/, '');
-  }
-
-  const forwardedProto = (req.headers['x-forwarded-proto'] as string | undefined)
-    ?.split(',')[0]
-    ?.trim();
   const forwardedHost = (req.headers['x-forwarded-host'] as string | undefined)
     ?.split(',')[0]
     ?.trim();
-  const host = forwardedHost || req.headers.host || `localhost:${PORT}`;
-  const proto = forwardedProto || (host.startsWith('localhost') || host.startsWith('127.') ? 'http' : 'https');
-  return `${proto}://${host}`.replace(/\/+$/, '');
+  const host = forwardedHost || req.headers.host || '';
+  const sanitizedReqHost = host ? sanitizePublicOrigin(`https://${host}`) : '';
+  if (sanitizedReqHost) {
+    return sanitizedReqHost;
+  }
+
+  return DEFAULT_PRODUCTION_URL;
 }
 
 /**
  * Injects exact route-level <title>, <meta name="description">, <meta name="robots">,
- * OpenGraph/Twitter tags, and conditional verified-domain <link rel="canonical"> into HTML.
+ * OpenGraph/Twitter tags, canonical URL, optional GSC verification, and JSON-LD into HTML.
  */
 function injectRouteSeoIntoHtml(rawHtml: string, rawUrl: string, status: 200 | 301 | 404): string {
-  const cleanPath = normalizePathname(rawUrl);
+  const cleanPath = normalizeSeoPathname(rawUrl);
   const isNotFound = status === 404;
+  const canonicalBase = resolveVerifiedProductionDomain();
+  const seo = getRouteSeoForPath(isNotFound ? '/404' : cleanPath, canonicalBase);
 
-  const meta = isNotFound
-    ? {
-        title: 'Page Not Found (404) | FreeTools Hub',
-        description: 'The requested page or utility could not be found on FreeTools Hub.',
-      }
-    : ROUTE_SEO_MAP[cleanPath] || ROUTE_SEO_MAP['/'];
-
-  const robotsContent = isNotFound ? 'noindex, follow' : 'index, follow';
-  const safeTitle = escapeXml(meta.title);
-  const safeDesc = escapeXml(meta.description);
+  const safeTitle = escapeXml(seo.title);
+  const safeDesc = escapeXml(seo.description);
+  const ogImageUrl = escapeXml(`${canonicalBase}${OG_IMAGE_PATH}`);
 
   let html = rawHtml;
   html = html.replace(/<title>[\s\S]*?<\/title>/i, `<title>${safeTitle}</title>`);
   html = html.replace(
     /<meta\s+name="robots"\s+content="[^"]*"\s*\/?>/i,
-    `<meta name="robots" content="${robotsContent}" />`
+    `<meta name="robots" content="${seo.robots}" />`
   );
   html = html.replace(
     /<meta\s+name="description"\s+content="[\s\S]*?"\s*\/?>/i,
@@ -373,6 +113,14 @@ function injectRouteSeoIntoHtml(rawHtml: string, rawUrl: string, status: 200 | 3
     `<meta property="og:description" content="${safeDesc}" />`
   );
   html = html.replace(
+    /<meta\s+property="og:image"\s+content="[^"]*"\s*\/?>/i,
+    `<meta property="og:image" content="${ogImageUrl}" />`
+  );
+  html = html.replace(
+    /<meta\s+property="og:image:alt"\s+content="[\s\S]*?"\s*\/?>/i,
+    `<meta property="og:image:alt" content="${escapeXml(OG_IMAGE_ALT)}" />`
+  );
+  html = html.replace(
     /<meta\s+name="twitter:title"\s+content="[\s\S]*?"\s*\/?>/i,
     `<meta name="twitter:title" content="${safeTitle}" />`
   );
@@ -380,18 +128,41 @@ function injectRouteSeoIntoHtml(rawHtml: string, rawUrl: string, status: 200 | 3
     /<meta\s+name="twitter:description"\s+content="[\s\S]*?"\s*\/?>/i,
     `<meta name="twitter:description" content="${safeDesc}" />`
   );
+  html = html.replace(
+    /<meta\s+name="twitter:image"\s+content="[^"]*"\s*\/?>/i,
+    `<meta name="twitter:image" content="${ogImageUrl}" />`
+  );
 
-  // Strip any pre-existing canonical or og:url before conditionally injecting verified production URL
+  // Strip any pre-existing canonical or og:url before conditionally injecting
   html = html.replace(/<link\s+rel="canonical"\s+href="[^"]*"\s*\/?>\s*/gi, '');
   html = html.replace(/<meta\s+property="og:url"\s+content="[^"]*"\s*\/?>\s*/gi, '');
 
-  const verifiedDomain = resolveVerifiedProductionDomain();
-  if (!isNotFound && verifiedDomain) {
+  if (!isNotFound && seo.canonicalPath) {
     const canonicalHref = escapeXml(
-      cleanPath === '/' ? `${verifiedDomain}/` : `${verifiedDomain}${cleanPath}`
+      seo.canonicalPath === '/' ? `${canonicalBase}/` : `${canonicalBase}${seo.canonicalPath}`
     );
     const canonicalTags = `\n    <link rel="canonical" href="${canonicalHref}" />\n    <meta property="og:url" content="${canonicalHref}" />`;
     html = html.replace('</title>', `</title>${canonicalTags}`);
+  }
+
+  // Optional Google Site Verification tag from env
+  const verificationToken = (
+    process.env.VITE_GOOGLE_SITE_VERIFICATION ||
+    process.env.GOOGLE_SITE_VERIFICATION ||
+    ''
+  ).trim();
+  if (verificationToken && !/name="google-site-verification"/i.test(html)) {
+    html = html.replace(
+      '</head>',
+      `    <meta name="google-site-verification" content="${escapeXml(verificationToken)}" />\n  </head>`
+    );
+  }
+
+  // Route-specific JSON-LD
+  html = html.replace(/<script\s+type="application\/ld\+json"[^>]*>[\s\S]*?<\/script>\s*/gi, '');
+  if (!isNotFound && seo.jsonLd && seo.jsonLd.length > 0) {
+    const schemaTag = `\n    <script id="dynamic-route-jsonld" type="application/ld+json">${JSON.stringify(seo.jsonLd)}</script>`;
+    html = html.replace('</head>', `${schemaTag}\n  </head>`);
   }
 
   return html;
@@ -774,13 +545,14 @@ async function startServer() {
     res.status(404).json({ error: 'API endpoint not found.' });
   });
 
-  // 2. Dynamic Robots.txt (uses configured VITE_SITE_URL / APP_URL or active request host)
+  // 2. Dynamic Robots.txt
   app.get('/robots.txt', (req: Request, res: Response) => {
     const baseUrl = resolveBaseUrl(req);
     const body = [
       'User-agent: *',
       'Allow: /',
       'Disallow: /api/',
+      'Disallow: /.netlify/',
       '',
       `Sitemap: ${baseUrl}/sitemap.xml`,
       '',
@@ -791,45 +563,32 @@ async function startServer() {
   // 3. Dynamic XML Sitemap (strictly canonical, indexable 200 OK public routes only)
   app.get('/sitemap.xml', (req: Request, res: Response) => {
     const baseUrl = resolveBaseUrl(req);
-    const entries: { path: string; changefreq: string; priority: string }[] = [
-      { path: '/', changefreq: 'weekly', priority: '1.0' },
-      { path: '/tools', changefreq: 'weekly', priority: '0.9' },
-      ...Object.keys(CANONICAL_TOOL_SLUGS).map((slug, idx) => ({
-        path: `/tools/${slug}`,
-        changefreq: 'monthly',
-        priority: idx < 5 ? '0.9' : '0.8',
-      })),
-      { path: '/about', changefreq: 'monthly', priority: '0.5' },
-      { path: '/contact', changefreq: 'monthly', priority: '0.5' },
-      { path: '/privacy', changefreq: 'yearly', priority: '0.4' },
-      { path: '/terms', changefreq: 'yearly', priority: '0.4' },
-      { path: '/disclaimer', changefreq: 'yearly', priority: '0.4' },
-    ];
+    const entries = getAllCanonicalSitemapEntries(baseUrl);
 
     const xmlUrls = entries
-      .map((entry) => {
-        const loc = entry.path === '/' ? `${baseUrl}/` : `${baseUrl}${entry.path}`;
-        return [
+      .map((entry) =>
+        [
           '  <url>',
-          `    <loc>${escapeXml(loc)}</loc>`,
-          `    <changefreq>${entry.changefreq}</changefreq>`,
-          `    <priority>${entry.priority}</priority>`,
+          `    <loc>${escapeXml(entry.loc)}</loc>`,
+          `    <lastmod>${escapeXml(entry.lastmod)}</lastmod>`,
+          `    <changefreq>${escapeXml(entry.changefreq)}</changefreq>`,
+          `    <priority>${escapeXml(entry.priority)}</priority>`,
           '  </url>',
-        ].join('\n');
-      })
+        ].join('\n')
+      )
       .join('\n');
 
     const xml = `<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n${xmlUrls}\n</urlset>\n`;
     res.status(200).type('application/xml; charset=utf-8').send(xml);
   });
 
-  // 4. Canonical 301 Redirects for Legacy Alias Slugs (preserves existing links while preventing duplicate URLs)
+  // 4. Canonical 301 Redirects for Legacy Alias Slugs
   app.use((req, res, next) => {
     if (req.method !== 'GET' && req.method !== 'HEAD') {
       next();
       return;
     }
-    const clean = normalizePathname(req.path);
+    const clean = normalizeSeoPathname(req.path);
     if (clean.startsWith('/tools/')) {
       const routeInfo = classifyAppRoute(clean);
       if (routeInfo.status === 301 && routeInfo.redirectTo) {
@@ -928,7 +687,18 @@ async function startServer() {
         return;
       }
 
-      const cleanPath = normalizePathname(req.originalUrl);
+      const cleanPath = normalizeSeoPathname(req.originalUrl);
+      if (routeInfo.status === 404) {
+        const notFoundHtmlPath = path.join(distDir, '404.html');
+        if (fs.existsSync(notFoundHtmlPath)) {
+          res
+            .status(404)
+            .set({ 'Content-Type': 'text/html; charset=utf-8', 'X-Robots-Tag': 'noindex, follow' })
+            .sendFile(notFoundHtmlPath);
+          return;
+        }
+      }
+
       const prerenderedSubPath = path.join(distDir, cleanPath.replace(/^\//, ''), 'index.html');
       if (cleanPath !== '/' && fs.existsSync(prerenderedSubPath)) {
         res.status(200).set({ 'Content-Type': 'text/html; charset=utf-8' }).sendFile(prerenderedSubPath);
@@ -939,7 +709,10 @@ async function startServer() {
       const seoHtml = injectRouteSeoIntoHtml(rawHtml, req.originalUrl, routeInfo.status);
       res
         .status(routeInfo.status === 404 ? 404 : 200)
-        .set({ 'Content-Type': 'text/html; charset=utf-8' })
+        .set({
+          'Content-Type': 'text/html; charset=utf-8',
+          ...(routeInfo.status === 404 ? { 'X-Robots-Tag': 'noindex, follow' } : {}),
+        })
         .send(seoHtml);
     });
   }

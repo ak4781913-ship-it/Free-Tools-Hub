@@ -3,35 +3,40 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
+import {
+  DEFAULT_PRODUCTION_URL,
+  OG_IMAGE_ALT,
+  OG_IMAGE_HEIGHT,
+  OG_IMAGE_PATH,
+  OG_IMAGE_WIDTH,
+  SITE_NAME,
+  sanitizePublicOrigin,
+} from '../data/seoRegistry';
+
 /**
- * Returns the verified production base URL ONLY when explicitly configured via VITE_SITE_URL
- * (and never returns localhost, loopback, placeholder, or ephemeral preview container URLs).
+ * Resolves the canonical public origin without ever stripping production domains
+ * like freetoolshub1.netlify.app when VITE_SITE_URL is unset.
  */
 export function getVerifiedProductionBaseUrl(): string {
-  const envUrl = ((import.meta as { env?: Record<string, string | undefined> }).env?.VITE_SITE_URL)?.trim() || '';
-  if (!envUrl || !/^https?:\/\//i.test(envUrl)) {
-    return '';
+  const envUrl =
+    ((import.meta as { env?: Record<string, string | undefined> }).env?.VITE_SITE_URL)?.trim() || '';
+  const sanitizedEnv = sanitizePublicOrigin(envUrl);
+  if (sanitizedEnv) {
+    return sanitizedEnv;
   }
-  try {
-    const parsed = new URL(envUrl);
-    const host = parsed.hostname.toLowerCase();
-    if (
-      host === 'localhost' ||
-      host === '127.0.0.1' ||
-      host.endsWith('.run.app') ||
-      envUrl.includes('MY_APP_URL')
-    ) {
-      return '';
+
+  if (typeof window !== 'undefined' && window.location?.origin) {
+    const sanitizedOrigin = sanitizePublicOrigin(window.location.origin);
+    if (sanitizedOrigin) {
+      return sanitizedOrigin;
     }
-    return `${parsed.protocol}//${parsed.host}`;
-  } catch {
-    return '';
   }
+
+  return DEFAULT_PRODUCTION_URL;
 }
 
 /**
- * Backwards-compatible alias returning the verified production domain when configured,
- * or empty string so canonical URLs never point to unverified preview/localhost origins.
+ * Returns the active public site base URL for canonical links, OpenGraph URLs, and JSON-LD.
  */
 export function getSiteBaseUrl(): string {
   return getVerifiedProductionBaseUrl();
@@ -76,6 +81,12 @@ function upsertCanonicalLink(href: string) {
 
 function upsertDynamicJsonLd(payload?: Record<string, unknown> | Record<string, unknown>[]) {
   const existing = document.getElementById('dynamic-route-jsonld');
+  const staticScripts = document.querySelectorAll(
+    'head script[type="application/ld+json"]:not(#dynamic-route-jsonld)'
+  );
+  // Prevent duplicate static WebSite/ItemList scripts after client hydration takes over
+  staticScripts.forEach((node) => node.remove());
+
   if (!payload) {
     if (existing) existing.remove();
     return;
@@ -93,21 +104,21 @@ function upsertDynamicJsonLd(payload?: Record<string, unknown> | Record<string, 
 
 /**
  * Updates document <head> tags (title, meta description, canonical URL, robots, OpenGraph, Twitter, and JSON-LD)
- * whenever the route changes. Emits canonical & og:url strictly when a verified production domain is configured,
- * and omits canonical tags on non-indexable (404 / noindex) pages.
+ * whenever the route changes. Omits canonical & og:url on non-indexable (404 / noindex) pages.
  */
 export function applyRouteSeo(meta: RouteSeoMetadata): void {
   if (typeof document === 'undefined') return;
 
   const isNoIndex = (meta.robots || 'index, follow').toLowerCase().includes('noindex');
-  const verifiedBaseUrl = getVerifiedProductionBaseUrl();
+  const baseUrl = getVerifiedProductionBaseUrl();
+  const ogImageUrl = `${baseUrl}${OG_IMAGE_PATH}`;
 
   let canonicalUrl = '';
-  if (!isNoIndex && verifiedBaseUrl && meta.canonicalPath) {
+  if (!isNoIndex && baseUrl && meta.canonicalPath) {
     const cleanPath = meta.canonicalPath.startsWith('/')
       ? meta.canonicalPath
       : `/${meta.canonicalPath}`;
-    canonicalUrl = cleanPath === '/' ? `${verifiedBaseUrl}/` : `${verifiedBaseUrl}${cleanPath}`;
+    canonicalUrl = cleanPath === '/' ? `${baseUrl}/` : `${baseUrl}${cleanPath}`;
   }
 
   document.title = meta.title;
@@ -115,19 +126,30 @@ export function applyRouteSeo(meta: RouteSeoMetadata): void {
   upsertMetaTag('name', 'description', meta.description);
   upsertMetaTag('name', 'robots', meta.robots || 'index, follow');
 
+  const envVerification =
+    ((import.meta as { env?: Record<string, string | undefined> }).env?.VITE_GOOGLE_SITE_VERIFICATION)?.trim() || '';
+  if (envVerification) {
+    upsertMetaTag('name', 'google-site-verification', envVerification);
+  }
+
   upsertCanonicalLink(canonicalUrl);
 
   // OpenGraph
   upsertMetaTag('property', 'og:type', meta.ogType || 'website');
-  upsertMetaTag('property', 'og:site_name', 'FreeTools Hub');
+  upsertMetaTag('property', 'og:site_name', SITE_NAME);
   upsertMetaTag('property', 'og:title', meta.title);
   upsertMetaTag('property', 'og:description', meta.description);
   upsertMetaTag('property', 'og:url', canonicalUrl);
+  upsertMetaTag('property', 'og:image', ogImageUrl);
+  upsertMetaTag('property', 'og:image:width', String(OG_IMAGE_WIDTH));
+  upsertMetaTag('property', 'og:image:height', String(OG_IMAGE_HEIGHT));
+  upsertMetaTag('property', 'og:image:alt', OG_IMAGE_ALT);
 
   // Twitter Card
   upsertMetaTag('name', 'twitter:card', 'summary_large_image');
   upsertMetaTag('name', 'twitter:title', meta.title);
   upsertMetaTag('name', 'twitter:description', meta.description);
+  upsertMetaTag('name', 'twitter:image', ogImageUrl);
 
   // Route-specific JSON-LD structured data
   upsertDynamicJsonLd(meta.jsonLd);
