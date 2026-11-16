@@ -44,7 +44,7 @@
         "email": {
           "type": "string",
           "format": "email",
-          "description": "Verified Google account email address.",
+          "description": "Google account email address (empty string if omitted by auth token).",
           "maxLength": 254
         },
         "displayName": {

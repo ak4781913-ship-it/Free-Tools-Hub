@@ -566,8 +566,13 @@ export async function ensureUserAccountRoot(uid: string): Promise<void> {
       });
     } else {
       const existingData = snap.data();
+      const rawSyncVersion = Number(existingData?.syncVersion);
+      const safeSyncVersion =
+        Number.isInteger(rawSyncVersion) && rawSyncVersion >= 1 && rawSyncVersion <= 10
+          ? rawSyncVersion
+          : 1;
       await updateDoc(ref, {
-        syncVersion: typeof existingData.syncVersion === 'number' ? existingData.syncVersion : 1,
+        syncVersion: safeSyncVersion,
         updatedAt: serverTimestamp(),
       });
     }
