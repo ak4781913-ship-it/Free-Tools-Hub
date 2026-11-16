@@ -659,7 +659,10 @@ async function startServer() {
         }
         res
           .status(routeInfo.status === 404 ? 404 : 200)
-          .set({ 'Content-Type': 'text/html; charset=utf-8' })
+          .set({
+            'Content-Type': 'text/html; charset=utf-8',
+            ...(routeInfo.status === 404 ? { 'X-Robots-Tag': 'noindex, follow' } : {}),
+          })
           .end(html);
       } catch (err) {
         vite.ssrFixStacktrace(err as Error);
@@ -699,10 +702,18 @@ async function startServer() {
         }
       }
 
-      const prerenderedSubPath = path.join(distDir, cleanPath.replace(/^\//, ''), 'index.html');
-      if (cleanPath !== '/' && fs.existsSync(prerenderedSubPath)) {
-        res.status(200).set({ 'Content-Type': 'text/html; charset=utf-8' }).sendFile(prerenderedSubPath);
-        return;
+      const cleanRel = cleanPath.replace(/^\//, '');
+      const prerenderedFlatPath = path.join(distDir, `${cleanRel}.html`);
+      const prerenderedDirPath = path.join(distDir, cleanRel, 'index.html');
+      if (cleanPath !== '/') {
+        if (fs.existsSync(prerenderedFlatPath)) {
+          res.status(200).set({ 'Content-Type': 'text/html; charset=utf-8' }).sendFile(prerenderedFlatPath);
+          return;
+        }
+        if (fs.existsSync(prerenderedDirPath)) {
+          res.status(200).set({ 'Content-Type': 'text/html; charset=utf-8' }).sendFile(prerenderedDirPath);
+          return;
+        }
       }
 
       const rawHtml = fs.readFileSync(indexHtmlPath, 'utf-8');

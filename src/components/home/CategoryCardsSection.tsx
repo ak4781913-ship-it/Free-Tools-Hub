@@ -132,14 +132,19 @@ export const CategoryCardsSection: React.FC<CategoryCardsSectionProps> = ({
           </p>
         </div>
 
-        <button
-          type="button"
-          onClick={onViewAllTools}
+        <a
+          href="/tools"
+          onClick={(e) => {
+            if (!e.metaKey && !e.ctrlKey && !e.shiftKey && e.button === 0) {
+              e.preventDefault();
+              onViewAllTools();
+            }
+          }}
           className="inline-flex items-center gap-1.5 text-xs font-bold text-blue-700 dark:text-blue-400 hover:text-blue-800 dark:hover:text-blue-300 cursor-pointer"
         >
           <span>{isUrdu ? 'تمام دیکھیں' : 'View All'}</span>
           <ArrowRight className="w-3.5 h-3.5" />
-        </button>
+        </a>
       </div>
 
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">

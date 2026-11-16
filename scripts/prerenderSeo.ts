@@ -3,6 +3,7 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
+import crypto from 'node:crypto';
 import fs from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
@@ -481,7 +482,7 @@ export function prerenderAllPages() {
     throw new Error('dist/index.html does not exist. Run "vite build" first before prerendering.');
   }
 
-  // Ensure dist/ also has synchronized generated sitemap.xml, robots.txt, 404.html, and site.webmanifest
+  // Ensure dist/ also has synchronized generated sitemap.xml, robots.txt, 404.html, site.webmanifest, and _redirects
   const seoAssetsResult = generateSeoFilesToDirectory(DIST_DIR);
 
   const baseHtml = fs.readFileSync(distIndexPath, 'utf-8');
@@ -493,27 +494,54 @@ export function prerenderAllPages() {
   const homepageHtml = generatePrerenderedHomepageHtml(baseHtml);
   fs.writeFileSync(distIndexPath, homepageHtml, 'utf-8');
 
-  // 2. Prerender All Tool Pages
-  const toolRoutes = Object.values(TOOL_ROUTES);
-  for (const route of toolRoutes) {
-    const toolDir = path.resolve(DIST_DIR, 'tools', route.primarySlug);
-    fs.mkdirSync(toolDir, { recursive: true });
-    const toolHtml = generateToolPrerenderedHtml(baseHtml, route);
-    fs.writeFileSync(path.resolve(toolDir, 'index.html'), toolHtml, 'utf-8');
+  // Keep Workbox SW precache revision for index.html synchronized with the prerendered file
+  const swPath = path.resolve(DIST_DIR, 'sw.js');
+  if (fs.existsSync(swPath)) {
+    const newIndexHash = crypto.createHash('md5').update(homepageHtml, 'utf8').digest('hex');
+    const swRaw = fs.readFileSync(swPath, 'utf-8');
+    const swUpdated = swRaw.replace(
+      /(\{\s*"?url"?:\s*"index\.html"\s*,\s*"?revision"?:\s*")[a-f0-9]+("\s*\})/g,
+      `$1${newIndexHash}$2`
+    );
+    if (swUpdated !== swRaw) {
+      fs.writeFileSync(swPath, swUpdated, 'utf-8');
+    } else if (swRaw.includes('"index.html"')) {
+      throw new Error('Failed to synchronize index.html precache revision in dist/sw.js');
+    }
   }
 
-  // 3. Prerender Static Pages (all non-root routes in STATIC_PAGES_SEO)
+  // 2. Prerender All Tool Pages as flat .html files (prevents Netlify directory trailing-slash 301 redirects)
+  const toolsOutDir = path.resolve(DIST_DIR, 'tools');
+  fs.mkdirSync(toolsOutDir, { recursive: true });
+  const toolRoutes = Object.values(TOOL_ROUTES);
+  for (const route of toolRoutes) {
+    const legacyDir = path.resolve(toolsOutDir, route.primarySlug);
+    if (fs.existsSync(legacyDir) && fs.statSync(legacyDir).isDirectory()) {
+      fs.rmSync(legacyDir, { recursive: true, force: true });
+    }
+    const toolHtml = generateToolPrerenderedHtml(baseHtml, route);
+    fs.writeFileSync(path.resolve(toolsOutDir, `${route.primarySlug}.html`), toolHtml, 'utf-8');
+  }
+
+  // 3. Prerender Static Pages as flat .html files (all non-root routes in STATIC_PAGES_SEO)
   const subStaticPages = STATIC_PAGES_SEO.filter((p) => p.slug !== '');
   for (const page of subStaticPages) {
-    const pageDir = path.resolve(DIST_DIR, page.slug);
-    fs.mkdirSync(pageDir, { recursive: true });
+    const legacyPageDir = path.resolve(DIST_DIR, page.slug);
+    if (page.slug !== 'tools' && fs.existsSync(legacyPageDir) && fs.statSync(legacyPageDir).isDirectory()) {
+      fs.rmSync(legacyPageDir, { recursive: true, force: true });
+    } else if (page.slug === 'tools') {
+      const legacyToolsIndex = path.resolve(legacyPageDir, 'index.html');
+      if (fs.existsSync(legacyToolsIndex)) {
+        fs.rmSync(legacyToolsIndex, { force: true });
+      }
+    }
     const pageHtml = generateStaticPageHtml(baseHtml, page);
-    fs.writeFileSync(path.resolve(pageDir, 'index.html'), pageHtml, 'utf-8');
+    fs.writeFileSync(path.resolve(DIST_DIR, `${page.slug}.html`), pageHtml, 'utf-8');
   }
 
   const totalPages = 1 + toolRoutes.length + subStaticPages.length;
   console.log(
-    `[SEO Prerender] ✓ Generated ${totalPages} static prerendered HTML pages + sitemap.xml (${seoAssetsResult.urlCount} URLs), robots.txt, 404.html, and site.webmanifest in dist/.`
+    `[SEO Prerender] ✓ Generated ${totalPages} flat prerendered HTML pages + sitemap.xml (${seoAssetsResult.urlCount} URLs), robots.txt, 404.html, site.webmanifest, and _redirects in dist/.`
   );
 }
 

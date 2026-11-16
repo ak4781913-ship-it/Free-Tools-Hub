@@ -10,10 +10,12 @@ import {
   DEFAULT_PRODUCTION_URL,
   NOT_FOUND_SEO,
   SITE_NAME,
+  STATIC_PAGES_SEO,
   getAllCanonicalSitemapEntries,
   sanitizePublicOrigin,
 } from '../src/data/seoRegistry';
 import { TOOLS_LIST } from '../src/data/tools';
+import { TOOL_ROUTES } from '../src/data/toolsRouting';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -232,6 +234,47 @@ export function buildWebManifestJson(): string {
   return `${JSON.stringify(manifest, null, 2)}\n`;
 }
 
+export function buildRedirectsTxt(): string {
+  const aliasLines: string[] = [
+    '# AbbasPro FreeTools Hub - URL Redirects & Prerendered HTML Routing for Netlify & Cloudflare Pages',
+    '',
+    '# 1. 301 Permanent Redirects for Legacy Tool Aliases',
+  ];
+
+  for (const route of Object.values(TOOL_ROUTES)) {
+    for (const alias of route.aliases) {
+      if (alias === route.primarySlug) continue;
+      aliasLines.push(`/tools/${alias}  ${route.primaryPath}  301!`);
+    }
+  }
+
+  aliasLines.push('', '# 2. 301 Trailing-Slash Canonicalization for Public Subpages');
+  const subStaticPages = STATIC_PAGES_SEO.filter((p) => p.slug !== '');
+  for (const page of subStaticPages) {
+    aliasLines.push(`${page.path}/  ${page.path}  301!`);
+  }
+  for (const route of Object.values(TOOL_ROUTES)) {
+    aliasLines.push(`${route.primaryPath}/  ${route.primaryPath}  301!`);
+  }
+
+  aliasLines.push('', '# 3. 200 OK Direct Serves for Prerendered Flat HTML Subpages');
+  for (const page of subStaticPages) {
+    aliasLines.push(`${page.path}  /${page.slug}.html  200!`);
+  }
+  for (const route of Object.values(TOOL_ROUTES)) {
+    aliasLines.push(`${route.primaryPath}  /tools/${route.primarySlug}.html  200!`);
+  }
+
+  aliasLines.push(
+    '',
+    '# 4. Custom 404 for Non-Existent Routes (prevents Soft 404 indexing)',
+    '/*  /404.html  404',
+    ''
+  );
+
+  return aliasLines.join('\n');
+}
+
 export function generateSeoFilesToDirectory(targetDir: string): {
   urlCount: number;
   baseUrl: string;
@@ -245,11 +288,13 @@ export function generateSeoFilesToDirectory(targetDir: string): {
   const robotsTxt = buildRobotsTxt(baseUrl);
   const notFoundHtml = build404Html(baseUrl);
   const manifestJson = buildWebManifestJson();
+  const redirectsTxt = buildRedirectsTxt();
 
   fs.writeFileSync(path.resolve(targetDir, 'sitemap.xml'), sitemapXml, 'utf-8');
   fs.writeFileSync(path.resolve(targetDir, 'robots.txt'), robotsTxt, 'utf-8');
   fs.writeFileSync(path.resolve(targetDir, '404.html'), notFoundHtml, 'utf-8');
   fs.writeFileSync(path.resolve(targetDir, 'site.webmanifest'), manifestJson, 'utf-8');
+  fs.writeFileSync(path.resolve(targetDir, '_redirects'), redirectsTxt, 'utf-8');
 
   const urlCount = (sitemapXml.match(/<url>/g) || []).length;
   return { urlCount, baseUrl, lastmod };
@@ -258,6 +303,6 @@ export function generateSeoFilesToDirectory(targetDir: string): {
 if (process.argv[1] && process.argv[1].endsWith('generateSeoFiles.ts')) {
   const result = generateSeoFilesToDirectory(PUBLIC_DIR);
   console.log(
-    `[SEO Generator] ✓ Generated sitemap.xml (${result.urlCount} URLs, lastmod ${result.lastmod}), robots.txt, 404.html, and site.webmanifest in public/ for ${result.baseUrl}`
+    `[SEO Generator] ✓ Generated sitemap.xml (${result.urlCount} URLs, lastmod ${result.lastmod}), robots.txt, 404.html, site.webmanifest, and _redirects in public/ for ${result.baseUrl}`
   );
 }

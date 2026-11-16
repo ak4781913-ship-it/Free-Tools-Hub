@@ -265,17 +265,427 @@
   status = 301
   force = true
 
+# 301 Trailing-slash canonicalization for public subpages
+[[redirects]]
+  from = "/tools/"
+  to = "/tools"
+  status = 301
+  force = true
+
+[[redirects]]
+  from = "/about/"
+  to = "/about"
+  status = 301
+  force = true
+
+[[redirects]]
+  from = "/contact/"
+  to = "/contact"
+  status = 301
+  force = true
+
+[[redirects]]
+  from = "/privacy/"
+  to = "/privacy"
+  status = 301
+  force = true
+
+[[redirects]]
+  from = "/terms/"
+  to = "/terms"
+  status = 301
+  force = true
+
+[[redirects]]
+  from = "/disclaimer/"
+  to = "/disclaimer"
+  status = 301
+  force = true
+
+[[redirects]]
+  from = "/tools/cv-maker/"
+  to = "/tools/cv-maker"
+  status = 301
+  force = true
+
+[[redirects]]
+  from = "/tools/uae-gratuity-calculator/"
+  to = "/tools/uae-gratuity-calculator"
+  status = 301
+  force = true
+
+[[redirects]]
+  from = "/tools/uae-salary-calculator/"
+  to = "/tools/uae-salary-calculator"
+  status = 301
+  force = true
+
+[[redirects]]
+  from = "/tools/ai-photo-prompt-generator/"
+  to = "/tools/ai-photo-prompt-generator"
+  status = 301
+  force = true
+
+[[redirects]]
+  from = "/tools/ai-video-prompt-generator/"
+  to = "/tools/ai-video-prompt-generator"
+  status = 301
+  force = true
+
+[[redirects]]
+  from = "/tools/markdown-editor/"
+  to = "/tools/markdown-editor"
+  status = 301
+  force = true
+
+[[redirects]]
+  from = "/tools/seo-page-analyzer/"
+  to = "/tools/seo-page-analyzer"
+  status = 301
+  force = true
+
+[[redirects]]
+  from = "/tools/seo-meta-generator/"
+  to = "/tools/seo-meta-generator"
+  status = 301
+  force = true
+
+[[redirects]]
+  from = "/tools/word-counter/"
+  to = "/tools/word-counter"
+  status = 301
+  force = true
+
+[[redirects]]
+  from = "/tools/text-case-converter/"
+  to = "/tools/text-case-converter"
+  status = 301
+  force = true
+
+[[redirects]]
+  from = "/tools/image-compressor/"
+  to = "/tools/image-compressor"
+  status = 301
+  force = true
+
+[[redirects]]
+  from = "/tools/qr-code-generator/"
+  to = "/tools/qr-code-generator"
+  status = 301
+  force = true
+
+[[redirects]]
+  from = "/tools/color-picker/"
+  to = "/tools/color-picker"
+  status = 301
+  force = true
+
+[[redirects]]
+  from = "/tools/loan-calculator/"
+  to = "/tools/loan-calculator"
+  status = 301
+  force = true
+
+[[redirects]]
+  from = "/tools/currency-converter/"
+  to = "/tools/currency-converter"
+  status = 301
+  force = true
+
+[[redirects]]
+  from = "/tools/crypto-converter/"
+  to = "/tools/crypto-converter"
+  status = 301
+  force = true
+
+[[redirects]]
+  from = "/tools/percentage-calculator/"
+  to = "/tools/percentage-calculator"
+  status = 301
+  force = true
+
+[[redirects]]
+  from = "/tools/discount-calculator/"
+  to = "/tools/discount-calculator"
+  status = 301
+  force = true
+
+[[redirects]]
+  from = "/tools/unit-converter/"
+  to = "/tools/unit-converter"
+  status = 301
+  force = true
+
+[[redirects]]
+  from = "/tools/password-generator/"
+  to = "/tools/password-generator"
+  status = 301
+  force = true
+
+[[redirects]]
+  from = "/tools/password-strength/"
+  to = "/tools/password-strength"
+  status = 301
+  force = true
+
+[[redirects]]
+  from = "/tools/age-calculator/"
+  to = "/tools/age-calculator"
+  status = 301
+  force = true
+
+[[redirects]]
+  from = "/tools/date-difference/"
+  to = "/tools/date-difference"
+  status = 301
+  force = true
+
+[[redirects]]
+  from = "/tools/bmi-calculator/"
+  to = "/tools/bmi-calculator"
+  status = 301
+  force = true
+
+[[redirects]]
+  from = "/tools/timezone-converter/"
+  to = "/tools/timezone-converter"
+  status = 301
+  force = true
+
+[[redirects]]
+  from = "/tools/json-formatter/"
+  to = "/tools/json-formatter"
+  status = 301
+  force = true
+
+[[redirects]]
+  from = "/tools/base64-converter/"
+  to = "/tools/base64-converter"
+  status = 301
+  force = true
+
+[[redirects]]
+  from = "/tools/pdf-tools-suite/"
+  to = "/tools/pdf-tools-suite"
+  status = 301
+  force = true
+
+# Direct 200 OK rewrites to flat prerendered HTML pages (zero directory redirect)
+[[redirects]]
+  from = "/tools"
+  to = "/tools.html"
+  status = 200
+  force = true
+
+[[redirects]]
+  from = "/about"
+  to = "/about.html"
+  status = 200
+  force = true
+
+[[redirects]]
+  from = "/contact"
+  to = "/contact.html"
+  status = 200
+  force = true
+
+[[redirects]]
+  from = "/privacy"
+  to = "/privacy.html"
+  status = 200
+  force = true
+
+[[redirects]]
+  from = "/terms"
+  to = "/terms.html"
+  status = 200
+  force = true
+
+[[redirects]]
+  from = "/disclaimer"
+  to = "/disclaimer.html"
+  status = 200
+  force = true
+
+[[redirects]]
+  from = "/tools/cv-maker"
+  to = "/tools/cv-maker.html"
+  status = 200
+  force = true
+
+[[redirects]]
+  from = "/tools/uae-gratuity-calculator"
+  to = "/tools/uae-gratuity-calculator.html"
+  status = 200
+  force = true
+
+[[redirects]]
+  from = "/tools/uae-salary-calculator"
+  to = "/tools/uae-salary-calculator.html"
+  status = 200
+  force = true
+
+[[redirects]]
+  from = "/tools/ai-photo-prompt-generator"
+  to = "/tools/ai-photo-prompt-generator.html"
+  status = 200
+  force = true
+
+[[redirects]]
+  from = "/tools/ai-video-prompt-generator"
+  to = "/tools/ai-video-prompt-generator.html"
+  status = 200
+  force = true
+
+[[redirects]]
+  from = "/tools/markdown-editor"
+  to = "/tools/markdown-editor.html"
+  status = 200
+  force = true
+
+[[redirects]]
+  from = "/tools/seo-page-analyzer"
+  to = "/tools/seo-page-analyzer.html"
+  status = 200
+  force = true
+
+[[redirects]]
+  from = "/tools/seo-meta-generator"
+  to = "/tools/seo-meta-generator.html"
+  status = 200
+  force = true
+
+[[redirects]]
+  from = "/tools/word-counter"
+  to = "/tools/word-counter.html"
+  status = 200
+  force = true
+
+[[redirects]]
+  from = "/tools/text-case-converter"
+  to = "/tools/text-case-converter.html"
+  status = 200
+  force = true
+
+[[redirects]]
+  from = "/tools/image-compressor"
+  to = "/tools/image-compressor.html"
+  status = 200
+  force = true
+
+[[redirects]]
+  from = "/tools/qr-code-generator"
+  to = "/tools/qr-code-generator.html"
+  status = 200
+  force = true
+
+[[redirects]]
+  from = "/tools/color-picker"
+  to = "/tools/color-picker.html"
+  status = 200
+  force = true
+
+[[redirects]]
+  from = "/tools/loan-calculator"
+  to = "/tools/loan-calculator.html"
+  status = 200
+  force = true
+
+[[redirects]]
+  from = "/tools/currency-converter"
+  to = "/tools/currency-converter.html"
+  status = 200
+  force = true
+
+[[redirects]]
+  from = "/tools/crypto-converter"
+  to = "/tools/crypto-converter.html"
+  status = 200
+  force = true
+
+[[redirects]]
+  from = "/tools/percentage-calculator"
+  to = "/tools/percentage-calculator.html"
+  status = 200
+  force = true
+
+[[redirects]]
+  from = "/tools/discount-calculator"
+  to = "/tools/discount-calculator.html"
+  status = 200
+  force = true
+
+[[redirects]]
+  from = "/tools/unit-converter"
+  to = "/tools/unit-converter.html"
+  status = 200
+  force = true
+
+[[redirects]]
+  from = "/tools/password-generator"
+  to = "/tools/password-generator.html"
+  status = 200
+  force = true
+
+[[redirects]]
+  from = "/tools/password-strength"
+  to = "/tools/password-strength.html"
+  status = 200
+  force = true
+
+[[redirects]]
+  from = "/tools/age-calculator"
+  to = "/tools/age-calculator.html"
+  status = 200
+  force = true
+
+[[redirects]]
+  from = "/tools/date-difference"
+  to = "/tools/date-difference.html"
+  status = 200
+  force = true
+
+[[redirects]]
+  from = "/tools/bmi-calculator"
+  to = "/tools/bmi-calculator.html"
+  status = 200
+  force = true
+
+[[redirects]]
+  from = "/tools/timezone-converter"
+  to = "/tools/timezone-converter.html"
+  status = 200
+  force = true
+
+[[redirects]]
+  from = "/tools/json-formatter"
+  to = "/tools/json-formatter.html"
+  status = 200
+  force = true
+
+[[redirects]]
+  from = "/tools/base64-converter"
+  to = "/tools/base64-converter.html"
+  status = 200
+  force = true
+
+[[redirects]]
+  from = "/tools/pdf-tools-suite"
+  to = "/tools/pdf-tools-suite.html"
+  status = 200
+  force = true
+
 # Route API endpoints to Netlify Functions
 [[redirects]]
   from = "/api/analyze-seo"
   to = "/.netlify/functions/analyze-seo"
   status = 200
 
-# Client-side SPA routing fallback
+# Custom 404 fallback for unknown routes (prevents Soft 404 indexing)
 [[redirects]]
   from = "/*"
-  to = "/index.html"
-  status = 200
+  to = "/404.html"
+  status = 404
 
 # Global Security & Performance Headers
 [[headers]]

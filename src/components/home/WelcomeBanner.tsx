@@ -55,23 +55,33 @@ export const WelcomeBanner: React.FC<WelcomeBannerProps> = ({
 
         {/* Action CTAs */}
         <div className="flex flex-wrap items-center gap-3 shrink-0">
-          <button
-            type="button"
-            onClick={onExploreClick}
+          <a
+            href="/tools"
+            onClick={(e) => {
+              if (!e.metaKey && !e.ctrlKey && !e.shiftKey && e.button === 0) {
+                e.preventDefault();
+                onExploreClick();
+              }
+            }}
             className="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl bg-white text-blue-900 hover:bg-blue-50 text-xs sm:text-sm font-bold shadow-md hover:shadow-lg transition-all active:scale-95 cursor-pointer"
           >
             <Compass className="w-4 h-4 text-blue-700" />
             <span>{isUrdu ? 'تمام ٹولز دریافت کریں' : 'Explore All Tools'}</span>
-          </button>
+          </a>
 
-          <button
-            type="button"
-            onClick={onOpenCvClick}
+          <a
+            href="/tools/cv-maker"
+            onClick={(e) => {
+              if (!e.metaKey && !e.ctrlKey && !e.shiftKey && e.button === 0) {
+                e.preventDefault();
+                onOpenCvClick();
+              }
+            }}
             className="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl bg-blue-800/80 hover:bg-blue-700 border border-blue-500/40 text-white text-xs sm:text-sm font-semibold transition-all active:scale-95 cursor-pointer backdrop-blur-xs"
           >
             <span>{isUrdu ? 'سی وی بنائیں' : 'Create Resume'}</span>
             <ArrowRight className="w-3.5 h-3.5" />
-          </button>
+          </a>
         </div>
       </div>
     </div>

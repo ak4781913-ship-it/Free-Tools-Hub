@@ -51,15 +51,20 @@ export const QuickAccessSection: React.FC<QuickAccessSectionProps> = ({
           </p>
         </div>
 
-        <button
-          type="button"
-          onClick={onViewAllTools}
+        <a
+          href="/tools"
+          onClick={(e) => {
+            if (!e.metaKey && !e.ctrlKey && !e.shiftKey && e.button === 0) {
+              e.preventDefault();
+              onViewAllTools();
+            }
+          }}
           className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 hover:bg-slate-50 dark:hover:bg-slate-800 text-blue-700 dark:text-blue-400 text-xs font-bold transition-all shadow-2xs self-start sm:self-auto cursor-pointer"
         >
           <Compass className="w-3.5 h-3.5" />
           <span>{isUrdu ? 'مکمل ڈائرکٹری دیکھیں' : 'View All Tools'}</span>
           <ArrowRight className="w-3.5 h-3.5" />
-        </button>
+        </a>
       </div>
 
       {/* Grid of Modern Tool Cards */}

@@ -78,14 +78,16 @@ export default defineConfig(() => {
         workbox: {
           maximumFileSizeToCacheInBytes: 6 * 1024 * 1024, // 6 MB to precache full client bundle
           globPatterns: ['**/*.{js,css,html,ico,png,svg,woff,woff2,json}'],
-          globIgnores: ['**/404.html'],
+          globIgnores: ['**/404.html', '**/sitemap.xml', '**/robots.txt'],
           navigateFallback: '/index.html',
           navigateFallbackDenylist: [
             /^\/api/,
+            /^\/\.netlify/,
             /^\/sitemap\.xml$/,
             /^\/robots\.txt$/,
             /^\/404\.html$/,
             /^\/site\.webmanifest$/,
+            /^\/manifest\.webmanifest$/,
           ],
           runtimeCaching: [
             {

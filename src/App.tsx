@@ -14,21 +14,37 @@ import { getRouteSeoForPath } from './data/seoRegistry';
 import { applyRouteSeo, getSiteBaseUrl } from './utils/seoManager';
 
 // Layout components
-import { Header } from './components/layout/Header';
 import { Sidebar } from './components/layout/Sidebar';
 import { DashboardHeader } from './components/layout/DashboardHeader';
 import { Footer } from './components/layout/Footer';
 import { ToolPageLayout } from './components/layout/ToolPageLayout';
-import { LegalModal } from './components/layout/Modals/LegalModal';
-import { SettingsModal } from './components/layout/Modals/SettingsModal';
-import { HelpModal } from './components/layout/Modals/HelpModal';
 import { FavoritesDrawer } from './components/layout/FavoritesDrawer';
-import { GlobalSearchModal } from './components/layout/GlobalSearchModal';
-import { FeedbackModal } from './components/layout/FeedbackModal';
-import { ShortcutsModal } from './components/layout/ShortcutsModal';
-import { OnboardingTour } from './components/layout/OnboardingTour';
-import { PrintHistoryModal } from './components/layout/PrintHistoryModal';
 import { OfflineIndicator } from './components/layout/OfflineIndicator';
+
+const LegalModal = lazy(() =>
+  import('./components/layout/Modals/LegalModal').then((m) => ({ default: m.LegalModal }))
+);
+const SettingsModal = lazy(() =>
+  import('./components/layout/Modals/SettingsModal').then((m) => ({ default: m.SettingsModal }))
+);
+const HelpModal = lazy(() =>
+  import('./components/layout/Modals/HelpModal').then((m) => ({ default: m.HelpModal }))
+);
+const GlobalSearchModal = lazy(() =>
+  import('./components/layout/GlobalSearchModal').then((m) => ({ default: m.GlobalSearchModal }))
+);
+const FeedbackModal = lazy(() =>
+  import('./components/layout/FeedbackModal').then((m) => ({ default: m.FeedbackModal }))
+);
+const ShortcutsModal = lazy(() =>
+  import('./components/layout/ShortcutsModal').then((m) => ({ default: m.ShortcutsModal }))
+);
+const OnboardingTour = lazy(() =>
+  import('./components/layout/OnboardingTour').then((m) => ({ default: m.OnboardingTour }))
+);
+const PrintHistoryModal = lazy(() =>
+  import('./components/layout/PrintHistoryModal').then((m) => ({ default: m.PrintHistoryModal }))
+);
 
 // Dedicated Pages
 import { ToolsDirectoryPage } from './components/pages/ToolsDirectoryPage';
@@ -39,11 +55,9 @@ import { WelcomeBanner } from './components/home/WelcomeBanner';
 import { StatsCards } from './components/home/StatsCards';
 import { QuickAccessSection } from './components/home/QuickAccessSection';
 import { CategoryCardsSection } from './components/home/CategoryCardsSection';
-import { HeroSection } from './components/home/HeroSection';
 import { DailyGoalTracker } from './components/home/DailyGoalTracker';
 import { RecentlyUsedSection } from './components/home/RecentlyUsedSection';
 import { FavoritesSection } from './components/home/FavoritesSection';
-import { ToolsGrid } from './components/home/ToolsGrid';
 import { FeaturedUAESection } from './components/home/FeaturedUAESection';
 import { FeaturedAIPromptsSection } from './components/home/FeaturedAIPromptsSection';
 import { HowItWorksSection } from './components/home/HowItWorksSection';
@@ -782,59 +796,70 @@ const MainApp: React.FC = () => {
       {/* Saved & Recent Tools Drawer */}
       <FavoritesDrawer onNavigate={navigateTo} />
 
-      {/* Legacy Legal Modal preserved for backward compatibility */}
-      <LegalModal
-        type={legalModalType}
-        onClose={() => setLegalModalType(null)}
-      />
+      {/* Deferred Lazy-Loaded Modals (loaded on demand to keep initial JS fast) */}
+      <Suspense fallback={null}>
+        {legalModalType && (
+          <LegalModal
+            type={legalModalType}
+            onClose={() => setLegalModalType(null)}
+          />
+        )}
 
-      {/* Settings Modal (Theme, Language, Storage Reset) */}
-      <SettingsModal
-        isOpen={isSettingsOpen}
-        onClose={() => setIsSettingsOpen(false)}
-      />
+        {isSettingsOpen && (
+          <SettingsModal
+            isOpen={isSettingsOpen}
+            onClose={() => setIsSettingsOpen(false)}
+          />
+        )}
 
-      {/* Help & Support Modal */}
-      <HelpModal
-        isOpen={isHelpOpen}
-        onClose={() => setIsHelpOpen(false)}
-        onNavigateTo={navigateTo}
-        onOpenFeedback={() => setIsFeedbackOpen(true)}
-      />
+        {isHelpOpen && (
+          <HelpModal
+            isOpen={isHelpOpen}
+            onClose={() => setIsHelpOpen(false)}
+            onNavigateTo={navigateTo}
+            onOpenFeedback={() => setIsFeedbackOpen(true)}
+          />
+        )}
 
-      {/* Global Search Palette */}
-      <GlobalSearchModal
-        isOpen={isSearchOpen}
-        onClose={() => setIsSearchOpen(false)}
-        onSelectTool={(toolId) => navigateTo(getToolPrimaryPath(toolId))}
-      />
+        {isSearchOpen && (
+          <GlobalSearchModal
+            isOpen={isSearchOpen}
+            onClose={() => setIsSearchOpen(false)}
+            onSelectTool={(toolId) => navigateTo(getToolPrimaryPath(toolId))}
+          />
+        )}
 
-      {/* Feature Request & Issue Report Modal */}
-      <FeedbackModal
-        isOpen={isFeedbackOpen}
-        onClose={() => setIsFeedbackOpen(false)}
-        currentView={isToolPage && activeToolDef ? `tool:${activeToolDef.id}` : 'home'}
-      />
+        {isFeedbackOpen && (
+          <FeedbackModal
+            isOpen={isFeedbackOpen}
+            onClose={() => setIsFeedbackOpen(false)}
+            currentView={isToolPage && activeToolDef ? `tool:${activeToolDef.id}` : 'home'}
+          />
+        )}
 
-      {/* Keyboard Shortcuts Modal */}
-      <ShortcutsModal
-        isOpen={isShortcutsOpen}
-        onClose={() => setIsShortcutsOpen(false)}
-      />
+        {isShortcutsOpen && (
+          <ShortcutsModal
+            isOpen={isShortcutsOpen}
+            onClose={() => setIsShortcutsOpen(false)}
+          />
+        )}
 
-      {/* Print History Modal */}
-      <PrintHistoryModal
-        isOpen={isPrintHistoryOpen}
-        onClose={() => setIsPrintHistoryOpen(false)}
-        onNavigate={navigateTo}
-      />
+        {isPrintHistoryOpen && (
+          <PrintHistoryModal
+            isOpen={isPrintHistoryOpen}
+            onClose={() => setIsPrintHistoryOpen(false)}
+            onNavigate={navigateTo}
+          />
+        )}
 
-      {/* Optional Getting Started Tour (only opened on explicit user click) */}
-      <OnboardingTour
-        isOpen={isTourOpen}
-        onClose={() => setIsTourOpen(false)}
-        onNavigate={navigateTo}
-      />
+        {isTourOpen && (
+          <OnboardingTour
+            isOpen={isTourOpen}
+            onClose={() => setIsTourOpen(false)}
+            onNavigate={navigateTo}
+          />
+        )}
+      </Suspense>
 
       {/* PWA Offline / Sync Status Indicator */}
       <OfflineIndicator />
