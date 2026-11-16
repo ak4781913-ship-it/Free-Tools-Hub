@@ -53,19 +53,32 @@ Open [http://localhost:3000](http://localhost:3000) in your browser.
 
 | Command | Purpose |
 | :--- | :--- |
-| `bun run dev` | Runs the full-stack dev server (`server.ts`) on port 3000 |
-| `bun run seo:generate` | Regenerates `sitemap.xml`, `robots.txt`, `404.html`, `site.webmanifest`, `_redirects`, and syncs `netlify.toml` |
-| `bun run build` | Generates SEO assets, builds Vite bundle, and creates 35 flat prerendered HTML pages in `dist/` |
-| `bun run lint` | Runs TypeScript type checking (`tsc --noEmit`) across all files |
-| `bun run preview` | Runs Vite static preview on the compiled `dist/` bundle |
-| `bun run start` | Runs the production Node.js Express server against the `dist/` bundle |
-| `bun run clean` | Cleans build artifacts (`dist/` and temp files) |
+| `bun run dev` / `npm run dev` | Runs the full-stack dev server (`server.ts`) on port 3000 |
+| `bun run seo:generate` / `npm run seo:generate` | Regenerates `sitemap.xml`, `robots.txt`, `404.html`, `site.webmanifest`, `_redirects`, and syncs `netlify.toml` |
+| `bun run build` / `npm run build` | Generates SEO assets, builds Vite bundle, prerenders 35 HTML pages in `dist/`, and compiles `server.js` |
+| `bun run lint` / `npm run lint` | Runs TypeScript type checking (`tsc --noEmit`) across all files |
+| `bun run preview` / `npm run preview` | Runs Vite static preview on the compiled `dist/` bundle |
+| `bun run start` / `npm start` | Runs the compiled production Express server (`node server.js`) against `dist/` on `0.0.0.0:$PORT` |
+| `bun run clean` / `npm run clean` | Cleans build artifacts (`dist/` and `server.js`) |
+
+---
+
+## 🏢 Hostinger Node.js Deployment (GitHub Auto-Deploy)
+
+FreeTools Hub is ready for **Hostinger Node.js 22 Web App Hosting** with `npm` and automatic GitHub deploys. See [`HOSTINGER_DEPLOYMENT_GUIDE.md`](./HOSTINGER_DEPLOYMENT_GUIDE.md) for the complete 18-step setup, Firebase Authorized Domains checklist, and environment variable table.
+
+- **Node.js Version**: `22` (`.nvmrc`)
+- **Package Manager**: `npm` (`package-lock.json`)
+- **Build Command**: `npm run build`
+- **Start Command**: `npm start` (`node server.js`)
+- **Production Entry File**: `server.js` (bundles `server.ts` for Node 22 ESM cleanly during `npm run build`)
+- **Environment Variables**: Set `VITE_SITE_URL`, optional `VITE_GOOGLE_SITE_VERIFICATION` / `VITE_CONTACT_EMAIL`, and `VITE_FIREBASE_*` in Hostinger before building so Vite, prerendered HTML, and `sitemap.xml` / `robots.txt` align with your live domain.
 
 ---
 
 ## 🌐 Netlify Deployment & CI Workflow
 
-FreeTools Hub uses **Netlify Git Integration** as its single automatic production deployment mechanism for `https://freetoolshub1.netlify.app/`, while GitHub Actions (`.github/workflows/deploy-netlify.yml`) runs **CI validation** (`bun install --frozen-lockfile`, `bun run lint`, `bun run build`, and SEO output checks) without triggering competing duplicate production deploys.
+FreeTools Hub also supports **Netlify Git Integration** (`https://freetoolshub1.netlify.app/`), while GitHub Actions (`.github/workflows/deploy-netlify.yml`) runs **CI validation** (`bun install --frozen-lockfile`, `bun run lint`, `bun run build`, and SEO output checks) without triggering competing duplicate production deploys.
 
 ### Netlify Configuration (`netlify.toml`)
 - **Build command**: `bun run build`
@@ -92,7 +105,7 @@ Cloudflare Pages support (`functions/api/analyze-seo.ts`, `wrangler.toml`, `publ
 
 ## 🔒 Security & Serverless Architecture
 
-All `/api/analyze-seo` runtimes (`server.ts`, `netlify/functions/analyze-seo.ts`, and `functions/api/analyze-seo.ts`) enforce defense-in-depth SSRF safeguards:
+All `/api/analyze-seo` runtimes (`server.ts`/`server.js`, `netlify/functions/analyze-seo.ts`, and `functions/api/analyze-seo.ts`) enforce defense-in-depth SSRF safeguards:
 - **HTTP Method Enforcement**: Only `GET` and `HEAD` permitted (`405` otherwise).
 - **Protocol & Port Whitelisting**: Only `http:`/`https:` and ports `80`, `443`, `8080`, `8443` allowed.
 - **Credential & Private IP Blocking**: Rejects embedded credentials and resolves hostnames to block loopback, RFC1918, CGNAT, link-local, cloud metadata (`169.254.169.254`, `metadata.google.internal`), and IPv6 ULA/link-local ranges.
@@ -102,7 +115,7 @@ All `/api/analyze-seo` runtimes (`server.ts`, `netlify/functions/analyze-seo.ts`
 
 ## 🗂️ Single-Source Canonical Routing & Redirects
 
-All 35 indexable canonical URLs (1 homepage + 6 static trust/directory pages + 28 tools) and 38 legacy 301 alias redirects are defined once in `src/data/toolsRouting.ts` and `src/data/seoRegistry.ts`. Running `bun run seo:generate` (and `bun run build`) automatically synchronizes both `netlify.toml` and `public/_redirects` / `dist/_redirects`.
+All 35 indexable canonical URLs (1 homepage + 6 static trust/directory pages + 28 tools) and 38 legacy 301 alias redirects are defined once in `src/data/toolsRouting.ts` and `src/data/seoRegistry.ts`. Running `npm run seo:generate` or `npm run build` automatically synchronizes `netlify.toml`, `public/_redirects`, `dist/_redirects`, `sitemap.xml`, `robots.txt`, and `server.js`.
 
 ---
 

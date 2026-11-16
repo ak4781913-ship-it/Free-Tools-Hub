@@ -169,7 +169,7 @@ function mapFirebaseAuthError(
         ? `فراہم کردہ Firebase Web API Key غلط یا پروجیکٹ سے مطابقت نہیں رکھتی (${code})۔`
         : `Invalid Firebase Web API Key for project "${firebaseDiagnostics.projectId || 'unknown'}" (${code}).`;
       diagnosticHint =
-        'Verify VITE_FIREBASE_API_KEY in Netlify environment variables matches the exact Web API key in Firebase Project Settings.';
+        'Verify VITE_FIREBASE_API_KEY in your hosting environment variables (Hostinger / Netlify / .env) matches the exact Web API key in Firebase Project Settings.';
       break;
 
     case 'auth/popup-blocked':

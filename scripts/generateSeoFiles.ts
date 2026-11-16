@@ -3,6 +3,7 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
+import 'dotenv/config';
 import { execFileSync } from 'node:child_process';
 import fs from 'node:fs';
 import path from 'node:path';
@@ -134,6 +135,7 @@ export function resolveBuildBaseUrl(): string {
     process.env.SITE_URL,
     process.env.URL, // Automatically set by Netlify during production builds
     process.env.DEPLOY_PRIME_URL,
+    process.env.APP_URL,
   ];
   for (const candidate of candidates) {
     const sanitized = sanitizePublicOrigin(candidate);

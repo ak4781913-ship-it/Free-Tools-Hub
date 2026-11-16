@@ -25,7 +25,9 @@ dotenv.config();
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
-const PORT = 3000;
+const parsedPort = Number(process.env.PORT);
+const PORT =
+  Number.isInteger(parsedPort) && parsedPort > 0 && parsedPort < 65536 ? parsedPort : 3000;
 const MAX_HTML_BYTES = 2 * 1024 * 1024; // 2 MB cap
 const MAX_REDIRECTS = 4;
 const FETCH_TIMEOUT_MS = 8500;
@@ -41,18 +43,38 @@ function classifyAppRoute(pathname: string): {
   };
 }
 
+function getRequestOriginCandidate(req?: Request): string {
+  if (!req) return '';
+  const forwardedHost = (req.headers['x-forwarded-host'] as string | undefined)
+    ?.split(',')[0]
+    ?.trim();
+  const host = forwardedHost || req.headers.host || '';
+  if (!host) return '';
+  const protoHeader = (req.headers['x-forwarded-proto'] as string | undefined)
+    ?.split(',')[0]
+    ?.trim()
+    .toLowerCase();
+  const protocol = protoHeader === 'http' || protoHeader === 'https' ? protoHeader : 'https';
+  return sanitizePublicOrigin(`${protocol}://${host}`);
+}
+
 /**
- * Returns configured production domain or fallback DEFAULT_PRODUCTION_URL.
+ * Returns configured production domain, verified request host, or fallback DEFAULT_PRODUCTION_URL.
  */
-function resolveVerifiedProductionDomain(): string {
+function resolveVerifiedProductionDomain(req?: Request): string {
   const candidates = [
     process.env.VITE_SITE_URL,
     process.env.SITE_URL,
     process.env.URL,
+    process.env.APP_URL,
   ];
   for (const c of candidates) {
     const clean = sanitizePublicOrigin(c);
     if (clean) return clean;
+  }
+  const reqOrigin = getRequestOriginCandidate(req);
+  if (reqOrigin) {
+    return reqOrigin;
   }
   return DEFAULT_PRODUCTION_URL;
 }
@@ -61,33 +83,34 @@ function resolveVerifiedProductionDomain(): string {
  * Resolves active public site base URL for robots.txt and sitemap.xml.
  */
 function resolveBaseUrl(req: Request): string {
-  const configuredEnv = sanitizePublicOrigin(
-    process.env.VITE_SITE_URL || process.env.SITE_URL || process.env.URL || ''
-  );
-  if (configuredEnv) {
-    return configuredEnv;
-  }
+  return resolveVerifiedProductionDomain(req);
+}
 
-  const forwardedHost = (req.headers['x-forwarded-host'] as string | undefined)
-    ?.split(',')[0]
-    ?.trim();
-  const host = forwardedHost || req.headers.host || '';
-  const sanitizedReqHost = host ? sanitizePublicOrigin(`https://${host}`) : '';
-  if (sanitizedReqHost) {
-    return sanitizedReqHost;
+/**
+ * If prerendered HTML used DEFAULT_PRODUCTION_URL at build time but runtime serves a different
+ * verified public origin, rewrite canonical/OG/schema origin references cleanly.
+ */
+function applyRuntimeDomainToHtml(html: string, req: Request): string {
+  const activeDomain = resolveVerifiedProductionDomain(req);
+  if (activeDomain && activeDomain !== DEFAULT_PRODUCTION_URL && html.includes(DEFAULT_PRODUCTION_URL)) {
+    return html.split(DEFAULT_PRODUCTION_URL).join(activeDomain);
   }
-
-  return DEFAULT_PRODUCTION_URL;
+  return html;
 }
 
 /**
  * Injects exact route-level <title>, <meta name="description">, <meta name="robots">,
  * OpenGraph/Twitter tags, canonical URL, optional GSC verification, and JSON-LD into HTML.
  */
-function injectRouteSeoIntoHtml(rawHtml: string, rawUrl: string, status: 200 | 301 | 404): string {
+function injectRouteSeoIntoHtml(
+  rawHtml: string,
+  rawUrl: string,
+  status: 200 | 301 | 404,
+  req?: Request
+): string {
   const cleanPath = normalizeSeoPathname(rawUrl);
   const isNotFound = status === 404;
-  const canonicalBase = resolveVerifiedProductionDomain();
+  const canonicalBase = resolveVerifiedProductionDomain(req);
   const seo = getRouteSeoForPath(isNotFound ? '/404' : cleanPath, canonicalBase);
 
   const safeTitle = escapeXml(seo.title);
@@ -358,15 +381,21 @@ function escapeXml(str: string): string {
 async function startServer() {
   const app = express();
   app.disable('x-powered-by');
+  app.set('trust proxy', 1);
   const httpServer = http.createServer(app);
 
+  const isCompiledServerJs = path.basename(__filename) === 'server.js';
   const isProduction =
-    process.env.NODE_ENV === 'production' || process.env.npm_lifecycle_event === 'start';
+    process.env.NODE_ENV === 'production' ||
+    process.env.npm_lifecycle_event === 'start' ||
+    (isCompiledServerJs && process.env.NODE_ENV !== 'development');
 
-  // Common iframe-safe security headers
+  // Common iframe- & popup-safe security headers
   app.use((_req, res, next) => {
     res.setHeader('X-Content-Type-Options', 'nosniff');
     res.setHeader('Referrer-Policy', 'strict-origin-when-cross-origin');
+    res.setHeader('Permissions-Policy', 'camera=(self), microphone=(), geolocation=()');
+    res.setHeader('Cross-Origin-Opener-Policy', 'same-origin-allow-popups');
     next();
   });
 
@@ -385,6 +414,13 @@ async function startServer() {
     res.setHeader('Cache-Control', 'no-store');
     const clientIp = (req.headers['x-forwarded-for'] as string | undefined)?.split(',')[0]?.trim() || req.ip || 'unknown';
     const now = Date.now();
+    if (seoRateWindow.size > 250) {
+      for (const [key, entry] of seoRateWindow.entries()) {
+        if (now > entry.resetAt) {
+          seoRateWindow.delete(key);
+        }
+      }
+    }
     const bucket = seoRateWindow.get(clientIp);
     if (!bucket || now > bucket.resetAt) {
       seoRateWindow.set(clientIp, { count: 1, resetAt: now + 60_000 });
@@ -683,7 +719,7 @@ async function startServer() {
         const url = req.originalUrl;
         const routeInfo = classifyAppRoute(url);
         const rawTemplate = fs.readFileSync(path.resolve(__dirname, 'index.html'), 'utf-8');
-        const seoTemplate = injectRouteSeoIntoHtml(rawTemplate, url, routeInfo.status);
+        const seoTemplate = injectRouteSeoIntoHtml(rawTemplate, url, routeInfo.status, req);
         let html = await vite.transformIndexHtml(url, seoTemplate);
         if (hmrDisabled) {
           html = html.replace(
@@ -708,9 +744,35 @@ async function startServer() {
     app.use(
       express.static(distDir, {
         index: false,
-        maxAge: '7d',
+        redirect: false,
+        setHeaders: (res, filePath) => {
+          const normalized = filePath.replace(/\\/g, '/');
+          if (normalized.endsWith('.webmanifest')) {
+            res.setHeader('Content-Type', 'application/manifest+json; charset=utf-8');
+            res.setHeader('Cache-Control', 'public, max-age=0, must-revalidate');
+          } else if (
+            normalized.endsWith('/sw.js') ||
+            normalized.endsWith('/404.html') ||
+            normalized.endsWith('/sitemap.xml') ||
+            normalized.endsWith('/robots.txt')
+          ) {
+            res.setHeader('Cache-Control', 'public, max-age=0, must-revalidate');
+            if (normalized.endsWith('/404.html')) {
+              res.setHeader('X-Robots-Tag', 'noindex, follow');
+            }
+          } else if (normalized.includes('/assets/')) {
+            res.setHeader('Cache-Control', 'public, max-age=31536000, immutable');
+          } else {
+            res.setHeader('Cache-Control', 'public, max-age=604800');
+          }
+        },
       })
     );
+
+    // Prevent missing fingerprinted assets from returning HTML fallback with wrong MIME type
+    app.use('/assets', (_req, res) => {
+      res.status(404).set('Cache-Control', 'no-store').type('text/plain').send('Asset not found.');
+    });
 
     app.get('*', (req: Request, res: Response) => {
       const indexHtmlPath = path.join(distDir, 'index.html');
@@ -720,18 +782,30 @@ async function startServer() {
       }
       const routeInfo = classifyAppRoute(req.originalUrl);
       if (routeInfo.status === 301 && routeInfo.redirectTo) {
-        res.redirect(301, routeInfo.redirectTo);
+        const searchSuffix = req.originalUrl.includes('?')
+          ? req.originalUrl.slice(req.originalUrl.indexOf('?'))
+          : '';
+        res.redirect(301, `${routeInfo.redirectTo}${searchSuffix}`);
         return;
       }
 
       const cleanPath = normalizeSeoPathname(req.originalUrl);
+      const htmlHeaders = {
+        'Content-Type': 'text/html; charset=utf-8',
+        'Cache-Control': 'public, max-age=0, must-revalidate',
+      };
+
       if (routeInfo.status === 404) {
         const notFoundHtmlPath = path.join(distDir, '404.html');
         if (fs.existsSync(notFoundHtmlPath)) {
+          const notFoundHtml = applyRuntimeDomainToHtml(
+            fs.readFileSync(notFoundHtmlPath, 'utf-8'),
+            req
+          );
           res
             .status(404)
-            .set({ 'Content-Type': 'text/html; charset=utf-8', 'X-Robots-Tag': 'noindex, follow' })
-            .sendFile(notFoundHtmlPath);
+            .set({ ...htmlHeaders, 'X-Robots-Tag': 'noindex, follow' })
+            .send(notFoundHtml);
           return;
         }
       }
@@ -740,31 +814,60 @@ async function startServer() {
       const prerenderedFlatPath = path.join(distDir, `${cleanRel}.html`);
       const prerenderedDirPath = path.join(distDir, cleanRel, 'index.html');
       if (cleanPath !== '/') {
-        if (fs.existsSync(prerenderedFlatPath)) {
-          res.status(200).set({ 'Content-Type': 'text/html; charset=utf-8' }).sendFile(prerenderedFlatPath);
-          return;
-        }
-        if (fs.existsSync(prerenderedDirPath)) {
-          res.status(200).set({ 'Content-Type': 'text/html; charset=utf-8' }).sendFile(prerenderedDirPath);
+        const matchedPath = fs.existsSync(prerenderedFlatPath)
+          ? prerenderedFlatPath
+          : fs.existsSync(prerenderedDirPath)
+          ? prerenderedDirPath
+          : null;
+        if (matchedPath) {
+          const prerenderedHtml = applyRuntimeDomainToHtml(
+            fs.readFileSync(matchedPath, 'utf-8'),
+            req
+          );
+          res.status(200).set(htmlHeaders).send(prerenderedHtml);
           return;
         }
       }
 
       const rawHtml = fs.readFileSync(indexHtmlPath, 'utf-8');
-      const seoHtml = injectRouteSeoIntoHtml(rawHtml, req.originalUrl, routeInfo.status);
+      const seoHtml = injectRouteSeoIntoHtml(rawHtml, req.originalUrl, routeInfo.status, req);
       res
         .status(routeInfo.status === 404 ? 404 : 200)
         .set({
-          'Content-Type': 'text/html; charset=utf-8',
+          ...htmlHeaders,
           ...(routeInfo.status === 404 ? { 'X-Robots-Tag': 'noindex, follow' } : {}),
         })
         .send(seoHtml);
     });
   }
 
-  httpServer.listen(PORT, '0.0.0.0', () => {
-    console.log(`FreeTools Hub server running on http://0.0.0.0:${PORT} (${isProduction ? 'production' : 'development'})`);
+  // Generic Express error handler (prevents leaking stack traces in production)
+  app.use((err: unknown, req: Request, res: Response, _next: express.NextFunction) => {
+    console.error('[Server Error]', err instanceof Error ? err.message : String(err));
+    if (res.headersSent) return;
+    if (req.path.startsWith('/api')) {
+      res.status(500).set('Cache-Control', 'no-store').json({ error: 'Internal server error.' });
+      return;
+    }
+    res.status(500).type('text/plain').send('Internal server error.');
   });
+
+  httpServer.listen(PORT, '0.0.0.0', () => {
+    console.log(
+      `FreeTools Hub server running on http://0.0.0.0:${PORT} (${isProduction ? 'production' : 'development'})`
+    );
+  });
+
+  const gracefulShutdown = (signal: string) => {
+    console.log(`[Server] Received ${signal}, shutting down gracefully...`);
+    httpServer.close(() => {
+      process.exit(0);
+    });
+    setTimeout(() => process.exit(0), 5000).unref();
+  };
+
+  process.on('SIGTERM', () => gracefulShutdown('SIGTERM'));
+  process.on('SIGINT', () => gracefulShutdown('SIGINT'));
 }
 
 startServer();
