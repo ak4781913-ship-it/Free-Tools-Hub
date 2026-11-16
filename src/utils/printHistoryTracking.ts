@@ -99,6 +99,7 @@ export function recordPrintDocument(
     // Dispatch update event
     if (typeof window !== 'undefined') {
       window.dispatchEvent(new CustomEvent(CHANGE_EVENT_NAME, { detail: updated }));
+      window.dispatchEvent(new CustomEvent('freetools_workspace_mutated'));
     }
 
     return updated;
@@ -119,6 +120,7 @@ export function removePrintDocument(id: string): PrintHistoryItem[] {
 
     if (typeof window !== 'undefined') {
       window.dispatchEvent(new CustomEvent(CHANGE_EVENT_NAME, { detail: updated }));
+      window.dispatchEvent(new CustomEvent('freetools_workspace_mutated'));
     }
 
     return updated;
@@ -136,6 +138,7 @@ export function clearPrintHistory(): void {
     localStorage.removeItem(STORAGE_KEY);
     if (typeof window !== 'undefined') {
       window.dispatchEvent(new CustomEvent(CHANGE_EVENT_NAME, { detail: [] }));
+      window.dispatchEvent(new CustomEvent('freetools_workspace_mutated'));
     }
   } catch (err) {
     console.warn('Failed to clear print history:', err);
@@ -155,10 +158,12 @@ export function subscribeToPrintHistory(callback: (items: PrintHistoryItem[]) =>
   };
 
   window.addEventListener(CHANGE_EVENT_NAME, handler);
+  window.addEventListener('freetools_cloud_hydrated', handler);
   window.addEventListener('storage', handler);
 
   return () => {
     window.removeEventListener(CHANGE_EVENT_NAME, handler);
+    window.removeEventListener('freetools_cloud_hydrated', handler);
     window.removeEventListener('storage', handler);
   };
 }

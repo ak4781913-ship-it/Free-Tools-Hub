@@ -83,6 +83,9 @@ export const FavoritesProvider: React.FC<{ children: React.ReactNode }> = ({ chi
   useEffect(() => {
     try {
       localStorage.setItem('freetools_hub_favorites', JSON.stringify(favorites));
+      if (typeof window !== 'undefined') {
+        window.dispatchEvent(new CustomEvent('freetools_workspace_mutated'));
+      }
     } catch {
       // ignore
     }
@@ -94,10 +97,39 @@ export const FavoritesProvider: React.FC<{ children: React.ReactNode }> = ({ chi
       const recentIds = history.map((h) => h.toolId);
       localStorage.setItem('freetools_hub_recents', JSON.stringify(recentIds));
       localStorage.setItem('freetools_hub_recent_tools', JSON.stringify(recentIds.slice(0, 5)));
+      if (typeof window !== 'undefined') {
+        window.dispatchEvent(new CustomEvent('freetools_workspace_mutated'));
+      }
     } catch {
       // ignore
     }
   }, [history]);
+
+  useEffect(() => {
+    const handleCloudHydration = () => {
+      try {
+        const savedFavs = localStorage.getItem('freetools_hub_favorites');
+        if (savedFavs) {
+          const parsedFavs = JSON.parse(savedFavs);
+          if (Array.isArray(parsedFavs)) {
+            setFavorites(parsedFavs);
+          }
+        }
+        const savedHistory = localStorage.getItem('freetools_hub_history');
+        if (savedHistory) {
+          const parsedHistory = JSON.parse(savedHistory);
+          if (Array.isArray(parsedHistory)) {
+            setHistory(parsedHistory);
+          }
+        }
+      } catch {
+        // ignore
+      }
+    };
+
+    window.addEventListener('freetools_cloud_hydrated', handleCloudHydration);
+    return () => window.removeEventListener('freetools_cloud_hydrated', handleCloudHydration);
+  }, []);
 
   const isFavorite = (toolId: string) => favorites.includes(toolId);
 

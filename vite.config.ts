@@ -87,6 +87,7 @@ export default defineConfig(() => {
           navigateFallbackDenylist: [
             /^\/api/,
             /^\/\.netlify/,
+            /^\/__\/auth/,
             /^\/sitemap\.xml$/,
             /^\/robots\.txt$/,
             /^\/404\.html$/,

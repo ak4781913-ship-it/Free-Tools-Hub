@@ -1,0 +1,208 @@
+{
+  "entities": {
+    "UserAccount": {
+      "title": "UserAccount",
+      "description": "Root account ownership anchor keyed strictly by Firebase Auth UID (no PII).",
+      "type": "object",
+      "properties": {
+        "uid": {
+          "type": "string",
+          "description": "Firebase Auth UID of the account owner.",
+          "minLength": 1,
+          "maxLength": 128,
+          "pattern": "^[a-zA-Z0-9_\\-]+$"
+        },
+        "syncVersion": {
+          "type": "integer",
+          "description": "Workspace schema version."
+        },
+        "createdAt": {
+          "type": "string",
+          "format": "date-time",
+          "description": "Server timestamp when the account anchor was first provisioned."
+        },
+        "updatedAt": {
+          "type": "string",
+          "format": "date-time",
+          "description": "Server timestamp of the latest account update."
+        }
+      },
+      "required": ["uid", "syncVersion", "createdAt", "updatedAt"]
+    },
+    "UserPrivateProfile": {
+      "title": "UserPrivateProfile",
+      "description": "Isolated private identity profile containing Google Auth PII strictly readable/writable by the owner UID.",
+      "type": "object",
+      "properties": {
+        "uid": {
+          "type": "string",
+          "description": "Firebase Auth UID of the profile owner.",
+          "minLength": 1,
+          "maxLength": 128,
+          "pattern": "^[a-zA-Z0-9_\\-]+$"
+        },
+        "email": {
+          "type": "string",
+          "format": "email",
+          "description": "Verified Google account email address.",
+          "maxLength": 254
+        },
+        "displayName": {
+          "type": "string",
+          "description": "Google account display name.",
+          "maxLength": 120
+        },
+        "photoURL": {
+          "type": "string",
+          "format": "uri",
+          "description": "Google profile avatar URL.",
+          "maxLength": 1000
+        },
+        "providerId": {
+          "type": "string",
+          "description": "Authentication provider identifier (google.com).",
+          "maxLength": 64
+        },
+        "lastLoginAt": {
+          "type": "string",
+          "format": "date-time",
+          "description": "Server timestamp of most recent sign-in."
+        },
+        "createdAt": {
+          "type": "string",
+          "format": "date-time",
+          "description": "Server timestamp when profile record was created."
+        },
+        "updatedAt": {
+          "type": "string",
+          "format": "date-time",
+          "description": "Server timestamp when profile record was updated."
+        }
+      },
+      "required": ["uid", "email", "displayName", "photoURL", "providerId", "lastLoginAt", "createdAt", "updatedAt"]
+    },
+    "UserWorkspaceState": {
+      "title": "UserWorkspaceState",
+      "description": "User-scoped FreeTools Hub preferences, pinned favorites, tool usage history, daily goals, and saved items.",
+      "type": "object",
+      "properties": {
+        "uid": {
+          "type": "string",
+          "description": "Firebase Auth UID of the workspace owner.",
+          "minLength": 1,
+          "maxLength": 128,
+          "pattern": "^[a-zA-Z0-9_\\-]+$"
+        },
+        "theme": {
+          "type": "string",
+          "enum": ["light", "dark"],
+          "description": "Preferred UI color theme.",
+          "maxLength": 10
+        },
+        "language": {
+          "type": "string",
+          "enum": ["en", "ur"],
+          "description": "Preferred UI language.",
+          "maxLength": 5
+        },
+        "sidebarCollapsed": {
+          "type": "boolean",
+          "description": "Desktop sidebar collapsed preference."
+        },
+        "favorites": {
+          "type": "array",
+          "description": "List of pinned tool IDs (max 50)."
+        },
+        "recentTools": {
+          "type": "array",
+          "description": "Ordered list of recently used tool IDs (max 25)."
+        },
+        "history": {
+          "type": "array",
+          "description": "Tool access history entries (max 25)."
+        },
+        "dailyGoal": {
+          "type": "integer",
+          "description": "Daily tool usage target (1 to 20)."
+        },
+        "dailyProgress": {
+          "type": "object",
+          "description": "Today's date and unique tools used map."
+        },
+        "streakData": {
+          "type": "object",
+          "description": "Daily goal completion streak state."
+        },
+        "dailyHistory": {
+          "type": "object",
+          "description": "Map of YYYY-MM-DD dates to daily tool usage counts."
+        },
+        "savedColors": {
+          "type": "array",
+          "description": "Saved HEX colors from Color Picker tool (max 40)."
+        },
+        "recentColors": {
+          "type": "array",
+          "description": "Recent picked colors metadata (max 40)."
+        },
+        "savedPrompts": {
+          "type": "array",
+          "description": "User-saved AI photo prompts (max 40)."
+        },
+        "printHistory": {
+          "type": "array",
+          "description": "Last printed documents metadata (max 10)."
+        },
+        "createdAt": {
+          "type": "string",
+          "format": "date-time",
+          "description": "Server timestamp when workspace document was created."
+        },
+        "updatedAt": {
+          "type": "string",
+          "format": "date-time",
+          "description": "Server timestamp of the latest workspace sync."
+        }
+      },
+      "required": [
+        "uid",
+        "theme",
+        "language",
+        "sidebarCollapsed",
+        "favorites",
+        "recentTools",
+        "history",
+        "dailyGoal",
+        "dailyProgress",
+        "streakData",
+        "dailyHistory",
+        "savedColors",
+        "recentColors",
+        "savedPrompts",
+        "printHistory",
+        "createdAt",
+        "updatedAt"
+      ]
+    }
+  },
+  "firestore": {
+    "/users/{userId}": {
+      "schema": {
+        "$ref": "#/entities/UserAccount"
+      },
+      "description": "Owner-only root anchor document keyed strictly by Firebase Auth UID."
+    },
+    "/users/{userId}/private/{docId}": {
+      "schema": {
+        "$ref": "#/entities/UserPrivateProfile"
+      },
+      "description": "Owner-only private Google Auth identity metadata (docId = profile)."
+    },
+    "/users/{userId}/workspace/{docId}": {
+      "schema": {
+        "$ref": "#/entities/UserWorkspaceState"
+      },
+      "description": "Owner-only synchronized tools preferences, favorites, daily goals, and saved items (docId = state)."
+    }
+  }
+}

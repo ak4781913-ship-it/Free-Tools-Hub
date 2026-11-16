@@ -18,6 +18,7 @@
     "lint": "tsc --noEmit"
   },
   "dependencies": {
+    "@firebase/eslint-plugin-security-rules": "^0.0.2",
     "@neslinesli93/qpdf-wasm": "^0.3.1",
     "@pdfsmaller/pdf-encrypt-lite": "^1.2.0",
     "@tailwindcss/vite": "^4.3.3",
@@ -25,7 +26,9 @@
     "d3": "^7.9.0",
     "docx": "^9.15.3",
     "dotenv": "^17.2.3",
+    "eslint": "^10.15.0",
     "express": "^4.21.2",
+    "firebase": "^13.3.0",
     "html-to-image": "^1.11.13",
     "html2canvas": "^1.4.1",
     "html2canvas-pro": "^2.5.2",

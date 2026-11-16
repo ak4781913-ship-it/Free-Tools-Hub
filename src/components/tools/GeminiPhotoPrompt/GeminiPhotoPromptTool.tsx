@@ -211,6 +211,9 @@ export const GeminiPhotoPromptTool: React.FC = () => {
       const saved = JSON.parse(localStorage.getItem('freetools_saved_photo_prompts') || '[]');
       saved.push({ title: inputs.subjectDescription.slice(0, 30) || 'Photo Prompt', prompt: promptText, date: new Date().toISOString() });
       localStorage.setItem('freetools_saved_photo_prompts', JSON.stringify(saved));
+      if (typeof window !== 'undefined') {
+        window.dispatchEvent(new CustomEvent('freetools_workspace_mutated'));
+      }
       setIsFavoriteSaved(true);
       setTimeout(() => setIsFavoriteSaved(false), 2500);
     } catch {

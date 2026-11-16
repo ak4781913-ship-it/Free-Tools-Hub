@@ -416,6 +416,9 @@ export const ColorPickerTool: React.FC = () => {
   useEffect(() => {
     try {
       localStorage.setItem('freetools_color_palette', JSON.stringify(savedColors));
+      if (typeof window !== 'undefined') {
+        window.dispatchEvent(new CustomEvent('freetools_workspace_mutated'));
+      }
     } catch {
       // ignore
     }
@@ -425,10 +428,37 @@ export const ColorPickerTool: React.FC = () => {
   useEffect(() => {
     try {
       localStorage.setItem('freetools_recent_colors', JSON.stringify(recentColors));
+      if (typeof window !== 'undefined') {
+        window.dispatchEvent(new CustomEvent('freetools_workspace_mutated'));
+      }
     } catch {
       // ignore
     }
   }, [recentColors]);
+
+  // Reload palette on cloud account hydration
+  useEffect(() => {
+    const handleCloudHydration = () => {
+      try {
+        const saved = localStorage.getItem('freetools_color_palette');
+        if (saved) {
+          const parsed = JSON.parse(saved);
+          if (Array.isArray(parsed)) setSavedColors(parsed);
+        }
+        const recents = localStorage.getItem('freetools_recent_colors');
+        if (recents) {
+          const parsedRecents = JSON.parse(recents);
+          if (Array.isArray(parsedRecents) && parsedRecents.length > 0) {
+            setRecentColors(parsedRecents);
+          }
+        }
+      } catch {
+        // ignore
+      }
+    };
+    window.addEventListener('freetools_cloud_hydrated', handleCloudHydration);
+    return () => window.removeEventListener('freetools_cloud_hydrated', handleCloudHydration);
+  }, []);
 
   // Copy handler with visual feedback
   const handleCopy = (text: string, key: string) => {

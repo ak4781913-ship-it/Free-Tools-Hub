@@ -1,9 +1,10 @@
 import React, { useState } from 'react';
-import { X, Settings, Moon, Sun, Monitor, Shield, Trash2, Check, RefreshCw } from 'lucide-react';
+import { X, Settings, Moon, Sun, Shield, Trash2, Check, Cloud } from 'lucide-react';
 import { useTheme } from '../../../context/ThemeContext';
 import { useLanguage } from '../../../context/LanguageContext';
 import { useFavorites } from '../../../context/FavoritesContext';
 import { useToast } from '../../../context/ToastContext';
+import { useAuth } from '../../../context/AuthContext';
 
 interface SettingsModalProps {
   isOpen: boolean;
@@ -15,6 +16,7 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({ isOpen, onClose })
   const { language, setLanguage } = useLanguage();
   const { clearRecents, clearFavorites, resetFavorites } = useFavorites();
   const { toast } = useToast();
+  const { user, openAuthModal, openAccountModal, syncStatus } = useAuth();
   const isUrdu = language === 'ur';
 
   const [confirmClearData, setConfirmClearData] = useState(false);
@@ -150,16 +152,57 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({ isOpen, onClose })
             </div>
           </div>
 
-          {/* Local Data & Privacy */}
+          {/* Cloud Sync & Local Data Privacy */}
           <div className="pt-4 border-t border-slate-100 dark:border-slate-800 space-y-3">
-            <div className="flex items-center gap-2 text-xs font-bold text-slate-900 dark:text-white uppercase tracking-wider">
-              <Shield className="w-4 h-4 text-emerald-600 dark:text-emerald-400" />
-              <span>{isUrdu ? 'مقامی براؤزر ڈیٹا' : 'Local Browser Storage'}</span>
+            <div className="flex items-center justify-between gap-2">
+              <div className="flex items-center gap-2 text-xs font-bold text-slate-900 dark:text-white uppercase tracking-wider">
+                {user ? (
+                  <Cloud className="w-4 h-4 text-blue-600 dark:text-blue-400" />
+                ) : (
+                  <Shield className="w-4 h-4 text-emerald-600 dark:text-emerald-400" />
+                )}
+                <span>
+                  {user
+                    ? isUrdu
+                      ? 'گوگل کلاؤڈ سنک اور مقامی اسٹوریج'
+                      : 'Google Account Sync & Storage'
+                    : isUrdu
+                    ? 'مقامی براؤزر ڈیٹا'
+                    : 'Local Browser Storage'}
+                </span>
+              </div>
+              {user ? (
+                <button
+                  type="button"
+                  onClick={() => {
+                    onClose();
+                    openAccountModal('account');
+                  }}
+                  className="text-[11px] font-semibold text-blue-700 dark:text-blue-400 hover:underline cursor-pointer"
+                >
+                  {isUrdu ? 'اکاؤنٹ دیکھیں' : `Manage (${syncStatus})`}
+                </button>
+              ) : (
+                <button
+                  type="button"
+                  onClick={() => {
+                    onClose();
+                    openAuthModal();
+                  }}
+                  className="text-[11px] font-semibold text-blue-700 dark:text-blue-400 hover:underline cursor-pointer"
+                >
+                  {isUrdu ? 'گوگل سائن ان' : 'Enable Cloud Sync'}
+                </button>
+              )}
             </div>
             <p className="text-xs text-slate-600 dark:text-slate-400 leading-relaxed">
-              {isUrdu
-                ? 'عباس پرو تمام ڈیٹا جیسے حالیہ ٹولز اور ڈرافٹس آپ کے براؤزر کے لوکل اسٹوریج میں محفوظ رکھتا ہے۔ سرور پر کوئی ذاتی ڈیٹا اپلوڈ نہیں ہوتا۔'
-                : 'AbbasPro stores all your inputs, resume drafts, and recent activity strictly in your device browser storage. Zero private data is transmitted to external servers.'}
+              {user
+                ? isUrdu
+                  ? `آپ ${user.email || 'گوگل اکاؤنٹ'} سے سائن ان ہیں۔ آپ کے پسندیدہ ٹولز، یومیہ ہدف، حالیہ ہسٹری اور محفوظ کردہ پرامپٹس کلاؤڈ میں محفوظ طریقے سے سنک ہیں۔`
+                  : `Signed in as ${user.email || 'Google user'}. Your favorites, goals, history, and saved items are securely synchronized under your Firebase UID.`
+                : isUrdu
+                ? 'فری ٹولز ہب بطور گیسٹ آپ کے براؤزر میں مقامی طور پر کام کرتا ہے اور سرور پر کوئی ذاتی ڈیٹا اپلوڈ نہیں کرتا۔'
+                : 'When browsing as a guest, inputs and drafts stay strictly in your local browser storage. Sign in with Google optionally to sync preferences and saved items across devices.'}
             </p>
 
             {confirmClearData ? (

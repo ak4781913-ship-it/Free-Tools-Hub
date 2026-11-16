@@ -40,12 +40,15 @@ export const ThemeProvider: React.FC<{ children: React.ReactNode }> = ({ childre
 
     try {
       localStorage.setItem('freetools_hub_theme', theme);
+      if (typeof window !== 'undefined') {
+        window.dispatchEvent(new CustomEvent('freetools_workspace_mutated'));
+      }
     } catch {
       // ignore
     }
   }, [theme]);
 
-  // Synchronize across multiple browser tabs
+  // Synchronize across multiple browser tabs and cloud workspace hydration
   useEffect(() => {
     const handleStorageChange = (e: StorageEvent) => {
       if (e.key === 'freetools_hub_theme' && (e.newValue === 'light' || e.newValue === 'dark')) {
@@ -53,8 +56,23 @@ export const ThemeProvider: React.FC<{ children: React.ReactNode }> = ({ childre
       }
     };
 
+    const handleCloudHydration = () => {
+      try {
+        const saved = localStorage.getItem('freetools_hub_theme');
+        if (saved === 'light' || saved === 'dark') {
+          setThemeState(saved);
+        }
+      } catch {
+        // ignore
+      }
+    };
+
     window.addEventListener('storage', handleStorageChange);
-    return () => window.removeEventListener('storage', handleStorageChange);
+    window.addEventListener('freetools_cloud_hydrated', handleCloudHydration);
+    return () => {
+      window.removeEventListener('storage', handleStorageChange);
+      window.removeEventListener('freetools_cloud_hydrated', handleCloudHydration);
+    };
   }, []);
 
   return (

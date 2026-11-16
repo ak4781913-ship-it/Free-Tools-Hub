@@ -1,0 +1,226 @@
+rules_version = '2';
+
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // =========================================================================
+    // GLOBAL HELPER PRIMITIVES
+    // =========================================================================
+
+    function isValidId(id) {
+      return id is string && id.size() >= 1 && id.size() <= 128 && id.matches('^[a-zA-Z0-9_\\-]+$');
+    }
+
+    function incoming() {
+      return request.resource.data;
+    }
+
+    function existing() {
+      return resource.data;
+    }
+
+    function isSignedIn() {
+      return request.auth != null;
+    }
+
+    function isVerifiedUser() {
+      return isSignedIn() && request.auth.token.email_verified == true;
+    }
+
+    function isOwner(userId) {
+      return isSignedIn() && request.auth.uid == userId;
+    }
+
+    // =========================================================================
+    // SCHEMA VALIDATION BLUEPRINTS
+    // =========================================================================
+
+    function isValidUserAccount(data) {
+      return data.keys().hasAll(['uid', 'syncVersion', 'createdAt', 'updatedAt'])
+        && data.keys().hasOnly(['uid', 'syncVersion', 'createdAt', 'updatedAt'])
+        && isValidId(data.uid)
+        && data.uid == request.auth.uid
+        && data.syncVersion is int
+        && data.syncVersion >= 1
+        && data.syncVersion <= 10
+        && data.createdAt is timestamp
+        && data.updatedAt is timestamp;
+    }
+
+    function isValidUserPrivateProfile(data) {
+      return data.keys().hasAll([
+          'uid', 'email', 'displayName', 'photoURL',
+          'providerId', 'lastLoginAt', 'createdAt', 'updatedAt'
+        ])
+        && data.keys().hasOnly([
+          'uid', 'email', 'displayName', 'photoURL',
+          'providerId', 'lastLoginAt', 'createdAt', 'updatedAt'
+        ])
+        && isValidId(data.uid)
+        && data.uid == request.auth.uid
+        && data.email is string && data.email.size() <= 254
+        && data.displayName is string && data.displayName.size() <= 120
+        && data.photoURL is string && data.photoURL.size() <= 1000
+        && data.providerId is string && data.providerId.size() <= 64
+        && data.lastLoginAt is timestamp
+        && data.createdAt is timestamp
+        && data.updatedAt is timestamp;
+    }
+
+    function isValidStringList(listVal, maxItems, maxItemLen) {
+      return listVal is list
+        && listVal.size() <= maxItems
+        && (listVal.size() == 0 || (listVal[0] is string && listVal[0].size() <= maxItemLen));
+    }
+
+    function isValidMapList(listVal, maxItems) {
+      return listVal is list
+        && listVal.size() <= maxItems
+        && (listVal.size() == 0 || listVal[0] is map);
+    }
+
+    function isValidDailyProgress(dp) {
+      return dp is map
+        && dp.keys().hasAll(['date', 'toolsUsed'])
+        && dp.keys().hasOnly(['date', 'toolsUsed'])
+        && dp.date is string && dp.date.size() <= 16
+        && isValidStringList(dp.toolsUsed, 30, 64);
+    }
+
+    function isValidStreakData(sd) {
+      return sd is map
+        && sd.keys().hasAll(['lastCompletedDate', 'streakCount'])
+        && sd.keys().hasOnly(['lastCompletedDate', 'streakCount'])
+        && sd.lastCompletedDate is string && sd.lastCompletedDate.size() <= 16
+        && sd.streakCount is int && sd.streakCount >= 0 && sd.streakCount <= 36500;
+    }
+
+    function isValidUserWorkspaceState(data) {
+      return data.keys().hasAll([
+          'uid', 'theme', 'language', 'sidebarCollapsed',
+          'favorites', 'recentTools', 'history',
+          'dailyGoal', 'dailyProgress', 'streakData', 'dailyHistory',
+          'savedColors', 'recentColors', 'savedPrompts', 'printHistory',
+          'createdAt', 'updatedAt'
+        ])
+        && data.keys().hasOnly([
+          'uid', 'theme', 'language', 'sidebarCollapsed',
+          'favorites', 'recentTools', 'history',
+          'dailyGoal', 'dailyProgress', 'streakData', 'dailyHistory',
+          'savedColors', 'recentColors', 'savedPrompts', 'printHistory',
+          'createdAt', 'updatedAt'
+        ])
+        && isValidId(data.uid)
+        && data.uid == request.auth.uid
+        && data.theme is string && data.theme in ['light', 'dark'] && data.theme.size() <= 10
+        && data.language is string && data.language in ['en', 'ur'] && data.language.size() <= 5
+        && data.sidebarCollapsed is bool
+        && isValidStringList(data.favorites, 50, 64)
+        && isValidStringList(data.recentTools, 25, 64)
+        && isValidMapList(data.history, 25)
+        && data.dailyGoal is int && data.dailyGoal >= 1 && data.dailyGoal <= 20
+        && isValidDailyProgress(data.dailyProgress)
+        && isValidStreakData(data.streakData)
+        && data.dailyHistory is map && data.dailyHistory.size() <= 60
+        && isValidStringList(data.savedColors, 40, 32)
+        && isValidMapList(data.recentColors, 40)
+        && isValidMapList(data.savedPrompts, 40)
+        && isValidMapList(data.printHistory, 10)
+        && data.createdAt is timestamp
+        && data.updatedAt is timestamp;
+    }
+
+    // =========================================================================
+    // DEFAULT DENY SAFETY NET
+    // =========================================================================
+    match /{document=**} {
+      allow read, write: if false;
+    }
+
+    // =========================================================================
+    // USER ACCOUNT ROOT ANCHOR (No PII)
+    // =========================================================================
+    match /users/{userId} {
+      allow get: if isSignedIn() && isValidId(userId) && isOwner(userId);
+      allow list: if false;
+      allow create: if isVerifiedUser()
+        && isValidId(userId)
+        && isOwner(userId)
+        && isValidUserAccount(incoming())
+        && incoming().uid == userId
+        && incoming().createdAt == request.time
+        && incoming().updatedAt == request.time;
+      allow update: if isVerifiedUser()
+        && isValidId(userId)
+        && isOwner(userId)
+        && isValidUserAccount(incoming())
+        && incoming().uid == existing().uid
+        && incoming().createdAt == existing().createdAt
+        && incoming().updatedAt == request.time
+        && incoming().diff(existing()).affectedKeys().hasOnly(['syncVersion', 'updatedAt']);
+      allow delete: if isVerifiedUser() && isValidId(userId) && isOwner(userId);
+
+      // Isolated Private Profile PII
+      match /private/{docId} {
+        allow get: if isSignedIn() && isValidId(userId) && docId == 'profile' && isOwner(userId);
+        allow list: if false;
+        allow create: if isVerifiedUser()
+          && isValidId(userId)
+          && docId == 'profile'
+          && isOwner(userId)
+          && isValidUserPrivateProfile(incoming())
+          && exists(/databases/$(database)/documents/users/$(userId))
+          && incoming().uid == userId
+          && incoming().createdAt == request.time
+          && incoming().updatedAt == request.time
+          && incoming().lastLoginAt == request.time;
+        allow update: if isVerifiedUser()
+          && isValidId(userId)
+          && docId == 'profile'
+          && isOwner(userId)
+          && isValidUserPrivateProfile(incoming())
+          && exists(/databases/$(database)/documents/users/$(userId))
+          && incoming().uid == existing().uid
+          && incoming().createdAt == existing().createdAt
+          && incoming().updatedAt == request.time
+          && incoming().lastLoginAt == request.time
+          && incoming().diff(existing()).affectedKeys().hasOnly([
+            'email', 'displayName', 'photoURL', 'providerId', 'lastLoginAt', 'updatedAt'
+          ]);
+        allow delete: if isVerifiedUser() && isValidId(userId) && docId == 'profile' && isOwner(userId);
+      }
+
+      // User-Scoped Workspace Sync State
+      match /workspace/{docId} {
+        allow get: if isSignedIn() && isValidId(userId) && docId == 'state' && isOwner(userId);
+        allow list: if false;
+        allow create: if isVerifiedUser()
+          && isValidId(userId)
+          && docId == 'state'
+          && isOwner(userId)
+          && isValidUserWorkspaceState(incoming())
+          && exists(/databases/$(database)/documents/users/$(userId))
+          && incoming().uid == userId
+          && incoming().createdAt == request.time
+          && incoming().updatedAt == request.time;
+        allow update: if isVerifiedUser()
+          && isValidId(userId)
+          && docId == 'state'
+          && isOwner(userId)
+          && isValidUserWorkspaceState(incoming())
+          && exists(/databases/$(database)/documents/users/$(userId))
+          && incoming().uid == existing().uid
+          && incoming().createdAt == existing().createdAt
+          && incoming().updatedAt == request.time
+          && incoming().diff(existing()).affectedKeys().hasOnly([
+            'theme', 'language', 'sidebarCollapsed',
+            'favorites', 'recentTools', 'history',
+            'dailyGoal', 'dailyProgress', 'streakData', 'dailyHistory',
+            'savedColors', 'recentColors', 'savedPrompts', 'printHistory',
+            'updatedAt'
+          ]);
+        allow delete: if isVerifiedUser() && isValidId(userId) && docId == 'state' && isOwner(userId);
+      }
+    }
+  }
+}

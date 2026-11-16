@@ -8,6 +8,7 @@ import { ThemeProvider } from './context/ThemeContext';
 import { LanguageProvider, useLanguage } from './context/LanguageContext';
 import { FavoritesProvider, useFavorites } from './context/FavoritesContext';
 import { ToastProvider } from './context/ToastContext';
+import { AuthProvider } from './context/AuthContext';
 import { TOOLS_LIST } from './data/tools';
 import { findToolBySlugOrId, getToolPrimaryPath } from './data/toolsRouting';
 import { getRouteSeoForPath } from './data/seoRegistry';
@@ -44,6 +45,12 @@ const OnboardingTour = lazy(() =>
 );
 const PrintHistoryModal = lazy(() =>
   import('./components/layout/PrintHistoryModal').then((m) => ({ default: m.PrintHistoryModal }))
+);
+const AuthModal = lazy(() =>
+  import('./components/auth/AuthModal').then((m) => ({ default: m.AuthModal }))
+);
+const AccountModal = lazy(() =>
+  import('./components/auth/AccountModal').then((m) => ({ default: m.AccountModal }))
 );
 
 // Dedicated Pages
@@ -256,10 +263,23 @@ const MainApp: React.FC = () => {
       const next = !prev;
       try {
         localStorage.setItem('abbaspro_sidebar_collapsed', String(next));
+        if (typeof window !== 'undefined') {
+          window.dispatchEvent(new CustomEvent('freetools_workspace_mutated'));
+        }
       } catch {}
       return next;
     });
   };
+
+  useEffect(() => {
+    const handleCloudHydration = () => {
+      try {
+        setIsSidebarCollapsed(localStorage.getItem('abbaspro_sidebar_collapsed') === 'true');
+      } catch {}
+    };
+    window.addEventListener('freetools_cloud_hydrated', handleCloudHydration);
+    return () => window.removeEventListener('freetools_cloud_hydrated', handleCloudHydration);
+  }, []);
 
   const [isReaderMode, setIsReaderMode] = useState<boolean>(() => {
     try {
@@ -859,6 +879,12 @@ const MainApp: React.FC = () => {
             onNavigate={navigateTo}
           />
         )}
+
+        <AuthModal />
+        <AccountModal
+          onNavigateTo={navigateTo}
+          onOpenSettings={() => setIsSettingsOpen(true)}
+        />
       </Suspense>
 
       {/* PWA Offline / Sync Status Indicator */}
@@ -873,7 +899,9 @@ export default function App() {
       <LanguageProvider>
         <FavoritesProvider>
           <ToastProvider>
-            <MainApp />
+            <AuthProvider>
+              <MainApp />
+            </AuthProvider>
           </ToastProvider>
         </FavoritesProvider>
       </LanguageProvider>

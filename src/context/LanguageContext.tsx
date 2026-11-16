@@ -51,6 +51,9 @@ export const LanguageProvider: React.FC<{ children: React.ReactNode }> = ({ chil
     applyDomLanguage(lang);
     try {
       localStorage.setItem('freetools_hub_lang', lang);
+      if (typeof window !== 'undefined') {
+        window.dispatchEvent(new CustomEvent('freetools_workspace_mutated'));
+      }
     } catch {
       // ignore
     }
@@ -71,7 +74,7 @@ export const LanguageProvider: React.FC<{ children: React.ReactNode }> = ({ chil
     }
   }, [language, dir]);
 
-  // Synchronize language across multiple browser tabs
+  // Synchronize language across multiple browser tabs and cloud hydration
   useEffect(() => {
     const handleStorageChange = (e: StorageEvent) => {
       if (e.key === 'freetools_hub_lang' && (e.newValue === 'en' || e.newValue === 'ur')) {
@@ -81,8 +84,24 @@ export const LanguageProvider: React.FC<{ children: React.ReactNode }> = ({ chil
       }
     };
 
+    const handleCloudHydration = () => {
+      try {
+        const saved = localStorage.getItem('freetools_hub_lang');
+        if (saved === 'en' || saved === 'ur') {
+          setLanguageState(saved);
+          applyDomLanguage(saved);
+        }
+      } catch {
+        // ignore
+      }
+    };
+
     window.addEventListener('storage', handleStorageChange);
-    return () => window.removeEventListener('storage', handleStorageChange);
+    window.addEventListener('freetools_cloud_hydrated', handleCloudHydration);
+    return () => {
+      window.removeEventListener('storage', handleStorageChange);
+      window.removeEventListener('freetools_cloud_hydrated', handleCloudHydration);
+    };
   }, []);
 
   const t = translations[language] || translations.en;
