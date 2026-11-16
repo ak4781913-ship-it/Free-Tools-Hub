@@ -1,43 +1,77 @@
-name: Deploy to Netlify
+name: CI Build, SEO Validation & Optional Netlify Deploy
 
 on:
   push:
     branches:
       - main
+  pull_request:
+    branches:
+      - main
   workflow_dispatch:
+    inputs:
+      deploy_to_netlify:
+        description: 'Run manual Netlify CLI production deploy (keep false when Netlify Git auto-deploy is active)'
+        required: false
+        default: false
+        type: boolean
 
 concurrency:
-  group: netlify-deploy-${{ github.ref }}
+  group: ci-netlify-${{ github.ref }}
   cancel-in-progress: true
 
 jobs:
-  deploy:
-    name: Build & Deploy to Netlify
+  validate:
+    name: Bun Install, Typecheck, Build & SEO Validation
     runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout Source Code
+      - name: Checkout Source Code (full history for route lastmod dates)
         uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
 
       - name: Set up Node.js
         uses: actions/setup-node@v4
         with:
           node-version-file: '.nvmrc'
-          cache: 'npm'
 
-      - name: Install Dependencies
-        run: npm ci
+      - name: Set up Bun
+        uses: oven-sh/setup-bun@v2
+        with:
+          bun-version: '1.4.4'
+
+      - name: Cache Bun Dependencies
+        uses: actions/cache@v4
+        with:
+          path: ~/.bun/install/cache
+          key: ${{ runner.os }}-bun-${{ hashFiles('bun.lock') }}
+          restore-keys: |
+            ${{ runner.os }}-bun-
+
+      - name: Install Dependencies (Frozen Lockfile)
+        run: bun install --frozen-lockfile
 
       - name: Run Type Check & Linter
-        run: npm run lint
+        run: bun run lint
 
-      - name: Build Application
-        run: npm run build
+      - name: Build Production Bundle & Prerendered SEO Pages
+        run: bun run build
         env:
           NODE_ENV: production
 
-      - name: Deploy to Netlify Production
-        run: npx netlify-cli deploy --prod --dir=dist
+      - name: Validate Production SEO Artifacts
+        run: |
+          test -f dist/sitemap.xml
+          test -f dist/robots.txt
+          test -f dist/404.html
+          test -f dist/_redirects
+          test -f dist/index.html
+          test -f dist/tools/pdf-tools-suite.html
+          test -f dist/about.html
+
+      - name: Optional Manual Deploy to Netlify Production
+        if: github.event_name == 'workflow_dispatch' && inputs.deploy_to_netlify == true && github.ref == 'refs/heads/main'
+        run: bunx netlify-cli deploy --prod --dir=dist
         env:
           NETLIFY_AUTH_TOKEN: ${{ secrets.NETLIFY_AUTH_TOKEN }}
           NETLIFY_SITE_ID: ${{ secrets.NETLIFY_SITE_ID }}

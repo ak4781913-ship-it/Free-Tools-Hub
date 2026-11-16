@@ -278,7 +278,7 @@ export const Footer: React.FC<FooterProps> = ({
 
         {/* Hairline divider & bottom bar */}
         <div className="mt-10 pt-6 border-t border-slate-200/80 dark:border-slate-800 flex flex-col md:flex-row items-center justify-between gap-4 text-xs text-slate-500 dark:text-slate-400">
-          <p>© {new Date().getFullYear()} AbbasPro / FreeTools Hub. All rights reserved.</p>
+          <p>© {new Date().getFullYear()} NEXORA · FreeTools Hub. All rights reserved.</p>
 
           <div className="flex items-center gap-3 flex-wrap justify-center">
             {onStartTour && (

@@ -57,14 +57,34 @@
       />
     </noscript>
     <script type="application/ld+json">
-      {
-        "@context": "https://schema.org",
-        "@type": "WebSite",
-        "name": "FreeTools Hub",
-        "alternateName": ["AbbasPro FreeTools Hub", "Free Tools Hub"],
-        "url": "https://freetoolshub1.netlify.app/",
-        "description": "Free online PDF Tools Suite, CV and Resume Generator, UAE Salary & Gratuity Calculators, AI Image & Video Prompt Generators, and client-side productivity utilities."
-      }
+      [
+        {
+          "@context": "https://schema.org",
+          "@type": "Organization",
+          "@id": "https://freetoolshub1.netlify.app/#organization",
+          "name": "NEXORA",
+          "alternateName": ["FreeTools Hub", "NEXORA FreeTools Hub", "Free Tools Hub"],
+          "url": "https://freetoolshub1.netlify.app/",
+          "logo": {
+            "@type": "ImageObject",
+            "url": "https://freetoolshub1.netlify.app/pwa-512x512.png",
+            "width": 512,
+            "height": 512
+          }
+        },
+        {
+          "@context": "https://schema.org",
+          "@type": "WebSite",
+          "@id": "https://freetoolshub1.netlify.app/#website",
+          "name": "FreeTools Hub",
+          "alternateName": ["NEXORA FreeTools Hub", "Free Tools Hub"],
+          "url": "https://freetoolshub1.netlify.app/",
+          "publisher": {
+            "@id": "https://freetoolshub1.netlify.app/#organization"
+          },
+          "description": "Free online PDF Tools Suite, CV and Resume Generator, UAE Salary & Gratuity Calculators, AI Image & Video Prompt Generators, and client-side productivity utilities."
+        }
+      ]
     </script>
     <script>
       (function() {

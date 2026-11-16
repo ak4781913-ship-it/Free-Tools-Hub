@@ -52,7 +52,13 @@ export interface RouteSeoMetadata {
 }
 
 function upsertMetaTag(attrName: 'name' | 'property', attrValue: string, content: string) {
-  let el = document.querySelector(`meta[${attrName}="${attrValue}"]`) as HTMLMetaElement | null;
+  const matches = Array.from(
+    document.querySelectorAll(`meta[${attrName}="${attrValue}"]`)
+  ) as HTMLMetaElement[];
+  let el = matches[0] || null;
+  if (matches.length > 1) {
+    matches.slice(1).forEach((extra) => extra.remove());
+  }
   if (!content) {
     if (el) el.remove();
     return;

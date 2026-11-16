@@ -145,16 +145,17 @@ function injectRouteSeoIntoHtml(rawHtml: string, rawUrl: string, status: 200 | 3
     html = html.replace('</title>', `</title>${canonicalTags}`);
   }
 
-  // Optional Google Site Verification tag from env
+  // Google Site Verification tag from env (updates existing tag cleanly; preserves base tag when unset)
   const verificationToken = (
     process.env.VITE_GOOGLE_SITE_VERIFICATION ||
     process.env.GOOGLE_SITE_VERIFICATION ||
     ''
   ).trim();
-  if (verificationToken && !/name="google-site-verification"/i.test(html)) {
+  if (verificationToken) {
+    html = html.replace(/\s*<meta\s+name="google-site-verification"[^>]*\/?>/gi, '');
     html = html.replace(
       '</head>',
-      `    <meta name="google-site-verification" content="${escapeXml(verificationToken)}" />\n  </head>`
+      `\n    <meta name="google-site-verification" content="${escapeXml(verificationToken)}" />\n  </head>`
     );
   }
 
@@ -369,8 +370,32 @@ async function startServer() {
     next();
   });
 
+  const seoRateWindow = new Map<string, { count: number; resetAt: number }>();
+
   // 1. SSRF-Hardened SEO Page Analyzer Proxy
+  app.all('/api/analyze-seo', (req, res, next) => {
+    if (req.method !== 'GET' && req.method !== 'HEAD') {
+      res.status(405).set('Cache-Control', 'no-store').json({ error: 'Method not allowed.' });
+      return;
+    }
+    next();
+  });
+
   app.get('/api/analyze-seo', async (req: Request, res: Response) => {
+    res.setHeader('Cache-Control', 'no-store');
+    const clientIp = (req.headers['x-forwarded-for'] as string | undefined)?.split(',')[0]?.trim() || req.ip || 'unknown';
+    const now = Date.now();
+    const bucket = seoRateWindow.get(clientIp);
+    if (!bucket || now > bucket.resetAt) {
+      seoRateWindow.set(clientIp, { count: 1, resetAt: now + 60_000 });
+    } else {
+      bucket.count += 1;
+      if (bucket.count > 45) {
+        res.status(429).json({ error: 'Too many requests. Please wait a minute before auditing more URLs.' });
+        return;
+      }
+    }
+
     const rawTarget = typeof req.query.url === 'string' ? req.query.url.trim() : '';
     const checkOnly = req.query.checkOnly === '1';
 
@@ -566,35 +591,44 @@ async function startServer() {
     const entries = getAllCanonicalSitemapEntries(baseUrl);
 
     const xmlUrls = entries
-      .map((entry) =>
-        [
-          '  <url>',
-          `    <loc>${escapeXml(entry.loc)}</loc>`,
-          `    <lastmod>${escapeXml(entry.lastmod)}</lastmod>`,
+      .map((entry) => {
+        const lines = ['  <url>', `    <loc>${escapeXml(entry.loc)}</loc>`];
+        if (entry.lastmod) {
+          lines.push(`    <lastmod>${escapeXml(entry.lastmod)}</lastmod>`);
+        }
+        lines.push(
           `    <changefreq>${escapeXml(entry.changefreq)}</changefreq>`,
           `    <priority>${escapeXml(entry.priority)}</priority>`,
-          '  </url>',
-        ].join('\n')
-      )
+          '  </url>'
+        );
+        return lines.join('\n');
+      })
       .join('\n');
 
     const xml = `<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n${xmlUrls}\n</urlset>\n`;
     res.status(200).type('application/xml; charset=utf-8').send(xml);
   });
 
-  // 4. Canonical 301 Redirects for Legacy Alias Slugs
+  // 4. Canonical 301 Redirects (Trailing Slashes + Legacy Alias Slugs)
   app.use((req, res, next) => {
     if (req.method !== 'GET' && req.method !== 'HEAD') {
       next();
+      return;
+    }
+    const searchSuffix = req.originalUrl.includes('?')
+      ? req.originalUrl.slice(req.originalUrl.indexOf('?'))
+      : '';
+    if (req.path.length > 1 && req.path.endsWith('/') && !req.path.startsWith('/api')) {
+      const stripped = req.path.replace(/\/+$/, '') || '/';
+      const routeInfo = classifyAppRoute(stripped);
+      const target = routeInfo.status === 301 && routeInfo.redirectTo ? routeInfo.redirectTo : stripped;
+      res.redirect(301, `${target}${searchSuffix}`);
       return;
     }
     const clean = normalizeSeoPathname(req.path);
     if (clean.startsWith('/tools/')) {
       const routeInfo = classifyAppRoute(clean);
       if (routeInfo.status === 301 && routeInfo.redirectTo) {
-        const searchSuffix = req.originalUrl.includes('?')
-          ? req.originalUrl.slice(req.originalUrl.indexOf('?'))
-          : '';
         res.redirect(301, `${routeInfo.redirectTo}${searchSuffix}`);
         return;
       }

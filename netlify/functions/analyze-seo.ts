@@ -172,6 +172,13 @@ async function readStreamWithLimit(response: Response, maxBytes: number): Promis
 }
 
 export default async function handler(request: Request): Promise<Response> {
+  if (request.method !== 'GET' && request.method !== 'HEAD') {
+    return new Response(JSON.stringify({ error: 'Method not allowed.' }), {
+      status: 405,
+      headers: { 'Content-Type': 'application/json', 'Cache-Control': 'no-store' },
+    });
+  }
+
   const url = new URL(request.url);
   const rawTarget = url.searchParams.get('url')?.trim() || '';
   const checkOnly = url.searchParams.get('checkOnly') === '1';
@@ -181,7 +188,7 @@ export default async function handler(request: Request): Promise<Response> {
       JSON.stringify({ error: 'Please provide a valid public http:// or https:// URL.' }),
       {
         status: 400,
-        headers: { 'Content-Type': 'application/json' },
+        headers: { 'Content-Type': 'application/json', 'Cache-Control': 'no-store' },
       }
     );
   }
@@ -346,7 +353,7 @@ export default async function handler(request: Request): Promise<Response> {
       }),
       {
         status: 200,
-        headers: { 'Content-Type': 'application/json' },
+        headers: { 'Content-Type': 'application/json', 'Cache-Control': 'no-store' },
       }
     );
   } catch (err: unknown) {

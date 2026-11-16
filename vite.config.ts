@@ -13,7 +13,7 @@ function injectGoogleVerificationPlugin(): Plugin {
         process.env.GOOGLE_SITE_VERIFICATION ||
         ''
       ).trim();
-      if (!token || /name="google-site-verification"/i.test(html)) {
+      if (!token) {
         return html;
       }
       const escaped = token
@@ -21,9 +21,13 @@ function injectGoogleVerificationPlugin(): Plugin {
         .replace(/"/g, '&quot;')
         .replace(/</g, '&lt;')
         .replace(/>/g, '&gt;');
-      return html.replace(
+      const cleaned = html.replace(
+        /\s*<meta\s+name="google-site-verification"[^>]*\/?>/gi,
+        ''
+      );
+      return cleaned.replace(
         '</head>',
-        `    <meta name="google-site-verification" content="${escaped}" />\n  </head>`
+        `\n    <meta name="google-site-verification" content="${escaped}" />\n  </head>`
       );
     },
   };

@@ -3,12 +3,14 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
+import { execFileSync } from 'node:child_process';
 import fs from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 import {
   DEFAULT_PRODUCTION_URL,
   NOT_FOUND_SEO,
+  ORGANIZATION_NAME,
   SITE_NAME,
   STATIC_PAGES_SEO,
   getAllCanonicalSitemapEntries,
@@ -21,6 +23,110 @@ const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 const ROOT_DIR = path.resolve(__dirname, '..');
 const PUBLIC_DIR = path.resolve(ROOT_DIR, 'public');
+const NETLIFY_TOML_PATH = path.resolve(ROOT_DIR, 'netlify.toml');
+
+const NETLIFY_REDIRECTS_BEGIN = '# BEGIN GENERATED REDIRECTS';
+const NETLIFY_REDIRECTS_END = '# END GENERATED REDIRECTS';
+
+const TOOL_SOURCE_PATHS: Record<string, string[]> = {
+  'resume-builder': ['src/components/tools/ResumeBuilder'],
+  'uae-gratuity': ['src/components/tools/UAEGratuity', 'src/utils/gratuityCalculator.ts'],
+  'uae-salary-calculator': ['src/components/tools/UAESalary'],
+  'gemini-photo-prompt': ['src/components/tools/GeminiPhotoPrompt'],
+  'ai-video-prompt': ['src/components/tools/AIVideoPrompt'],
+  'markdown-editor': ['src/components/tools/MarkdownEditor'],
+  'seo-page-analyzer': ['src/components/tools/SeoPageAnalyzer'],
+  'seo-meta-generator': ['src/components/tools/SeoMetaGenerator'],
+  'word-counter': ['src/components/tools/WordCounter'],
+  'text-case-converter': ['src/components/tools/TextCaseConverter'],
+  'image-compressor': ['src/components/tools/ImageCompressor'],
+  'qr-generator': ['src/components/tools/QRCodeGenerator'],
+  'color-picker': ['src/components/tools/ColorPicker'],
+  'loan-calculator': ['src/components/tools/LoanCalculator'],
+  'currency-converter': ['src/components/tools/CurrencyConverter'],
+  'crypto-converter': ['src/components/tools/CryptoConverter'],
+  'percentage-calculator': ['src/components/tools/PercentageCalculator'],
+  'discount-calculator': ['src/components/tools/DiscountCalculator'],
+  'unit-converter': ['src/components/tools/UnitConverter'],
+  'password-generator': ['src/components/tools/PasswordGenerator'],
+  'password-strength': ['src/components/tools/PasswordStrength'],
+  'age-calculator': ['src/components/tools/AgeCalculator'],
+  'date-difference': ['src/components/tools/DateDifference'],
+  'bmi-calculator': ['src/components/tools/BMICalculator'],
+  'timezone-converter': ['src/components/tools/TimeZoneConverter'],
+  'json-formatter': ['src/components/tools/JsonFormatter'],
+  'base64-converter': ['src/components/tools/Base64Converter'],
+  'pdf-tools-suite': ['src/components/tools/PdfToolsSuite'],
+};
+
+const STATIC_PAGE_SOURCE_PATHS: Record<string, string[]> = {
+  '/': ['src/App.tsx', 'src/components/home', 'src/data/seoRegistry.ts'],
+  '/tools': ['src/components/pages/ToolsDirectoryPage.tsx', 'src/data/tools.ts', 'src/data/toolsRouting.ts'],
+  '/about': ['src/components/pages/TrustPages.tsx'],
+  '/contact': ['src/components/pages/TrustPages.tsx'],
+  '/privacy': ['src/components/pages/TrustPages.tsx'],
+  '/terms': ['src/components/pages/TrustPages.tsx'],
+  '/disclaimer': ['src/components/pages/TrustPages.tsx'],
+};
+
+/**
+ * Resolves authentic per-route modification dates (YYYY-MM-DD) from full Git history.
+ * Returns an empty map when Git history is unavailable or shallow so build scripts
+ * omit <lastmod> rather than falsely stamping the build date across every URL.
+ */
+export function resolveRouteLastmodMap(): Map<string, string> {
+  const result = new Map<string, string>();
+  try {
+    const insideGit = execFileSync('git', ['rev-parse', '--is-inside-work-tree'], {
+      cwd: ROOT_DIR,
+      stdio: ['ignore', 'pipe', 'ignore'],
+      encoding: 'utf-8',
+    }).trim();
+    if (insideGit !== 'true') {
+      return result;
+    }
+
+    const isShallow = execFileSync('git', ['rev-parse', '--is-shallow-repository'], {
+      cwd: ROOT_DIR,
+      stdio: ['ignore', 'pipe', 'ignore'],
+      encoding: 'utf-8',
+    }).trim();
+    if (isShallow === 'true') {
+      return result;
+    }
+
+    const queryLastmodForPaths = (paths: string[]): string | undefined => {
+      if (paths.length === 0) return undefined;
+      try {
+        const out = execFileSync('git', ['log', '-1', '--format=%cs', '--', ...paths], {
+          cwd: ROOT_DIR,
+          stdio: ['ignore', 'pipe', 'ignore'],
+          encoding: 'utf-8',
+        }).trim();
+        return /^\d{4}-\d{2}-\d{2}$/.test(out) ? out : undefined;
+      } catch {
+        return undefined;
+      }
+    };
+
+    for (const page of STATIC_PAGES_SEO) {
+      const dateStr = queryLastmodForPaths(STATIC_PAGE_SOURCE_PATHS[page.path] || []);
+      if (dateStr) {
+        result.set(page.path, dateStr);
+      }
+    }
+
+    for (const route of Object.values(TOOL_ROUTES)) {
+      const dateStr = queryLastmodForPaths(TOOL_SOURCE_PATHS[route.id] || []);
+      if (dateStr) {
+        result.set(route.primaryPath, dateStr);
+      }
+    }
+  } catch {
+    // Git not available in container environment — omit lastmod rather than fabricating build timestamps.
+  }
+  return result;
+}
 
 export function resolveBuildBaseUrl(): string {
   const candidates = [
@@ -54,19 +160,24 @@ function escapeHtml(str: string): string {
     .replace(/'/g, '&#39;');
 }
 
-export function buildSitemapXml(baseUrl: string, lastmod: string): string {
-  const entries = getAllCanonicalSitemapEntries(baseUrl, lastmod);
+export function buildSitemapXml(
+  baseUrl: string,
+  lastmodByPath?: ReadonlyMap<string, string>
+): string {
+  const entries = getAllCanonicalSitemapEntries(baseUrl, lastmodByPath);
   const xmlUrls = entries
-    .map((entry) =>
-      [
-        '  <url>',
-        `    <loc>${escapeXml(entry.loc)}</loc>`,
-        `    <lastmod>${escapeXml(entry.lastmod)}</lastmod>`,
+    .map((entry) => {
+      const lines = ['  <url>', `    <loc>${escapeXml(entry.loc)}</loc>`];
+      if (entry.lastmod) {
+        lines.push(`    <lastmod>${escapeXml(entry.lastmod)}</lastmod>`);
+      }
+      lines.push(
         `    <changefreq>${escapeXml(entry.changefreq)}</changefreq>`,
         `    <priority>${escapeXml(entry.priority)}</priority>`,
-        '  </url>',
-      ].join('\n')
-    )
+        '  </url>'
+      );
+      return lines.join('\n');
+    })
     .join('\n');
 
   return `<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n${xmlUrls}\n</urlset>\n`;
@@ -201,7 +312,7 @@ export function build404Html(baseUrl: string): string {
 export function buildWebManifestJson(): string {
   const manifest = {
     id: '/',
-    name: 'FreeTools Hub – Free CV Generator, UAE Gratuity, AI Prompts & Utilities',
+    name: `${SITE_NAME} – Free CV Generator, UAE Gratuity, AI Prompts & Utilities`,
     short_name: 'FreeTools',
     description:
       'Free PDF Tools Suite (43 tools), ATS CV maker, UAE salary & gratuity calculators, AI prompt builders, and privacy-first online tools that work offline.',
@@ -236,7 +347,7 @@ export function buildWebManifestJson(): string {
 
 export function buildRedirectsTxt(): string {
   const aliasLines: string[] = [
-    '# AbbasPro FreeTools Hub - URL Redirects & Prerendered HTML Routing for Netlify & Cloudflare Pages',
+    `# ${ORGANIZATION_NAME} · ${SITE_NAME} - Generated Single-Source-of-Truth Routing Rules`,
     '',
     '# 1. 301 Permanent Redirects for Legacy Tool Aliases',
   ];
@@ -275,16 +386,125 @@ export function buildRedirectsTxt(): string {
   return aliasLines.join('\n');
 }
 
+export function buildNetlifyRedirectsSection(): string {
+  const blocks: string[] = [
+    NETLIFY_REDIRECTS_BEGIN,
+    '# Auto-generated from src/data/toolsRouting.ts & src/data/seoRegistry.ts by scripts/generateSeoFiles.ts',
+    '',
+    '# 1. 301 Permanent Redirects for legacy tool aliases',
+  ];
+
+  for (const route of Object.values(TOOL_ROUTES)) {
+    for (const alias of route.aliases) {
+      if (alias === route.primarySlug) continue;
+      blocks.push(
+        `[[redirects]]`,
+        `  from = "/tools/${alias}"`,
+        `  to = "${route.primaryPath}"`,
+        `  status = 301`,
+        `  force = true`,
+        ''
+      );
+    }
+  }
+
+  blocks.push('# 2. 301 Trailing-Slash Canonicalization for Public Subpages');
+  const subStaticPages = STATIC_PAGES_SEO.filter((p) => p.slug !== '');
+  for (const page of subStaticPages) {
+    blocks.push(
+      `[[redirects]]`,
+      `  from = "${page.path}/"`,
+      `  to = "${page.path}"`,
+      `  status = 301`,
+      `  force = true`,
+      ''
+    );
+  }
+  for (const route of Object.values(TOOL_ROUTES)) {
+    blocks.push(
+      `[[redirects]]`,
+      `  from = "${route.primaryPath}/"`,
+      `  to = "${route.primaryPath}"`,
+      `  status = 301`,
+      `  force = true`,
+      ''
+    );
+  }
+
+  blocks.push(
+    '# 3. Route API endpoints to Netlify Functions (strictly evaluated before catch-all 404)',
+    `[[redirects]]`,
+    `  from = "/api/analyze-seo"`,
+    `  to = "/.netlify/functions/analyze-seo"`,
+    `  status = 200`,
+    `  force = true`,
+    ''
+  );
+
+  blocks.push('# 4. Direct 200 OK serves for prerendered flat HTML subpages (eliminates folder 301 redirects)');
+  for (const page of subStaticPages) {
+    blocks.push(
+      `[[redirects]]`,
+      `  from = "${page.path}"`,
+      `  to = "/${page.slug}.html"`,
+      `  status = 200`,
+      `  force = true`,
+      ''
+    );
+  }
+  for (const route of Object.values(TOOL_ROUTES)) {
+    blocks.push(
+      `[[redirects]]`,
+      `  from = "${route.primaryPath}"`,
+      `  to = "/tools/${route.primarySlug}.html"`,
+      `  status = 200`,
+      `  force = true`,
+      ''
+    );
+  }
+
+  blocks.push(
+    '# 5. Custom 404 fallback for unknown routes (prevents Soft 404 indexing)',
+    `[[redirects]]`,
+    `  from = "/*"`,
+    `  to = "/404.html"`,
+    `  status = 404`,
+    NETLIFY_REDIRECTS_END
+  );
+
+  return blocks.join('\n');
+}
+
+export function syncNetlifyTomlRedirects(): boolean {
+  if (!fs.existsSync(NETLIFY_TOML_PATH)) return false;
+  const current = fs.readFileSync(NETLIFY_TOML_PATH, 'utf-8');
+  const startIdx = current.indexOf(NETLIFY_REDIRECTS_BEGIN);
+  const endIdx = current.indexOf(NETLIFY_REDIRECTS_END);
+  if (startIdx === -1 || endIdx === -1 || endIdx < startIdx) {
+    return false;
+  }
+  const generatedBlock = buildNetlifyRedirectsSection();
+  const updated =
+    current.slice(0, startIdx) +
+    generatedBlock +
+    current.slice(endIdx + NETLIFY_REDIRECTS_END.length);
+  if (updated !== current) {
+    fs.writeFileSync(NETLIFY_TOML_PATH, updated, 'utf-8');
+    return true;
+  }
+  return false;
+}
+
 export function generateSeoFilesToDirectory(targetDir: string): {
   urlCount: number;
   baseUrl: string;
-  lastmod: string;
+  lastmodCount: number;
 } {
   fs.mkdirSync(targetDir, { recursive: true });
   const baseUrl = resolveBuildBaseUrl();
-  const lastmod = new Date().toISOString().split('T')[0];
+  const lastmodMap = resolveRouteLastmodMap();
 
-  const sitemapXml = buildSitemapXml(baseUrl, lastmod);
+  const sitemapXml = buildSitemapXml(baseUrl, lastmodMap);
   const robotsTxt = buildRobotsTxt(baseUrl);
   const notFoundHtml = build404Html(baseUrl);
   const manifestJson = buildWebManifestJson();
@@ -296,13 +516,19 @@ export function generateSeoFilesToDirectory(targetDir: string): {
   fs.writeFileSync(path.resolve(targetDir, 'site.webmanifest'), manifestJson, 'utf-8');
   fs.writeFileSync(path.resolve(targetDir, '_redirects'), redirectsTxt, 'utf-8');
 
+  syncNetlifyTomlRedirects();
+
   const urlCount = (sitemapXml.match(/<url>/g) || []).length;
-  return { urlCount, baseUrl, lastmod };
+  return { urlCount, baseUrl, lastmodCount: lastmodMap.size };
 }
 
 if (process.argv[1] && process.argv[1].endsWith('generateSeoFiles.ts')) {
   const result = generateSeoFilesToDirectory(PUBLIC_DIR);
+  const lastmodLabel =
+    result.lastmodCount > 0
+      ? `${result.lastmodCount} route-specific git dates`
+      : 'lastmod omitted (no git history in build env)';
   console.log(
-    `[SEO Generator] ✓ Generated sitemap.xml (${result.urlCount} URLs, lastmod ${result.lastmod}), robots.txt, 404.html, site.webmanifest, and _redirects in public/ for ${result.baseUrl}`
+    `[SEO Generator] ✓ Generated sitemap.xml (${result.urlCount} URLs, ${lastmodLabel}), robots.txt, 404.html, site.webmanifest, _redirects, and synced netlify.toml for ${result.baseUrl}`
   );
 }

@@ -8,10 +8,10 @@ import { TOOL_ROUTES, ToolRouteConfig, findToolBySlugOrId } from './toolsRouting
 
 export const DEFAULT_PRODUCTION_URL = 'https://freetoolshub1.netlify.app';
 export const SITE_NAME = 'FreeTools Hub';
-export const ORGANIZATION_NAME = 'AbbasPro';
+export const ORGANIZATION_NAME = 'NEXORA';
 export const ORGANIZATION_ALTERNATE_NAMES = [
   'FreeTools Hub',
-  'AbbasPro FreeTools Hub',
+  'NEXORA FreeTools Hub',
   'Free Tools Hub',
 ];
 
@@ -94,10 +94,10 @@ export const STATIC_PAGES_SEO: StaticPageSeoConfig[] = [
   {
     path: '/about',
     slug: 'about',
-    title: 'About FreeTools Hub – Privacy & Architecture | AbbasPro',
-    description: 'Learn how AbbasPro / FreeTools Hub builds fast, browser-based career, PDF, UAE financial, AI prompt, and developer tools with client-side privacy.',
-    h1: 'About AbbasPro & FreeTools Hub',
-    summary: 'FreeTools Hub was engineered by AbbasPro with a privacy-first client-side architecture so calculations, PDF processing, and document generation run locally in your browser.',
+    title: 'About FreeTools Hub – Privacy & Architecture | NEXORA',
+    description: 'Learn how NEXORA builds FreeTools Hub: fast, browser-based career, PDF, UAE financial, AI prompt, and developer tools with client-side privacy.',
+    h1: 'About FreeTools Hub by NEXORA',
+    summary: 'FreeTools Hub is engineered and published by NEXORA with a privacy-first client-side architecture so calculations, PDF processing, and document generation run locally in your browser.',
     schemaType: 'AboutPage',
     changefreq: 'monthly',
     priority: '0.7',
@@ -105,8 +105,8 @@ export const STATIC_PAGES_SEO: StaticPageSeoConfig[] = [
   {
     path: '/contact',
     slug: 'contact',
-    title: 'Contact & Support – FreeTools Hub | AbbasPro',
-    description: 'Contact AbbasPro / FreeTools Hub to report calculation issues, suggest new browser tools, or share technical feedback.',
+    title: 'Contact & Support – FreeTools Hub | NEXORA',
+    description: 'Contact NEXORA / FreeTools Hub to report calculation issues, suggest new browser tools, or share technical feedback.',
     h1: 'Contact FreeTools Hub & Support',
     summary: 'Have feedback, found a bug in a calculation or PDF workflow, or want to request a new productivity utility? Send your feedback directly to our engineering team.',
     schemaType: 'ContactPage',
@@ -127,7 +127,7 @@ export const STATIC_PAGES_SEO: StaticPageSeoConfig[] = [
   {
     path: '/terms',
     slug: 'terms',
-    title: 'Terms of Use – FreeTools Hub | AbbasPro',
+    title: 'Terms of Use – FreeTools Hub | NEXORA',
     description: 'Review the FreeTools Hub Terms of Use covering free personal and commercial usage, user output ownership, and acceptable conduct.',
     h1: 'Terms of Use',
     summary: 'By accessing FreeTools Hub, you agree to fair and lawful usage. All CVs, PDFs, prompts, and exported outputs generated on your device remain 100% your own property.',
@@ -210,7 +210,7 @@ export function normalizeSeoPathname(rawPath: string): string {
 export interface SitemapUrlEntry {
   path: string;
   loc: string;
-  lastmod: string;
+  lastmod?: string;
   changefreq: string;
   priority: string;
 }
@@ -219,10 +219,11 @@ export interface SitemapUrlEntry {
  * Single authoritative generator of canonical, indexable public URLs for sitemap.xml.
  * Automatically picks up all static routes in STATIC_PAGES_SEO and all canonical tool routes in TOOL_ROUTES.
  * Excludes aliases, /api/*, /.netlify/*, /404, and query-parameter URLs.
+ * Emits route-specific lastmod only when verified; omits lastmod when unavailable.
  */
 export function getAllCanonicalSitemapEntries(
   baseUrl: string = DEFAULT_PRODUCTION_URL,
-  lastmod: string = new Date().toISOString().split('T')[0]
+  lastmodByPath?: ReadonlyMap<string, string>
 ): SitemapUrlEntry[] {
   const cleanBase = (sanitizePublicOrigin(baseUrl) || DEFAULT_PRODUCTION_URL).replace(/\/+$/, '');
   const seenPaths = new Set<string>();
@@ -231,10 +232,11 @@ export function getAllCanonicalSitemapEntries(
   for (const page of STATIC_PAGES_SEO) {
     if (seenPaths.has(page.path)) continue;
     seenPaths.add(page.path);
+    const routeLastmod = lastmodByPath?.get(page.path);
     entries.push({
       path: page.path,
       loc: page.path === '/' ? `${cleanBase}/` : `${cleanBase}${page.path}`,
-      lastmod,
+      ...(routeLastmod ? { lastmod: routeLastmod } : {}),
       changefreq: page.changefreq,
       priority: page.priority,
     });
@@ -245,10 +247,11 @@ export function getAllCanonicalSitemapEntries(
     if (!toolPath || !toolPath.startsWith('/tools/') || toolPath.includes('?')) continue;
     if (seenPaths.has(toolPath)) continue;
     seenPaths.add(toolPath);
+    const routeLastmod = lastmodByPath?.get(toolPath);
     entries.push({
       path: toolPath,
       loc: `${cleanBase}${toolPath}`,
-      lastmod,
+      ...(routeLastmod ? { lastmod: routeLastmod } : {}),
       changefreq: HIGH_PRIORITY_TOOL_SLUGS.has(route.primarySlug) ? 'weekly' : 'monthly',
       priority: HIGH_PRIORITY_TOOL_SLUGS.has(route.primarySlug) ? '0.9' : '0.8',
     });

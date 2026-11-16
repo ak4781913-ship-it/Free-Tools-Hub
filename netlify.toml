@@ -1,12 +1,19 @@
 [build]
-  command = "npm run build"
+  command = "bun run build"
   publish = "dist"
   functions = "netlify/functions"
+
+[build.environment]
+  BUN_VERSION = "1.4.4"
+  NODE_VERSION = "22"
 
 [functions]
   node_bundler = "esbuild"
 
-# 301 Permanent Redirects for legacy tool aliases
+# BEGIN GENERATED REDIRECTS
+# Auto-generated from src/data/toolsRouting.ts & src/data/seoRegistry.ts by scripts/generateSeoFiles.ts
+
+# 1. 301 Permanent Redirects for legacy tool aliases
 [[redirects]]
   from = "/tools/resume-builder"
   to = "/tools/cv-maker"
@@ -265,7 +272,7 @@
   status = 301
   force = true
 
-# 301 Trailing-slash canonicalization for public subpages
+# 2. 301 Trailing-Slash Canonicalization for Public Subpages
 [[redirects]]
   from = "/tools/"
   to = "/tools"
@@ -470,7 +477,14 @@
   status = 301
   force = true
 
-# Direct 200 OK rewrites to flat prerendered HTML pages (zero directory redirect)
+# 3. Route API endpoints to Netlify Functions (strictly evaluated before catch-all 404)
+[[redirects]]
+  from = "/api/analyze-seo"
+  to = "/.netlify/functions/analyze-seo"
+  status = 200
+  force = true
+
+# 4. Direct 200 OK serves for prerendered flat HTML subpages (eliminates folder 301 redirects)
 [[redirects]]
   from = "/tools"
   to = "/tools.html"
@@ -675,17 +689,12 @@
   status = 200
   force = true
 
-# Route API endpoints to Netlify Functions
-[[redirects]]
-  from = "/api/analyze-seo"
-  to = "/.netlify/functions/analyze-seo"
-  status = 200
-
-# Custom 404 fallback for unknown routes (prevents Soft 404 indexing)
+# 5. Custom 404 fallback for unknown routes (prevents Soft 404 indexing)
 [[redirects]]
   from = "/*"
   to = "/404.html"
   status = 404
+# END GENERATED REDIRECTS
 
 # Global Security & Performance Headers
 [[headers]]

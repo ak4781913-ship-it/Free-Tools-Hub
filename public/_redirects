@@ -1,4 +1,4 @@
-# AbbasPro FreeTools Hub - URL Redirects & Prerendered HTML Routing for Netlify & Cloudflare Pages
+# NEXORA · FreeTools Hub - Generated Single-Source-of-Truth Routing Rules
 
 # 1. 301 Permanent Redirects for Legacy Tool Aliases
 /tools/resume-builder  /tools/cv-maker  301!

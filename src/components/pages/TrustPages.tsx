@@ -162,10 +162,10 @@ export const TrustPageView: React.FC<TrustPageViewProps> = ({ page, onNavigateTo
             <header className="space-y-3 border-b border-slate-100 dark:border-slate-800 pb-6">
               <div className="inline-flex items-center gap-2 text-xs font-semibold text-blue-700 dark:text-blue-400">
                 <Info className="w-4 h-4" />
-                <span>AbbasPro · FreeTools Hub Platform Overview</span>
+                <span>NEXORA · FreeTools Hub Platform Overview</span>
               </div>
               <h1 className="text-2xl sm:text-3xl font-extrabold text-slate-900 dark:text-white tracking-tight">
-                {isUrdu ? 'فری ٹولز ہب کے بارے میں' : 'About AbbasPro / FreeTools Hub'}
+                {isUrdu ? 'فری ٹولز ہب کے بارے میں' : 'About FreeTools Hub by NEXORA'}
               </h1>
               <p className="text-sm sm:text-base text-slate-600 dark:text-slate-300 leading-relaxed max-w-3xl">
                 {isUrdu
@@ -406,7 +406,7 @@ export const TrustPageView: React.FC<TrustPageViewProps> = ({ page, onNavigateTo
                 Privacy Policy
               </h1>
               <p className="text-xs text-slate-500">
-                Effective for AbbasPro / FreeTools Hub Web Application
+                Effective for NEXORA · FreeTools Hub Web Application
               </p>
             </header>
 
