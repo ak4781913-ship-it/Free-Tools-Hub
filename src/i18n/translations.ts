@@ -256,7 +256,7 @@ export const translations = {
       finish: 'Finish & Explore',
       stepOf: 'Step {current} of {total}',
       step1Title: 'Instant Universal Search',
-      step1Desc: 'Quickly find and launch any of our 23 web tools. Press "/" or "⌘K" from anywhere to trigger the command palette with live keyboard navigation.',
+      step1Desc: 'Quickly find and launch any of our 28 web tools. Press "/" or "⌘K" from anywhere to trigger the command palette with live keyboard navigation.',
       step2Title: 'Favorites & Quick Access',
       step2Desc: 'Star your top tools to keep them pinned. Click the saved tools badge or press "Alt+F" to slide open your favorites and recent history drawer.',
       step3Title: 'Power-User Keyboard Shortcuts',

@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useLanguage } from '../../../context/LanguageContext';
 import { X, CheckCircle, Shield, FileCheck, AlertTriangle, Mail } from 'lucide-react';
 
@@ -8,9 +8,21 @@ interface LegalModalProps {
 }
 
 export const LegalModal: React.FC<LegalModalProps> = ({ type, onClose }) => {
-  const { t } = useLanguage();
+  const { t, language } = useLanguage();
+  const isUrdu = language === 'ur';
   const [contactSubmitted, setContactSubmitted] = useState(false);
   const [contactForm, setContactForm] = useState({ name: '', email: '', message: '' });
+
+  useEffect(() => {
+    if (!type) return;
+    const handleEsc = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') {
+        onClose();
+      }
+    };
+    window.addEventListener('keydown', handleEsc);
+    return () => window.removeEventListener('keydown', handleEsc);
+  }, [type, onClose]);
 
   if (!type) return null;
 
@@ -19,12 +31,17 @@ export const LegalModal: React.FC<LegalModalProps> = ({ type, onClose }) => {
       role="dialog"
       aria-modal="true"
       className="fixed inset-0 z-50 overflow-y-auto bg-slate-900/60 backdrop-blur-xs flex items-center justify-center p-4"
+      onClick={onClose}
     >
-      <div className="relative w-full max-w-2xl bg-white dark:bg-slate-900 rounded-xl shadow-2xl border border-slate-200 dark:border-slate-800 p-6 max-h-[85vh] overflow-y-auto">
+      <div
+        className="relative w-full max-w-2xl bg-white dark:bg-slate-900 rounded-2xl shadow-2xl border border-slate-200 dark:border-slate-800 p-6 max-h-[85vh] overflow-y-auto"
+        onClick={(e) => e.stopPropagation()}
+      >
         <button
+          type="button"
           onClick={onClose}
           aria-label="Close dialog"
-          className="absolute top-4 right-4 p-1.5 text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors"
+          className="absolute top-4 end-4 p-1.5 text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors cursor-pointer"
         >
           <X className="w-5 h-5" />
         </button>
@@ -75,7 +92,7 @@ export const LegalModal: React.FC<LegalModalProps> = ({ type, onClose }) => {
               <p>
                 Welcome to FreeTools Hub. By accessing and using our web utilities, you agree to these terms:
               </p>
-              <ul className="list-disc pl-5 space-y-1.5">
+              <ul className="list-disc ps-5 space-y-1.5">
                 <li>FreeTools Hub utilities are offered free of charge for personal and commercial productivity.</li>
                 <li>You retain 100% intellectual property ownership of any resumes, text prompts, or documents you create using our generators.</li>
                 <li>Tools are provided on an "as is" and "as available" basis without warranties of any kind.</li>
@@ -100,7 +117,7 @@ export const LegalModal: React.FC<LegalModalProps> = ({ type, onClose }) => {
               <p>
                 Actual end-of-service benefits determined by the Ministry of Human Resources and Emiratisation (MOHRE), Free Zone Authorities (DIFC, ADGM, JAFZA, etc.), or UAE Labour Courts may vary based on:
               </p>
-              <ul className="list-disc pl-5 space-y-1">
+              <ul className="list-disc ps-5 space-y-1">
                 <li>Specific contract clauses, allowances excluded from the statutory basic salary definition.</li>
                 <li>Deduction of authorized unpaid leaves or disciplinary matters under Article 44.</li>
                 <li>Special workplace savings schemes (such as DEWS in DIFC or voluntary pension funds).</li>
@@ -163,7 +180,7 @@ export const LegalModal: React.FC<LegalModalProps> = ({ type, onClose }) => {
               >
                 <div>
                   <label htmlFor="legal-contact-name" className="block text-xs font-medium text-slate-700 dark:text-slate-300 mb-1">
-                    Your Name
+                    {isUrdu ? 'آپ کا نام' : 'Your Name'}
                   </label>
                   <input
                     id="legal-contact-name"
@@ -171,13 +188,13 @@ export const LegalModal: React.FC<LegalModalProps> = ({ type, onClose }) => {
                     required
                     value={contactForm.name}
                     onChange={(e) => setContactForm({ ...contactForm, name: e.target.value })}
-                    placeholder="Jane Doe"
+                    placeholder={isUrdu ? 'اپنا نام درج کریں' : 'Your Name'}
                     className="w-full px-3 py-2 text-sm rounded-lg border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-white focus:ring-2 focus:ring-indigo-500"
                   />
                 </div>
                 <div>
                   <label htmlFor="legal-contact-email" className="block text-xs font-medium text-slate-700 dark:text-slate-300 mb-1">
-                    Email Address
+                    {isUrdu ? 'ای میل ایڈریس' : 'Email Address'}
                   </label>
                   <input
                     id="legal-contact-email"
@@ -185,13 +202,13 @@ export const LegalModal: React.FC<LegalModalProps> = ({ type, onClose }) => {
                     required
                     value={contactForm.email}
                     onChange={(e) => setContactForm({ ...contactForm, email: e.target.value })}
-                    placeholder="jane@example.com"
+                    placeholder="name@example.com"
                     className="w-full px-3 py-2 text-sm rounded-lg border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-white focus:ring-2 focus:ring-indigo-500"
                   />
                 </div>
                 <div>
                   <label htmlFor="legal-contact-message" className="block text-xs font-medium text-slate-700 dark:text-slate-300 mb-1">
-                    Message / Tool Request
+                    {isUrdu ? 'پیغام / ٹول کی تجویز' : 'Message / Tool Request'}
                   </label>
                   <textarea
                     id="legal-contact-message"
@@ -199,7 +216,7 @@ export const LegalModal: React.FC<LegalModalProps> = ({ type, onClose }) => {
                     required
                     value={contactForm.message}
                     onChange={(e) => setContactForm({ ...contactForm, message: e.target.value })}
-                    placeholder="Suggest a new tool, report an issue, or ask a question..."
+                    placeholder={isUrdu ? 'نیا ٹول تجویز کریں یا اپنا سوال لکھیں...' : 'Suggest a new tool, report an issue, or ask a question...'}
                     className="w-full px-3 py-2 text-sm rounded-lg border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-white focus:ring-2 focus:ring-indigo-500"
                   />
                 </div>
@@ -207,7 +224,7 @@ export const LegalModal: React.FC<LegalModalProps> = ({ type, onClose }) => {
                   <button
                     type="button"
                     onClick={onClose}
-                    className="px-4 py-2 text-xs font-medium text-slate-700 dark:text-slate-300 bg-slate-100 dark:bg-slate-800 rounded-lg hover:bg-slate-200 cursor-pointer"
+                    className="px-4 py-2 text-xs font-medium text-slate-700 dark:text-slate-300 bg-slate-100 dark:bg-slate-800 rounded-lg hover:bg-slate-200 dark:hover:bg-slate-700 cursor-pointer"
                   >
                     {t.legal.close}
                   </button>
@@ -215,7 +232,7 @@ export const LegalModal: React.FC<LegalModalProps> = ({ type, onClose }) => {
                     type="submit"
                     className="px-4 py-2 text-xs font-medium text-white bg-indigo-600 rounded-lg hover:bg-indigo-700 cursor-pointer"
                   >
-                    Save Message
+                    {isUrdu ? 'پیغام محفوظ کریں' : 'Save Message'}
                   </button>
                 </div>
               </form>

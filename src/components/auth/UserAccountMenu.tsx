@@ -107,7 +107,7 @@ export const UserAccountMenu: React.FC<UserAccountMenuProps> = ({
         </button>
 
         {isMenuOpen && (
-          <div className="absolute right-0 rtl:right-auto rtl:left-0 top-12 w-64 rounded-2xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-xl py-2 z-50 animate-in fade-in zoom-in-95 duration-150">
+          <div className="absolute end-0 top-12 w-64 rounded-2xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 shadow-xl py-2 z-50 animate-in fade-in zoom-in-95 duration-150">
             <div className="px-4 py-3 border-b border-slate-100 dark:border-slate-800">
               <p className="text-xs font-bold text-slate-900 dark:text-white">
                 {isUrdu ? 'گیسٹ ورک اسپیس' : 'FreeTools Hub Guest'}
@@ -126,7 +126,7 @@ export const UserAccountMenu: React.FC<UserAccountMenuProps> = ({
                   setIsMenuOpen(false);
                   openAuthModal();
                 }}
-                className="w-full flex items-center gap-2.5 px-3 py-2 rounded-xl text-xs font-semibold text-blue-700 dark:text-blue-400 hover:bg-blue-50 dark:hover:bg-blue-950/50 transition-colors text-left rtl:text-right cursor-pointer"
+                className="w-full flex items-center gap-2.5 px-3 py-2 rounded-xl text-xs font-semibold text-blue-700 dark:text-blue-400 hover:bg-blue-50 dark:hover:bg-blue-950/50 transition-colors text-start cursor-pointer"
               >
                 <Cloud className="w-4 h-4 shrink-0" />
                 <span>{isUrdu ? 'کلاؤڈ سنک کے لیے سائن ان کریں' : 'Sign in for Cloud Sync'}</span>
@@ -138,7 +138,7 @@ export const UserAccountMenu: React.FC<UserAccountMenuProps> = ({
                   setIsMenuOpen(false);
                   onOpenSettings();
                 }}
-                className="w-full flex items-center gap-2.5 px-3 py-2 rounded-xl text-xs font-medium text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors text-left rtl:text-right cursor-pointer"
+                className="w-full flex items-center gap-2.5 px-3 py-2 rounded-xl text-xs font-medium text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors text-start cursor-pointer"
               >
                 <Settings className="w-4 h-4 text-slate-400 shrink-0" />
                 <span>{isUrdu ? 'ترجیحات اور سیٹنگز' : 'Settings & Preferences'}</span>
@@ -150,7 +150,7 @@ export const UserAccountMenu: React.FC<UserAccountMenuProps> = ({
                   setIsMenuOpen(false);
                   onOpenHelp();
                 }}
-                className="w-full flex items-center gap-2.5 px-3 py-2 rounded-xl text-xs font-medium text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors text-left rtl:text-right cursor-pointer"
+                className="w-full flex items-center gap-2.5 px-3 py-2 rounded-xl text-xs font-medium text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors text-start cursor-pointer"
               >
                 <HelpCircle className="w-4 h-4 text-slate-400 shrink-0" />
                 <span>{isUrdu ? 'مدد اور رہنمائی' : 'Help & Documentation'}</span>
@@ -162,10 +162,10 @@ export const UserAccountMenu: React.FC<UserAccountMenuProps> = ({
                   setIsMenuOpen(false);
                   onNavigateTo('/about');
                 }}
-                className="w-full flex items-center gap-2.5 px-3 py-2 rounded-xl text-xs font-medium text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors text-left rtl:text-right cursor-pointer"
+                className="w-full flex items-center gap-2.5 px-3 py-2 rounded-xl text-xs font-medium text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors text-start cursor-pointer"
               >
                 <Shield className="w-4 h-4 text-slate-400 shrink-0" />
-                <span>{isUrdu ? 'ہمارے بارے میں' : 'About NEXORA FreeTools Hub'}</span>
+                <span>{isUrdu ? 'ہمارے بارے میں' : 'About MAWA FreeTools Hub'}</span>
               </button>
             </div>
           </div>
@@ -233,7 +233,7 @@ export const UserAccountMenu: React.FC<UserAccountMenuProps> = ({
         onClick={() => setIsMenuOpen((prev) => !prev)}
         aria-expanded={isMenuOpen}
         aria-label="User account menu"
-        className="flex items-center gap-2 p-1 pr-2 rounded-xl hover:bg-slate-100 dark:hover:bg-slate-800 border border-transparent hover:border-slate-200 dark:hover:border-slate-700 transition-all cursor-pointer group max-w-[200px]"
+        className="flex items-center gap-2 p-1 pe-2 rounded-xl hover:bg-slate-100 dark:hover:bg-slate-800 border border-transparent hover:border-slate-200 dark:hover:border-slate-700 transition-all cursor-pointer group max-w-[200px]"
       >
         <div className="relative shrink-0">
           {user.photoURL && !avatarLoadError ? (
@@ -250,7 +250,7 @@ export const UserAccountMenu: React.FC<UserAccountMenuProps> = ({
             </div>
           )}
           <span
-            className={`absolute -bottom-0.5 -right-0.5 w-2.5 h-2.5 rounded-full ${syncMeta.dot} ring-2 ring-white dark:ring-slate-900`}
+            className={`absolute -bottom-0.5 -end-0.5 w-2.5 h-2.5 rounded-full ${syncMeta.dot} ring-2 ring-white dark:ring-slate-900`}
           />
         </div>
 

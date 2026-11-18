@@ -283,6 +283,7 @@ export async function renderPdfPageToDataUrl(
   }
 ): Promise<{ dataUrl: string; blob: Blob; width: number; height: number }> {
   const doc = await openPdfJsDocument(bytes, options?.password);
+  let canvas: HTMLCanvasElement | null = null;
   try {
     const page = await doc.getPage(pageNumber);
     const scale = options?.scale ?? 1.5;
@@ -292,36 +293,42 @@ export async function renderPdfPageToDataUrl(
       rotation: (baseRotation + (options?.extraRotationDeg || 0)) % 360,
     });
 
-    const canvas = document.createElement('canvas');
-    canvas.width = Math.max(1, Math.floor(viewport.width));
-    canvas.height = Math.max(1, Math.floor(viewport.height));
-    const ctx = canvas.getContext('2d');
+    const renderCanvas = document.createElement('canvas');
+    canvas = renderCanvas;
+    renderCanvas.width = Math.max(1, Math.floor(viewport.width));
+    renderCanvas.height = Math.max(1, Math.floor(viewport.height));
+    const ctx = renderCanvas.getContext('2d');
     if (!ctx) throw new Error('Canvas 2D context is unavailable.');
 
     // Fill white background so transparent PDFs render cleanly as JPG/PNG
     ctx.fillStyle = '#ffffff';
-    ctx.fillRect(0, 0, canvas.width, canvas.height);
+    ctx.fillRect(0, 0, renderCanvas.width, renderCanvas.height);
 
     await page.render({
       canvasContext: ctx,
       viewport,
-      canvas,
+      canvas: renderCanvas,
     }).promise;
 
     const format = options?.format || 'image/png';
     const quality = options?.quality ?? 0.92;
-    const dataUrl = canvas.toDataURL(format, quality);
+    const dataUrl = renderCanvas.toDataURL(format, quality);
 
     const blob = await new Promise<Blob>((resolve, reject) => {
-      canvas.toBlob(
+      renderCanvas.toBlob(
         (b) => (b ? resolve(b) : reject(new Error('Failed to encode canvas image'))),
         format,
         quality
       );
     });
 
-    return { dataUrl, blob, width: canvas.width, height: canvas.height };
+    return { dataUrl, blob, width: renderCanvas.width, height: renderCanvas.height };
   } finally {
+    if (canvas) {
+      canvas.width = 0;
+      canvas.height = 0;
+      canvas = null;
+    }
     await closePdfJsDocument(doc);
   }
 }

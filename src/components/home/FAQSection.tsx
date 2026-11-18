@@ -4,21 +4,22 @@ import { ChevronDown, HelpCircle } from 'lucide-react';
 import { HOMEPAGE_FAQS } from '../../data/seoRegistry';
 
 export const FAQSection: React.FC = () => {
-  const { t } = useLanguage();
+  const { language, t } = useLanguage();
+  const isUrdu = language === 'ur';
   const [openIndex, setOpenIndex] = useState<number | null>(0);
   const faqs = HOMEPAGE_FAQS;
 
   return (
-    <section className="w-full py-16 px-4 sm:px-6 lg:px-8 max-w-4xl mx-auto">
-      <div className="text-center mb-10">
+    <section className="w-full py-6 max-w-4xl mx-auto">
+      <div className="text-center mb-8">
         <div className="inline-flex items-center gap-1.5 text-xs font-semibold text-indigo-600 dark:text-indigo-400 mb-2">
           <HelpCircle className="w-4 h-4" />
-          <span>Help & Transparency</span>
+          <span>{isUrdu ? 'مدد اور شفافیت' : 'Help & Transparency'}</span>
         </div>
         <h2 className="text-2xl sm:text-3xl font-bold tracking-tight text-slate-900 dark:text-white">
           {t.home.faqHeading}
         </h2>
-        <p className="text-xs text-slate-500 dark:text-slate-400 mt-2">
+        <p className="text-xs text-slate-600 dark:text-slate-400 mt-2">
           {t.home.faqSub}
         </p>
       </div>
@@ -33,8 +34,9 @@ export const FAQSection: React.FC = () => {
             >
               <button
                 type="button"
+                aria-expanded={isOpen}
                 onClick={() => setOpenIndex(isOpen ? null : index)}
-                className="w-full px-5 py-4 text-left flex items-center justify-between gap-4 text-sm font-semibold text-slate-900 dark:text-white hover:bg-slate-50 dark:hover:bg-slate-800/50 transition-colors"
+                className="w-full px-5 py-4 text-start flex items-center justify-between gap-4 text-sm font-semibold text-slate-900 dark:text-white hover:bg-slate-50 dark:hover:bg-slate-800/50 transition-colors cursor-pointer"
               >
                 <span>{faq.q}</span>
                 <ChevronDown

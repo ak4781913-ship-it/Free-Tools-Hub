@@ -216,20 +216,20 @@ export const ToolsDirectoryPage: React.FC<ToolsDirectoryPageProps> = ({
               <label htmlFor="directory-search-input" className="sr-only">
                 {isUrdu ? 'ٹول تلاش کریں' : 'Search tools by name, category, or keyword'}
               </label>
-              <Search className="absolute left-3.5 rtl:left-auto rtl:right-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400 pointer-events-none" />
+              <Search className="absolute start-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400 pointer-events-none" />
               <input
                 id="directory-search-input"
                 type="search"
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
                 placeholder={isUrdu ? 'نام، فیچر یا کی ورڈ سے ٹول تلاش کریں...' : 'Search by tool name, category, or keyword...'}
-                className="w-full min-w-0 pl-10 pr-10 rtl:pl-10 rtl:pr-10 py-3 rounded-xl bg-slate-50 dark:bg-slate-950 border border-slate-300 dark:border-slate-700 text-slate-900 dark:text-white text-sm shadow-2xs focus:bg-white dark:focus:bg-slate-900 focus:outline-none focus:ring-2 focus:ring-blue-600 transition-all placeholder:text-slate-400"
+                className="w-full min-w-0 ps-10 pe-10 py-3 rounded-xl bg-slate-50 dark:bg-slate-950 border border-slate-300 dark:border-slate-700 text-slate-900 dark:text-white text-sm focus:bg-white dark:focus:bg-slate-900 focus:outline-none focus:ring-2 focus:ring-blue-600 transition-all placeholder:text-slate-400"
               />
               {searchQuery && (
                 <button
                   type="button"
                   onClick={() => setSearchQuery('')}
-                  className="absolute right-2.5 rtl:right-auto rtl:left-2.5 top-1/2 -translate-y-1/2 p-1.5 text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 cursor-pointer"
+                  className="absolute end-2.5 top-1/2 -translate-y-1/2 p-1.5 text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 cursor-pointer"
                   aria-label="Clear search"
                 >
                   <X className="w-4 h-4" />
@@ -281,21 +281,22 @@ export const ToolsDirectoryPage: React.FC<ToolsDirectoryPageProps> = ({
             {searchQuery ? (
               <span>
                 {isUrdu ? `تلاش کے نتائج برائے "${searchQuery}":` : `Showing search results for "${searchQuery}":`}
-                <strong className="text-slate-900 dark:text-white font-semibold ml-1">
-                  {filteredTools.length} {filteredTools.length === 1 ? 'tool' : 'tools'} found
+                <strong className="text-slate-900 dark:text-white font-semibold ms-1 tabular-nums">
+                  {filteredTools.length} {isUrdu ? 'ٹولز' : filteredTools.length === 1 ? 'tool found' : 'tools found'}
                 </strong>
               </span>
             ) : (
               <span>
                 {isUrdu ? 'دستیاب ٹولز کی تعداد:' : 'Showing:'}
-                <strong className="text-slate-900 dark:text-white font-semibold ml-1">
-                  {filteredTools.length} {filteredTools.length === 1 ? 'tool' : 'tools'}
+                <strong className="text-slate-900 dark:text-white font-semibold ms-1 tabular-nums">
+                  {filteredTools.length} {isUrdu ? 'ٹولز' : filteredTools.length === 1 ? 'tool' : 'tools'}
                 </strong>
               </span>
             )}
 
             {selectedCategory === 'rated-by-me' && (
-              <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-amber-500/10 text-amber-700 dark:text-amber-300 border border-amber-500/20 text-[10px] font-bold">
+              <span className="inline-flex items-center gap-1 text-amber-700 dark:text-amber-300 text-[11px] font-semibold">
+                <span aria-hidden="true" className="text-slate-300 dark:text-slate-700">·</span>
                 <Star className="w-3 h-3 fill-amber-400 text-amber-400" />
                 <span>{isUrdu ? 'میری محفوظ کردہ ریٹنگز' : 'Rated in This Browser'}</span>
               </span>
@@ -304,7 +305,7 @@ export const ToolsDirectoryPage: React.FC<ToolsDirectoryPageProps> = ({
 
           <div className="flex items-center gap-3 self-end sm:self-auto flex-wrap">
             {/* Sort Dropdown Selector */}
-            <div className="flex items-center gap-1.5 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-lg px-2.5 py-1 shadow-2xs">
+            <div className="flex items-center gap-1.5 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-lg px-2.5 py-1">
               <ArrowUpDown className="w-3.5 h-3.5 text-slate-400" />
               <label htmlFor="tools-sort-select" className="text-[11px] font-medium text-slate-500 dark:text-slate-400">
                 {isUrdu ? 'ترتیب:' : 'Sort by:'}
@@ -314,7 +315,7 @@ export const ToolsDirectoryPage: React.FC<ToolsDirectoryPageProps> = ({
                 value={sortBy}
                 onChange={(e) => setSortBy(e.target.value as ToolSortOption)}
                 aria-label={isUrdu ? 'ٹولز کی ترتیب منتخب کریں' : 'Select sorting order'}
-                className="bg-transparent text-xs font-semibold text-slate-900 dark:text-white focus:outline-none cursor-pointer pr-1"
+                className="bg-transparent text-xs font-semibold text-slate-900 dark:text-white focus:outline-none cursor-pointer pe-1"
               >
                 <option value="recommended" className="dark:bg-slate-900">
                   {isUrdu ? 'تجویز کردہ' : 'Featured Order'}
@@ -331,9 +332,9 @@ export const ToolsDirectoryPage: React.FC<ToolsDirectoryPageProps> = ({
               </select>
             </div>
 
-            <div className="hidden md:flex items-center gap-1.5 text-[11px] text-emerald-600 dark:text-emerald-400 font-medium">
+            <div className="hidden md:flex items-center gap-1.5 text-[11px] text-emerald-700 dark:text-emerald-400 font-medium">
               <CheckCircle2 className="w-3.5 h-3.5" />
-              <span>100% Free · Client-Side Private</span>
+              <span>{isUrdu ? '100% مفت · کلائنٹ سائیڈ پرائیویٹ' : '100% Free · Client-Side Private'}</span>
             </div>
           </div>
         </div>

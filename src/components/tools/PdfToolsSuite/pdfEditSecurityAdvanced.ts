@@ -476,79 +476,84 @@ export async function extractImagesFromPdf(
         seenObjectKeys.add(objKey);
 
         const canvas = document.createElement('canvas');
-        const ctx = canvas.getContext('2d');
-        if (!ctx) continue;
+        try {
+          const ctx = canvas.getContext('2d');
+          if (!ctx) continue;
 
-        const candidate = imgDataObj as {
-          bitmap?: ImageBitmap;
-          data?: Uint8ClampedArray | Uint8Array;
-          width?: number;
-          height?: number;
-          kind?: number;
-        };
+          const candidate = imgDataObj as {
+            bitmap?: ImageBitmap;
+            data?: Uint8ClampedArray | Uint8Array;
+            width?: number;
+            height?: number;
+            kind?: number;
+          };
 
-        if (typeof ImageBitmap !== 'undefined' && candidate instanceof ImageBitmap) {
-          canvas.width = candidate.width;
-          canvas.height = candidate.height;
-          ctx.drawImage(candidate, 0, 0);
-        } else if (candidate.bitmap) {
-          canvas.width = candidate.bitmap.width;
-          canvas.height = candidate.bitmap.height;
-          ctx.drawImage(candidate.bitmap, 0, 0);
-        } else if (candidate.data && candidate.width && candidate.height) {
-          const w = candidate.width;
-          const h = candidate.height;
-          canvas.width = w;
-          canvas.height = h;
-          const rgba = new Uint8ClampedArray(w * h * 4);
-          const raw = candidate.data;
-          if (raw.length === w * h * 4) {
-            rgba.set(raw);
-          } else if (raw.length === w * h * 3) {
-            for (let p = 0, q = 0; p < raw.length; p += 3, q += 4) {
-              rgba[q] = raw[p];
-              rgba[q + 1] = raw[p + 1];
-              rgba[q + 2] = raw[p + 2];
-              rgba[q + 3] = 255;
+          if (typeof ImageBitmap !== 'undefined' && candidate instanceof ImageBitmap) {
+            canvas.width = candidate.width;
+            canvas.height = candidate.height;
+            ctx.drawImage(candidate, 0, 0);
+          } else if (candidate.bitmap) {
+            canvas.width = candidate.bitmap.width;
+            canvas.height = candidate.bitmap.height;
+            ctx.drawImage(candidate.bitmap, 0, 0);
+          } else if (candidate.data && candidate.width && candidate.height) {
+            const w = candidate.width;
+            const h = candidate.height;
+            canvas.width = w;
+            canvas.height = h;
+            const rgba = new Uint8ClampedArray(w * h * 4);
+            const raw = candidate.data;
+            if (raw.length === w * h * 4) {
+              rgba.set(raw);
+            } else if (raw.length === w * h * 3) {
+              for (let p = 0, q = 0; p < raw.length; p += 3, q += 4) {
+                rgba[q] = raw[p];
+                rgba[q + 1] = raw[p + 1];
+                rgba[q + 2] = raw[p + 2];
+                rgba[q + 3] = 255;
+              }
+            } else if (raw.length === w * h) {
+              for (let p = 0, q = 0; p < raw.length; p += 1, q += 4) {
+                const v = raw[p];
+                rgba[q] = v;
+                rgba[q + 1] = v;
+                rgba[q + 2] = v;
+                rgba[q + 3] = 255;
+              }
+            } else {
+              continue;
             }
-          } else if (raw.length === w * h) {
-            for (let p = 0, q = 0; p < raw.length; p += 1, q += 4) {
-              const v = raw[p];
-              rgba[q] = v;
-              rgba[q + 1] = v;
-              rgba[q + 2] = v;
-              rgba[q + 3] = 255;
-            }
+            ctx.putImageData(new ImageData(rgba, w, h), 0, 0);
           } else {
             continue;
           }
-          ctx.putImageData(new ImageData(rgba, w, h), 0, 0);
-        } else {
-          continue;
+
+          if (canvas.width < 4 || canvas.height < 4) continue;
+
+          const pngBlob = await new Promise<Blob | null>((resolve) => {
+            canvas.toBlob((b) => resolve(b), 'image/png');
+          });
+          if (!pngBlob) continue;
+
+          const imgIndex = extracted.length + 1;
+          const art = createOutputArtifact(
+            `${baseName}_img_${imgIndex}_p${pageNum}.png`,
+            pngBlob,
+            'image/png',
+            { summaryNote: `Page ${pageNum} · ${canvas.width} × ${canvas.height} px` }
+          );
+          art.previewUrl = art.url;
+          extracted.push({
+            id: art.id,
+            page: pageNum,
+            width: canvas.width,
+            height: canvas.height,
+            artifact: art,
+          });
+        } finally {
+          canvas.width = 0;
+          canvas.height = 0;
         }
-
-        if (canvas.width < 4 || canvas.height < 4) continue;
-
-        const pngBlob = await new Promise<Blob | null>((resolve) => {
-          canvas.toBlob((b) => resolve(b), 'image/png');
-        });
-        if (!pngBlob) continue;
-
-        const imgIndex = extracted.length + 1;
-        const art = createOutputArtifact(
-          `${baseName}_img_${imgIndex}_p${pageNum}.png`,
-          pngBlob,
-          'image/png',
-          { summaryNote: `Page ${pageNum} · ${canvas.width} × ${canvas.height} px` }
-        );
-        art.previewUrl = art.url;
-        extracted.push({
-          id: art.id,
-          page: pageNum,
-          width: canvas.width,
-          height: canvas.height,
-          artifact: art,
-        });
       }
     }
   } finally {

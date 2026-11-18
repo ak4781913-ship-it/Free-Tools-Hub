@@ -164,7 +164,7 @@ export const GlobalSearchModal: React.FC<GlobalSearchModalProps> = ({
               setSelectedIndex(0);
             }}
             placeholder={isUrdu ? 'کوئی بھی ٹول تلاش کریں (مثلاً: ریزیوم، جی پی ٹی، کمپریس)...' : 'Search all tools by name, keyword, or category...'}
-            className="w-full pl-3 pr-10 py-1 bg-transparent text-slate-900 dark:text-white placeholder-slate-400 text-sm sm:text-base focus:outline-hidden font-medium"
+            className="w-full ps-3 pe-10 py-1 bg-transparent text-slate-900 dark:text-white placeholder-slate-400 text-sm sm:text-base focus:outline-hidden font-medium"
           />
 
           {query ? (
@@ -216,7 +216,7 @@ export const GlobalSearchModal: React.FC<GlobalSearchModalProps> = ({
                     type="button"
                     onClick={() => handleSelect(tool.id)}
                     onMouseEnter={() => setSelectedIndex(idx)}
-                    className={`w-full text-left px-3.5 py-3 rounded-xl flex items-start gap-3 transition-colors cursor-pointer ${
+                    className={`w-full text-start px-3.5 py-3 rounded-xl flex items-start gap-3 transition-colors cursor-pointer ${
                       isSelected
                         ? 'bg-indigo-50 dark:bg-indigo-950/60 text-slate-900 dark:text-white'
                         : 'hover:bg-slate-50 dark:hover:bg-slate-800/50 text-slate-700 dark:text-slate-200'
@@ -233,17 +233,25 @@ export const GlobalSearchModal: React.FC<GlobalSearchModalProps> = ({
                     </div>
 
                     <div className="flex-1 min-w-0">
-                      <div className="flex items-center gap-2 flex-wrap">
+                      <div className="flex items-center gap-1.5 flex-wrap">
                         <span className="font-bold text-sm tracking-tight text-slate-900 dark:text-white">
                           {isUrdu ? tool.nameUrdu : tool.name}
                         </span>
-                        <span className="text-[10px] px-2 py-0.5 rounded-full font-semibold uppercase tracking-wider bg-slate-100 dark:bg-slate-800 text-slate-500 dark:text-slate-400">
+                        <span aria-hidden="true" className="text-slate-300 dark:text-slate-600 text-xs">
+                          ·
+                        </span>
+                        <span className="text-[11px] font-medium uppercase tracking-wider text-slate-500 dark:text-slate-400">
                           {isUrdu ? tool.categoryNameUrdu : tool.categoryName}
                         </span>
                         {tool.isPopular && (
-                          <span className="text-[10px] px-1.5 py-0.2 rounded font-bold bg-amber-100 dark:bg-amber-950/80 text-amber-700 dark:text-amber-300">
-                            Popular
-                          </span>
+                          <>
+                            <span aria-hidden="true" className="text-slate-300 dark:text-slate-600 text-xs">
+                              ·
+                            </span>
+                            <span className="text-[11px] font-semibold text-amber-700 dark:text-amber-300">
+                              {isUrdu ? 'مقبول' : 'Popular'}
+                            </span>
+                          </>
                         )}
                       </div>
                       <p className="text-xs text-slate-500 dark:text-slate-400 line-clamp-1 mt-0.5">
@@ -273,15 +281,15 @@ export const GlobalSearchModal: React.FC<GlobalSearchModalProps> = ({
             <span className="flex items-center gap-1">
               <kbd className="px-1.5 py-0.5 rounded bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 font-mono text-[10px]">↑</kbd>
               <kbd className="px-1.5 py-0.5 rounded bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 font-mono text-[10px]">↓</kbd>
-              <span className="text-[11px] ml-0.5">Navigate</span>
+              <span className="text-[11px] ms-0.5">Navigate</span>
             </span>
             <span className="flex items-center gap-1">
               <kbd className="px-1.5 py-0.5 rounded bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 font-mono text-[10px]">↵</kbd>
-              <span className="text-[11px] ml-0.5">Open Tool</span>
+              <span className="text-[11px] ms-0.5">Open Tool</span>
             </span>
             <span className="flex items-center gap-1">
               <kbd className="px-1.5 py-0.5 rounded bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 font-mono text-[10px]">ESC</kbd>
-              <span className="text-[11px] ml-0.5">Close</span>
+              <span className="text-[11px] ms-0.5">Close</span>
             </span>
           </div>
 

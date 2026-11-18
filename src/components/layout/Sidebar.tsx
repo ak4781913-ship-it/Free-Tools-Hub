@@ -194,7 +194,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
   };
 
   const sidebarContent = (
-    <div className="flex flex-col h-full bg-white dark:bg-slate-900 border-r border-slate-200/80 dark:border-slate-800 transition-all select-none">
+    <div className="flex flex-col h-full bg-white dark:bg-slate-900 border-e border-slate-200/80 dark:border-slate-800 transition-all select-none">
       {/* Brand Header */}
       <div className="flex items-center justify-between h-16 px-4 border-b border-slate-200/80 dark:border-slate-800 shrink-0">
         <a
@@ -202,16 +202,16 @@ export const Sidebar: React.FC<SidebarProps> = ({
           onClick={(e) => handleNav('/', e)}
           className="flex items-center gap-3 group focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-600 rounded-lg min-w-0"
         >
-          <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-blue-700 via-blue-800 to-indigo-900 text-white flex items-center justify-center font-black text-base shadow-sm shadow-blue-900/20 shrink-0 group-hover:scale-105 transition-transform">
-            AP
+          <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-blue-700 via-blue-800 to-indigo-900 text-white flex items-center justify-center font-black text-sm tracking-tight shadow-sm shadow-blue-900/20 shrink-0 group-hover:scale-105 transition-transform">
+            MW
           </div>
           {!isCollapsed && (
             <div className="min-w-0 flex flex-col">
-              <span className="text-base font-extrabold tracking-tight text-slate-900 dark:text-white leading-tight">
-                Abbas<span className="text-blue-700 dark:text-blue-400">Pro</span>
+              <span className="text-base font-extrabold tracking-tight text-slate-900 dark:text-white leading-tight truncate">
+                MAWA <span className="text-blue-700 dark:text-blue-400 font-bold">Hub</span>
               </span>
-              <span className="text-[10px] font-semibold text-slate-600 dark:text-slate-400 uppercase tracking-wider">
-                Tools Dashboard
+              <span className="text-[10px] font-semibold text-slate-600 dark:text-slate-400 uppercase tracking-wider truncate">
+                FreeTools Hub
               </span>
             </div>
           )}
@@ -234,9 +234,13 @@ export const Sidebar: React.FC<SidebarProps> = ({
             onClick={onToggleCollapse}
             aria-label={isCollapsed ? 'Expand sidebar' : 'Collapse sidebar'}
             title={isCollapsed ? 'Expand sidebar' : 'Collapse sidebar'}
-            className="hidden lg:flex p-1.5 rounded-lg text-slate-400 hover:text-slate-700 dark:hover:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800 cursor-pointer transition-colors"
+            className="hidden lg:flex p-1.5 rounded-lg text-slate-500 dark:text-slate-400 hover:text-slate-700 dark:hover:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800 cursor-pointer transition-colors"
           >
-            {isCollapsed ? <ChevronRight className="w-4 h-4" /> : <ChevronLeft className="w-4 h-4" />}
+            {isCollapsed ? (
+              <ChevronRight className="w-4 h-4 rtl:rotate-180" />
+            ) : (
+              <ChevronLeft className="w-4 h-4 rtl:rotate-180" />
+            )}
           </button>
         )}
       </div>
@@ -341,12 +345,13 @@ export const Sidebar: React.FC<SidebarProps> = ({
                     type="button"
                     onClick={(e) => toggleCategoryExpand(category.id, e)}
                     aria-label={`Toggle ${category.label} tools`}
-                    className="p-1.5 mr-2 rtl:mr-0 rtl:ml-2 rounded-lg text-slate-400 hover:text-slate-700 dark:hover:text-slate-200 hover:bg-slate-200/60 dark:hover:bg-slate-700/60 cursor-pointer transition-colors"
+                    aria-expanded={isExpanded}
+                    className="p-1.5 me-2 rounded-lg text-slate-500 dark:text-slate-400 hover:text-slate-700 dark:hover:text-slate-200 hover:bg-slate-200/60 dark:hover:bg-slate-700/60 cursor-pointer transition-colors"
                   >
                     {isExpanded ? (
                       <ChevronDown className="w-3.5 h-3.5" />
                     ) : (
-                      <ChevronRight className="w-3.5 h-3.5" />
+                      <ChevronRight className="w-3.5 h-3.5 rtl:rotate-180" />
                     )}
                   </button>
                 )}
@@ -354,7 +359,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
 
               {/* Sub-menu Tools list when expanded */}
               {!isCollapsed && isExpanded && hasChildren && (
-                <div className="pl-8 rtl:pl-0 rtl:pr-8 pr-2 py-1 space-y-1 border-l-2 rtl:border-l-0 rtl:border-r-2 border-slate-200 dark:border-slate-800 ml-4 rtl:ml-0 rtl:mr-4 animate-in fade-in slide-in-from-top-1 duration-150">
+                <div className="ps-8 pe-2 py-1 space-y-1 border-s-2 border-slate-200 dark:border-slate-800 ms-4 animate-in fade-in slide-in-from-top-1 duration-150">
                   {category.toolIds.map((toolId) => {
                     const tool = TOOLS_LIST.find((t) => t.id === toolId);
                     if (!tool) return null;
@@ -411,7 +416,9 @@ export const Sidebar: React.FC<SidebarProps> = ({
         {!isCollapsed && (
           <div className="pt-2 px-3 flex items-center gap-1.5 text-[10px] text-slate-600 dark:text-slate-400">
             <Shield className="w-3 h-3 text-emerald-600 dark:text-emerald-400 shrink-0" />
-            <span className="truncate">100% Client-Side Privacy</span>
+            <span className="truncate">
+              {isUrdu ? '100% براؤزر پرائیویسی' : '100% Client-Side Privacy'}
+            </span>
           </div>
         )}
       </div>
@@ -443,7 +450,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
             onClick={onCloseMobile}
           />
           {/* Drawer Pane */}
-          <div className="relative w-72 max-w-[85vw] h-full shadow-2xl z-10 animate-in slide-in-from-left duration-200">
+          <div className="relative w-72 max-w-[85vw] h-full shadow-2xl z-10 animate-in ltr:slide-in-from-left rtl:slide-in-from-right duration-200">
             {sidebarContent}
           </div>
         </div>

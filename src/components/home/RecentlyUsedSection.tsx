@@ -22,6 +22,7 @@ import {
   Star,
 } from 'lucide-react';
 import { getToolRating } from '../../utils/toolRatingStorage';
+import { getToolPrimaryPath } from '../../data/toolsRouting';
 
 interface RecentlyUsedSectionProps {
   onSelectTool: (toolId: string) => void;
@@ -94,31 +95,26 @@ export const RecentlyUsedSection: React.FC<RecentlyUsedSectionProps> = ({
   return (
     <section
       id="recently-used-section"
-      className="w-full max-w-7xl mx-auto py-6 px-4 sm:px-6 lg:px-8 transition-colors min-w-0"
+      className="w-full transition-colors min-w-0"
       aria-label="Recently Used Tools Section"
     >
-      <div className="bg-white dark:bg-slate-900 rounded-2xl sm:rounded-3xl p-4 sm:p-7 border border-slate-200/90 dark:border-slate-800 shadow-xs relative overflow-hidden min-w-0">
-        {/* Subtle decorative glow kept strictly within card bounds */}
-        <div className="absolute top-0 right-0 w-44 sm:w-80 max-w-full h-44 sm:h-80 bg-gradient-to-bl from-indigo-500/8 via-cyan-500/5 to-transparent rounded-full blur-2xl pointer-events-none" />
-
+      <div className="bg-white dark:bg-slate-900 rounded-2xl p-4 sm:p-6 border border-slate-200 dark:border-slate-800 min-w-0">
         {/* Section Header */}
-        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3.5 mb-5 pb-4 border-b border-slate-100 dark:border-slate-800/80 relative z-10 min-w-0">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3.5 mb-5 pb-4 border-b border-slate-100 dark:border-slate-800/80 min-w-0">
           <div className="flex items-start sm:items-center gap-3 min-w-0">
-            <div className="w-10 h-10 rounded-xl bg-indigo-500/10 text-indigo-600 dark:text-indigo-400 flex items-center justify-center shrink-0 ring-1 ring-indigo-500/20">
+            <div className="w-10 h-10 rounded-xl bg-indigo-50 dark:bg-indigo-950/60 text-indigo-600 dark:text-indigo-400 flex items-center justify-center shrink-0">
               <Clock className="w-5 h-5" />
             </div>
             <div className="min-w-0 flex-1">
-              <div className="flex items-center gap-2 flex-wrap">
+              <div className="flex items-center gap-x-2 gap-y-0.5 flex-wrap">
                 <h2 className="text-lg sm:text-xl font-bold tracking-tight text-slate-900 dark:text-white break-words">
                   {t.recentlyUsedSection.title}
                 </h2>
-                <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[11px] font-bold bg-indigo-50 dark:bg-indigo-950/70 text-indigo-700 dark:text-indigo-300 border border-indigo-200/70 dark:border-indigo-800 max-w-full">
-                  <span className="w-1.5 h-1.5 rounded-full bg-indigo-500 animate-pulse shrink-0" />
-                  <span className="truncate">
-                    {resolvedTools.length > 0
-                      ? `${resolvedTools.length}/5 ${t.recentlyUsedSection.badge}`
-                      : t.recentlyUsedSection.badge}
-                  </span>
+                <span aria-hidden="true" className="text-slate-300 dark:text-slate-700">·</span>
+                <span className="text-xs font-semibold text-indigo-700 dark:text-indigo-400 tabular-nums">
+                  {resolvedTools.length > 0
+                    ? `${resolvedTools.length}/5 ${t.recentlyUsedSection.badge}`
+                    : t.recentlyUsedSection.badge}
                 </span>
               </div>
               <p className="text-xs text-slate-600 dark:text-slate-400 mt-0.5 break-words">
@@ -172,10 +168,10 @@ export const RecentlyUsedSection: React.FC<RecentlyUsedSectionProps> = ({
               <button
                 type="button"
                 onClick={onViewAllTools}
-                className="min-h-[38px] inline-flex items-center gap-1.5 text-xs font-semibold text-indigo-600 dark:text-indigo-400 hover:bg-indigo-50 dark:hover:bg-indigo-950/40 rounded-lg cursor-pointer px-3 py-1.5 transition-colors ml-auto sm:ml-0 rtl:ml-0 rtl:mr-auto sm:rtl:mr-0"
+                className="min-h-[38px] inline-flex items-center gap-1.5 text-xs font-semibold text-indigo-600 dark:text-indigo-400 hover:bg-indigo-50 dark:hover:bg-indigo-950/40 rounded-lg cursor-pointer px-3 py-1.5 transition-colors ms-auto sm:ms-0"
               >
                 <span>{t.recentlyUsedSection.viewAll}</span>
-                <ArrowRight className={`w-3.5 h-3.5 shrink-0 ${isUrdu ? '-scale-x-100' : ''}`} />
+                <ArrowRight className="w-3.5 h-3.5 shrink-0 rtl:rotate-180" />
               </button>
             )}
           </div>
@@ -192,36 +188,29 @@ export const RecentlyUsedSection: React.FC<RecentlyUsedSectionProps> = ({
               const categoryName = isUrdu ? tool.categoryNameUrdu : tool.categoryName;
               const timeAgo = formatTimeAgo(entry.timestamp);
 
+              const primaryPath = getToolPrimaryPath(tool.id);
+
               return (
-                <div
+                <article
                   key={`recent-5-tool-${tool.id}-${entry.timestamp}`}
-                  onClick={() => onSelectTool(tool.id)}
-                  onKeyDown={(e) => {
-                    if (e.key === 'Enter' || e.key === ' ') {
-                      e.preventDefault();
-                      onSelectTool(tool.id);
-                    }
-                  }}
-                  role="button"
-                  tabIndex={0}
-                  className="group relative flex flex-col justify-between p-4 bg-slate-50/90 dark:bg-slate-800/50 hover:bg-white dark:hover:bg-slate-800 rounded-2xl border border-slate-200/80 dark:border-slate-800/90 hover:border-indigo-400 dark:hover:border-indigo-500/80 hover:shadow-md transition-all duration-200 cursor-pointer overflow-hidden min-w-0 w-full text-left rtl:text-right"
+                  className="group relative flex flex-col justify-between p-4 bg-slate-50/70 dark:bg-slate-950/50 hover:bg-white dark:hover:bg-slate-800/80 rounded-xl border border-slate-200 dark:border-slate-800 hover:border-indigo-500/70 dark:hover:border-indigo-500/70 focus-within:ring-2 focus-within:ring-blue-600 transition-colors overflow-hidden min-w-0 w-full text-start"
                 >
-                  {/* Top Bar inside Card: Category Badge, Rating & Remove Button */}
+                  {/* Top Bar inside Card: Category, Rating & Remove Button */}
                   <div className="flex items-center justify-between gap-1.5 mb-3 min-w-0">
-                    <div className="flex items-center gap-1.5 min-w-0">
-                      <span className="inline-flex items-center px-2 py-0.5 rounded-md text-[10px] font-semibold tracking-wide bg-slate-200/70 dark:bg-slate-700/60 text-slate-700 dark:text-slate-300 truncate max-w-[120px]">
+                    <div className="flex items-center gap-1.5 min-w-0 text-[11px] font-medium text-slate-500 dark:text-slate-400">
+                      <span className="truncate max-w-[120px]">
                         {categoryName}
                       </span>
                       {savedRating.userRating !== null && (
-                        <span className="inline-flex items-center gap-0.5 text-[10px] font-bold text-amber-500 dark:text-amber-400 shrink-0 tabular-nums">
+                        <span className="inline-flex items-center gap-0.5 text-[10px] font-bold text-amber-600 dark:text-amber-400 shrink-0 tabular-nums">
                           <Star className="w-2.5 h-2.5 fill-amber-400 text-amber-400 shrink-0" />
                           <span>{savedRating.userRating}/5</span>
                         </span>
                       )}
                     </div>
 
-                    <div className="flex items-center gap-1 shrink-0">
-                      <span className="text-[10px] font-mono tabular-nums text-slate-400 dark:text-slate-400">
+                    <div className="flex items-center gap-1 shrink-0 relative z-10">
+                      <span className="text-[10px] font-mono tabular-nums text-slate-500 dark:text-slate-400">
                         #{index + 1}
                       </span>
                       <button
@@ -239,14 +228,25 @@ export const RecentlyUsedSection: React.FC<RecentlyUsedSectionProps> = ({
                     </div>
                   </div>
 
-                  {/* Icon & Title */}
+                  {/* Icon & Semantic Crawlable Link Title */}
                   <div className="flex items-center gap-3 mb-3 min-w-0">
-                    <div className="w-10 h-10 rounded-xl bg-indigo-100/70 dark:bg-indigo-950/60 text-indigo-600 dark:text-indigo-400 group-hover:bg-indigo-600 group-hover:text-white flex items-center justify-center shrink-0 transition-all duration-200 shadow-2xs">
+                    <div className="w-10 h-10 rounded-lg bg-indigo-50 dark:bg-indigo-950/60 text-indigo-600 dark:text-indigo-400 group-hover:bg-indigo-600 group-hover:text-white flex items-center justify-center shrink-0 transition-colors">
                       <ToolIcon className="w-5 h-5" />
                     </div>
                     <div className="min-w-0 flex-1">
                       <h3 className="text-sm font-bold text-slate-900 dark:text-white group-hover:text-indigo-600 dark:group-hover:text-indigo-400 transition-colors truncate">
-                        {title}
+                        <a
+                          href={primaryPath}
+                          onClick={(e) => {
+                            if (!e.metaKey && !e.ctrlKey && !e.shiftKey && e.button === 0) {
+                              e.preventDefault();
+                              onSelectTool(tool.id);
+                            }
+                          }}
+                          className="after:absolute after:inset-0 focus:outline-none"
+                        >
+                          {title}
+                        </a>
                       </h3>
                       <div className="flex items-center gap-1 text-[11px] text-slate-500 dark:text-slate-400 mt-0.5 min-w-0">
                         <Clock className="w-3 h-3 shrink-0" />
@@ -262,10 +262,10 @@ export const RecentlyUsedSection: React.FC<RecentlyUsedSectionProps> = ({
                     </span>
                     <span className="inline-flex items-center gap-1 text-[11px] font-bold text-indigo-600 dark:text-indigo-400 shrink-0">
                       <span>{t.recentlyUsedSection.resumeWorkflow}</span>
-                      <ArrowRight className={`w-3 h-3 ${isUrdu ? '-scale-x-100' : ''}`} />
+                      <ArrowRight className="w-3 h-3 rtl:rotate-180" />
                     </span>
                   </div>
-                </div>
+                </article>
               );
             })}
           </div>
@@ -283,7 +283,7 @@ export const RecentlyUsedSection: React.FC<RecentlyUsedSectionProps> = ({
             </p>
 
             <div className="max-w-4xl mx-auto min-w-0">
-              <div className="text-[11px] font-bold text-slate-400 dark:text-slate-400 uppercase tracking-wider mb-2.5 flex items-center justify-center gap-1.5">
+              <div className="text-[11px] font-semibold text-slate-500 dark:text-slate-400 mb-2.5 flex items-center justify-center gap-1.5">
                 <Compass className="w-3.5 h-3.5 text-indigo-500 shrink-0" />
                 <span>{t.recentlyUsedSection.quickStarters}</span>
               </div>
@@ -296,7 +296,7 @@ export const RecentlyUsedSection: React.FC<RecentlyUsedSectionProps> = ({
                       key={`starter-wf-${tool.id}`}
                       type="button"
                       onClick={() => onSelectTool(tool.id)}
-                      className="min-h-[48px] flex items-center gap-2.5 p-3 rounded-xl bg-white dark:bg-slate-800 text-left rtl:text-right border border-slate-200 dark:border-slate-700 hover:border-indigo-400 dark:hover:border-indigo-500 hover:shadow-xs transition-all group cursor-pointer min-w-0 w-full"
+                      className="min-h-[48px] flex items-center gap-2.5 p-3 rounded-xl bg-white dark:bg-slate-800 text-start border border-slate-200 dark:border-slate-700 hover:border-indigo-400 dark:hover:border-indigo-500 hover:shadow-xs transition-all group cursor-pointer min-w-0 w-full"
                     >
                       <div className="w-8 h-8 rounded-lg bg-indigo-50 dark:bg-indigo-950/60 text-indigo-600 dark:text-indigo-400 flex items-center justify-center shrink-0">
                         <Icon className="w-4 h-4" />

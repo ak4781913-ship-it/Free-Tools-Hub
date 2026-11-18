@@ -1,6 +1,6 @@
 # Hostinger Node.js Production & GitHub Deployment Guide
 
-Complete step-by-step instructions for deploying **FreeTools Hub (NEXORA)** on **Hostinger Node.js Web App Hosting** with automatic GitHub CI/CD deployments, full SSR/prerendered SEO routing, `/api/analyze-seo`, PWA offline caching, and Firebase Google Authentication + Firestore sync.
+Complete step-by-step instructions for deploying **FreeTools Hub (MAWA)** on **Hostinger Node.js Web App Hosting** with automatic GitHub CI/CD deployments, full SSR/prerendered SEO routing, `/api/analyze-seo`, PWA offline caching, and Firebase Google Authentication + Firestore sync.
 
 ---
 
@@ -11,8 +11,8 @@ Complete step-by-step instructions for deploying **FreeTools Hub (NEXORA)** on *
 | **Framework Preset** | Vite / React with Express backend (Node.js Web App) |
 | **Repository Root** | `/` (project root) |
 | **Node.js Version** | `22` (matches `.nvmrc` and `package.json` `engines.node`) |
-| **Package Manager** | `npm` (`package-lock.json` included; Bun remains supported locally) |
-| **Install Command** | `npm install` (or `npm ci`) |
+| **Package Manager** | `npm` (`package-lock.json` included; Bun remains supported locally / on Netlify & Cloudflare) |
+| **Install Command** | `npm ci` |
 | **Build Command** | `npm run build` |
 | **Start Command** | `npm start` |
 | **Production Entry File** | `server.js` (compiled from `server.ts` during `npm run build`) |
@@ -128,22 +128,28 @@ Express automatically binds to `process.env.PORT` (defaulting to `3000` only if 
 
 In **Hostinger hPanel -> Node.js App Settings -> Environment Variables**, add the variables below **before triggering your first production build** (because Vite inlines `VITE_*` variables at build time, while Express reads server variables at runtime).
 
-### Environment Variables Checklist
+### Build-Time Variables (Required Before `npm run build`)
 
-| Variable Name | Scope | Required? | Purpose & Example Value |
-| :--- | :--- | :--- | :--- |
-| `VITE_SITE_URL` | **Build + Runtime** | Recommended | Full canonical domain without trailing slash, e.g. `https://yourdomain.com`. Used for `<link rel="canonical">`, `og:url`, `/sitemap.xml`, `/robots.txt`, and prerendered HTML. |
-| `VITE_GOOGLE_SITE_VERIFICATION` | **Build + Runtime** | Optional | Search Console HTML meta verification token (token value only, not the full `<meta>` tag). |
-| `VITE_CONTACT_EMAIL` | **Build** | Optional | Support email shown in Feedback / Contact dialogs (leave unset to keep local feedback log mode). |
-| `VITE_FIREBASE_API_KEY` | **Build** | Recommended | Firebase Web App public `apiKey` (client config, not a secret). |
-| `VITE_FIREBASE_AUTH_DOMAIN` | **Build** | Recommended | Firebase Auth domain (e.g. `gothic-episode-jrrhs.firebaseapp.com`). |
-| `VITE_FIREBASE_PROJECT_ID` | **Build** | Recommended | Firebase Project ID (e.g. `gothic-episode-jrrhs`). |
-| `VITE_FIREBASE_STORAGE_BUCKET` | **Build** | Optional | Firebase Storage bucket (e.g. `gothic-episode-jrrhs.firebasestorage.app`). |
-| `VITE_FIREBASE_MESSAGING_SENDER_ID` | **Build** | Recommended | Firebase Cloud Messaging sender ID (e.g. `520554932092`). |
-| `VITE_FIREBASE_APP_ID` | **Build** | Recommended | Firebase Web App ID (e.g. `1:520554932092:web:...`). |
-| `VITE_FIREBASE_DATABASE_ID` | **Build** | Recommended | Named Firestore database ID if not using `(default)` (e.g. `ai-studio-freetoolshub-b88be027-7c91-4df2-b7a8-ec31b2d0735a`). |
-| `APP_URL` | **Runtime** | Optional | Server-side public URL fallback if `VITE_SITE_URL` is unset at runtime. |
-| `GEMINI_API_KEY` | **Runtime (Server-Only)** | Optional | Optional server-side Gemini API key (leave empty if unused). **Never** prefix with `VITE_`. |
+| Variable Name | Required? | Purpose & Example Value |
+| :--- | :--- | :--- |
+| `VITE_SITE_URL` | **Required for custom domains** | Full canonical domain without trailing slash, e.g. `https://yourdomain.com`. Used during `npm run build` for `<link rel="canonical">`, `og:url`, `/sitemap.xml`, `/robots.txt`, and all 35 prerendered HTML pages. If omitted, the build logs a `[SEO Warning]` and falls back to `https://freetoolshub1.netlify.app`. |
+| `VITE_GOOGLE_SITE_VERIFICATION` | Optional | Search Console HTML meta verification token (token value only, not the full `<meta>` tag). |
+| `VITE_CONTACT_EMAIL` | Optional | Support email shown in Feedback / Contact dialogs (leave unset to keep local feedback log mode). |
+| `VITE_FIREBASE_API_KEY` | Recommended | Firebase Web App public `apiKey` (client config, not a secret). |
+| `VITE_FIREBASE_AUTH_DOMAIN` | Recommended | Firebase Auth domain (e.g. `gothic-episode-jrrhs.firebaseapp.com`). |
+| `VITE_FIREBASE_PROJECT_ID` | Recommended | Firebase Project ID (e.g. `gothic-episode-jrrhs`). |
+| `VITE_FIREBASE_STORAGE_BUCKET` | Optional | Firebase Storage bucket (e.g. `gothic-episode-jrrhs.firebasestorage.app`). |
+| `VITE_FIREBASE_MESSAGING_SENDER_ID` | Recommended | Firebase Cloud Messaging sender ID (e.g. `520554932092`). |
+| `VITE_FIREBASE_APP_ID` | Recommended | Firebase Web App ID (e.g. `1:520554932092:web:...`). |
+| `VITE_FIREBASE_DATABASE_ID` | Recommended | Named Firestore database ID if not using `(default)` (e.g. `ai-studio-freetoolshub-b88be027-7c91-4df2-b7a8-ec31b2d0735a`). |
+
+### Runtime Variables (Read by `server.js` at Startup)
+
+| Variable Name | Required? | Purpose & Example Value |
+| :--- | :--- | :--- |
+| `PORT` | Optional (auto-set) | HTTP listening port injected automatically by Hostinger Node.js hosting (defaults to `3000` locally when unset). |
+| `APP_URL` | Optional | Explicit server-side public origin fallback (`https://yourdomain.com`) if `VITE_SITE_URL` is unset at runtime. Note: For security, `server.js` never trusts arbitrary incoming `Host` or `X-Forwarded-Host` headers for canonical URLs or sitemaps—if neither `VITE_SITE_URL` nor `APP_URL` is set, it logs `[SEO Warning]` and falls back to `https://freetoolshub1.netlify.app`. |
+| `GEMINI_API_KEY` | Optional (Server-Only) | Optional server-side Gemini API key (only needed if future server-side AI features are enabled; not required by current routes). **Never** prefix with `VITE_`. |
 
 > **Firebase Fallback Behavior:** If `VITE_FIREBASE_*` variables are left empty, the app automatically falls back to `firebase-applet-config.json` (project `gothic-episode-jrrhs`). Whenever you specify `VITE_FIREBASE_PROJECT_ID` for a *different* Firebase project, provide all matching `VITE_FIREBASE_*` keys for that project so IDs never mix across projects.
 

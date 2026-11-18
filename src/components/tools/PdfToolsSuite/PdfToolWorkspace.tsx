@@ -690,10 +690,11 @@ export const PdfToolWorkspace: React.FC<PdfToolWorkspaceProps> = ({ tool, isUrdu
           {(tool.id === 'pdf-to-jpg' || tool.id === 'pdf-to-png' || tool.id === 'pdf-pages-to-images') && (
             <div className="rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800/70 p-4 grid grid-cols-1 sm:grid-cols-3 gap-3">
               <div>
-                <label className="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1">
+                <label htmlFor="pdf-image-scale" className="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1">
                   Resolution / Scale
                 </label>
                 <select
+                  id="pdf-image-scale"
                   value={imageDpiScale}
                   onChange={(e) => setImageDpiScale(Number(e.target.value))}
                   className="w-full rounded-lg border border-slate-300 dark:border-slate-700 bg-slate-50 dark:bg-slate-900 px-3 py-2 text-sm"
@@ -706,10 +707,11 @@ export const PdfToolWorkspace: React.FC<PdfToolWorkspaceProps> = ({ tool, isUrdu
               </div>
               {tool.id === 'pdf-to-jpg' && (
                 <div>
-                  <label className="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1">
+                  <label htmlFor="pdf-jpg-quality" className="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1">
                     JPG Quality ({Math.round(imageQuality * 100)}%)
                   </label>
                   <input
+                    id="pdf-jpg-quality"
                     type="range"
                     min={0.5}
                     max={1}
@@ -722,10 +724,11 @@ export const PdfToolWorkspace: React.FC<PdfToolWorkspaceProps> = ({ tool, isUrdu
               )}
               {tool.id === 'pdf-pages-to-images' && (
                 <div className="sm:col-span-2">
-                  <label className="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1">
+                  <label htmlFor="pdf-page-range" className="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1">
                     Pages to Export (e.g. 1, 3-5 — leave blank for all)
                   </label>
                   <input
+                    id="pdf-page-range"
                     type="text"
                     value={pageRangeInput}
                     onChange={(e) => setPageRangeInput(e.target.value)}
@@ -755,10 +758,11 @@ export const PdfToolWorkspace: React.FC<PdfToolWorkspaceProps> = ({ tool, isUrdu
           {(tool.id === 'pdf-to-txt' || tool.id === 'extract-text-pdf') && (
             <div className="rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800/70 p-4 grid grid-cols-1 sm:grid-cols-2 gap-3 items-center">
               <div>
-                <label className="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1">
+                <label htmlFor="pdf-txt-page-range" className="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1">
                   Page Filter (blank = all pages)
                 </label>
                 <input
+                  id="pdf-txt-page-range"
                   type="text"
                   value={pageRangeInput}
                   onChange={(e) => setPageRangeInput(e.target.value)}
@@ -781,8 +785,9 @@ export const PdfToolWorkspace: React.FC<PdfToolWorkspaceProps> = ({ tool, isUrdu
           {(tool.id === 'jpg-to-pdf' || tool.id === 'png-to-pdf' || tool.id === 'images-to-pdf') && (
             <div className="rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800/70 p-4 grid grid-cols-1 sm:grid-cols-3 gap-3">
               <div>
-                <label className="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1">Page Size</label>
+                <label htmlFor="pdf-img-size" className="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1">Page Size</label>
                 <select
+                  id="pdf-img-size"
                   value={imgPageSize}
                   onChange={(e) => setImgPageSize(e.target.value as 'fit' | 'a4' | 'letter')}
                   className="w-full rounded-lg border border-slate-300 dark:border-slate-700 bg-slate-50 dark:bg-slate-900 px-3 py-2 text-sm"
@@ -793,8 +798,9 @@ export const PdfToolWorkspace: React.FC<PdfToolWorkspaceProps> = ({ tool, isUrdu
                 </select>
               </div>
               <div>
-                <label className="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1">Orientation</label>
+                <label htmlFor="pdf-img-orient" className="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1">Orientation</label>
                 <select
+                  id="pdf-img-orient"
                   value={imgOrientation}
                   onChange={(e) => setImgOrientation(e.target.value as 'auto' | 'portrait' | 'landscape')}
                   disabled={imgPageSize === 'fit'}
@@ -806,8 +812,9 @@ export const PdfToolWorkspace: React.FC<PdfToolWorkspaceProps> = ({ tool, isUrdu
                 </select>
               </div>
               <div>
-                <label className="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1">Margin</label>
+                <label htmlFor="pdf-img-margin" className="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1">Margin</label>
                 <select
+                  id="pdf-img-margin"
                   value={imgMarginPt}
                   onChange={(e) => setImgMarginPt(Number(e.target.value))}
                   className="w-full rounded-lg border border-slate-300 dark:border-slate-700 bg-slate-50 dark:bg-slate-900 px-3 py-2 text-sm"
@@ -822,10 +829,11 @@ export const PdfToolWorkspace: React.FC<PdfToolWorkspaceProps> = ({ tool, isUrdu
 
           {tool.id === 'excel-to-pdf' && (
             <div className="rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800/70 p-4">
-              <label className="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1">
+              <label htmlFor="pdf-excel-orient" className="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1">
                 PDF Page Orientation
               </label>
               <select
+                id="pdf-excel-orient"
                 value={excelOrientation}
                 onChange={(e) => setExcelOrientation(e.target.value as 'portrait' | 'landscape')}
                 className="w-full sm:w-64 rounded-lg border border-slate-300 dark:border-slate-700 bg-slate-50 dark:bg-slate-900 px-3 py-2 text-sm"
@@ -840,8 +848,9 @@ export const PdfToolWorkspace: React.FC<PdfToolWorkspaceProps> = ({ tool, isUrdu
             <div className="rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800/70 p-4 space-y-3">
               <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
                 <div>
-                  <label className="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1">Font Family</label>
+                  <label htmlFor="pdf-txt-font" className="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1">Font Family</label>
                   <select
+                    id="pdf-txt-font"
                     value={txtFontFamily}
                     onChange={(e) => setTxtFontFamily(e.target.value as 'helvetica' | 'times' | 'courier')}
                     className="w-full rounded-lg border border-slate-300 dark:border-slate-700 bg-slate-50 dark:bg-slate-900 px-3 py-2 text-sm"
@@ -852,8 +861,9 @@ export const PdfToolWorkspace: React.FC<PdfToolWorkspaceProps> = ({ tool, isUrdu
                   </select>
                 </div>
                 <div>
-                  <label className="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1">Font Size</label>
+                  <label htmlFor="pdf-txt-size" className="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1">Font Size</label>
                   <input
+                    id="pdf-txt-size"
                     type="number"
                     min={8}
                     max={24}
@@ -863,8 +873,9 @@ export const PdfToolWorkspace: React.FC<PdfToolWorkspaceProps> = ({ tool, isUrdu
                   />
                 </div>
                 <div>
-                  <label className="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1">Paper Size</label>
+                  <label htmlFor="pdf-txt-paper" className="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1">Paper Size</label>
                   <select
+                    id="pdf-txt-paper"
                     value={imgPageSize === 'letter' ? 'letter' : 'a4'}
                     onChange={(e) => setImgPageSize(e.target.value as 'a4' | 'letter')}
                     className="w-full rounded-lg border border-slate-300 dark:border-slate-700 bg-slate-50 dark:bg-slate-900 px-3 py-2 text-sm"
@@ -875,10 +886,11 @@ export const PdfToolWorkspace: React.FC<PdfToolWorkspaceProps> = ({ tool, isUrdu
                 </div>
               </div>
               <div>
-                <label className="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1">
+                <label htmlFor="pdf-txt-paste" className="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1">
                   {isUrdu ? 'یا براہِ راست ٹیکسٹ یہاں لکھیں/پیسٹ کریں:' : 'Or type / paste text directly:'}
                 </label>
                 <textarea
+                  id="pdf-txt-paste"
                   rows={5}
                   value={pastedText}
                   onChange={(e) => setPastedText(e.target.value)}
@@ -916,10 +928,11 @@ export const PdfToolWorkspace: React.FC<PdfToolWorkspaceProps> = ({ tool, isUrdu
               </div>
               {splitMode === 'every-n' && (
                 <div>
-                  <label className="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1">
+                  <label htmlFor="pdf-split-n" className="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1">
                     Pages per split PDF (1–{primaryFile.pageCount || 1})
                   </label>
                   <input
+                    id="pdf-split-n"
                     type="number"
                     min={1}
                     max={Math.max(1, primaryFile.pageCount || 1)}
@@ -931,10 +944,11 @@ export const PdfToolWorkspace: React.FC<PdfToolWorkspaceProps> = ({ tool, isUrdu
               )}
               {splitMode === 'custom-ranges' && (
                 <div>
-                  <label className="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1">
+                  <label htmlFor="pdf-split-ranges" className="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1">
                     Separate output ranges with semicolons (e.g. 1-2; 3-5; 6)
                   </label>
                   <input
+                    id="pdf-split-ranges"
                     type="text"
                     value={splitRanges}
                     onChange={(e) => setSplitRanges(e.target.value)}
@@ -1103,7 +1117,7 @@ export const PdfToolWorkspace: React.FC<PdfToolWorkspaceProps> = ({ tool, isUrdu
                     key={m.id}
                     type="button"
                     onClick={() => setCompressionMode(m.id)}
-                    className={`text-left rounded-xl border p-3 transition-colors ${
+                    className={`text-start rounded-xl border p-3 transition-colors ${
                       compressionMode === m.id
                         ? 'border-blue-600 bg-blue-50/70 dark:bg-blue-950/40'
                         : 'border-slate-200 dark:border-slate-700 hover:bg-slate-50 dark:hover:bg-slate-800'
@@ -1138,10 +1152,11 @@ export const PdfToolWorkspace: React.FC<PdfToolWorkspaceProps> = ({ tool, isUrdu
                   {tool.id === 'compression-quality' && (
                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                       <div>
-                        <label className="block text-xs font-medium text-slate-600 dark:text-slate-300 mb-1">
+                        <label htmlFor="pdf-compress-scale" className="block text-xs font-medium text-slate-600 dark:text-slate-300 mb-1">
                           Render Resolution: {Math.round(customRasterScale * 72)} DPI
                         </label>
                         <input
+                          id="pdf-compress-scale"
                           type="range"
                           min={0.75}
                           max={2.0}
@@ -1152,10 +1167,11 @@ export const PdfToolWorkspace: React.FC<PdfToolWorkspaceProps> = ({ tool, isUrdu
                         />
                       </div>
                       <div>
-                        <label className="block text-xs font-medium text-slate-600 dark:text-slate-300 mb-1">
+                        <label htmlFor="pdf-compress-quality" className="block text-xs font-medium text-slate-600 dark:text-slate-300 mb-1">
                           JPEG Quality: {Math.round(customRasterJpgQ * 100)}%
                         </label>
                         <input
+                          id="pdf-compress-quality"
                           type="range"
                           min={0.35}
                           max={0.95}
@@ -1177,10 +1193,11 @@ export const PdfToolWorkspace: React.FC<PdfToolWorkspaceProps> = ({ tool, isUrdu
             <div className="rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800/70 p-4 space-y-4">
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                 <div>
-                  <label className="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1">
+                  <label htmlFor="pdf-protect-pw" className="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1">
                     Open Password
                   </label>
                   <input
+                    id="pdf-protect-pw"
                     type="password"
                     value={userPassword}
                     onChange={(e) => setUserPassword(e.target.value)}
@@ -1189,10 +1206,11 @@ export const PdfToolWorkspace: React.FC<PdfToolWorkspaceProps> = ({ tool, isUrdu
                   />
                 </div>
                 <div>
-                  <label className="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1">
+                  <label htmlFor="pdf-protect-confirm" className="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1">
                     Confirm Password
                   </label>
                   <input
+                    id="pdf-protect-confirm"
                     type="password"
                     value={confirmPassword}
                     onChange={(e) => setConfirmPassword(e.target.value)}
@@ -1232,10 +1250,11 @@ export const PdfToolWorkspace: React.FC<PdfToolWorkspaceProps> = ({ tool, isUrdu
 
           {tool.id === 'unlock-pdf' && (
             <div className="rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800/70 p-4 space-y-2">
-              <label className="block text-xs font-semibold text-slate-700 dark:text-slate-300">
+              <label htmlFor="pdf-unlock-pw" className="block text-xs font-semibold text-slate-700 dark:text-slate-300">
                 Authorized User or Owner Password
               </label>
               <input
+                id="pdf-unlock-pw"
                 type="password"
                 value={unlockPassword}
                 onChange={(e) => setUnlockPassword(e.target.value)}
@@ -1253,8 +1272,9 @@ export const PdfToolWorkspace: React.FC<PdfToolWorkspaceProps> = ({ tool, isUrdu
               </h4>
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                 <div>
-                  <label className="block text-xs font-medium text-slate-600 dark:text-slate-300 mb-1">Title</label>
+                  <label htmlFor="pdf-meta-title" className="block text-xs font-medium text-slate-600 dark:text-slate-300 mb-1">Title</label>
                   <input
+                    id="pdf-meta-title"
                     type="text"
                     value={metaTitle}
                     onChange={(e) => setMetaTitle(e.target.value)}
@@ -1262,8 +1282,9 @@ export const PdfToolWorkspace: React.FC<PdfToolWorkspaceProps> = ({ tool, isUrdu
                   />
                 </div>
                 <div>
-                  <label className="block text-xs font-medium text-slate-600 dark:text-slate-300 mb-1">Author</label>
+                  <label htmlFor="pdf-meta-author" className="block text-xs font-medium text-slate-600 dark:text-slate-300 mb-1">Author</label>
                   <input
+                    id="pdf-meta-author"
                     type="text"
                     value={metaAuthor}
                     onChange={(e) => setMetaAuthor(e.target.value)}
@@ -1271,8 +1292,9 @@ export const PdfToolWorkspace: React.FC<PdfToolWorkspaceProps> = ({ tool, isUrdu
                   />
                 </div>
                 <div>
-                  <label className="block text-xs font-medium text-slate-600 dark:text-slate-300 mb-1">Subject</label>
+                  <label htmlFor="pdf-meta-subject" className="block text-xs font-medium text-slate-600 dark:text-slate-300 mb-1">Subject</label>
                   <input
+                    id="pdf-meta-subject"
                     type="text"
                     value={metaSubject}
                     onChange={(e) => setMetaSubject(e.target.value)}
@@ -1280,10 +1302,11 @@ export const PdfToolWorkspace: React.FC<PdfToolWorkspaceProps> = ({ tool, isUrdu
                   />
                 </div>
                 <div>
-                  <label className="block text-xs font-medium text-slate-600 dark:text-slate-300 mb-1">
+                  <label htmlFor="pdf-meta-keywords" className="block text-xs font-medium text-slate-600 dark:text-slate-300 mb-1">
                     Keywords (comma-separated)
                   </label>
                   <input
+                    id="pdf-meta-keywords"
                     type="text"
                     value={metaKeywords}
                     onChange={(e) => setMetaKeywords(e.target.value)}
@@ -1291,8 +1314,9 @@ export const PdfToolWorkspace: React.FC<PdfToolWorkspaceProps> = ({ tool, isUrdu
                   />
                 </div>
                 <div className="sm:col-span-2">
-                  <label className="block text-xs font-medium text-slate-600 dark:text-slate-300 mb-1">Creator Application</label>
+                  <label htmlFor="pdf-meta-creator" className="block text-xs font-medium text-slate-600 dark:text-slate-300 mb-1">Creator Application</label>
                   <input
+                    id="pdf-meta-creator"
                     type="text"
                     value={metaCreator}
                     onChange={(e) => setMetaCreator(e.target.value)}
@@ -1327,7 +1351,7 @@ export const PdfToolWorkspace: React.FC<PdfToolWorkspaceProps> = ({ tool, isUrdu
                 </span>
               </div>
               <div className="overflow-x-auto">
-                <table className="min-w-full text-xs text-left">
+                <table className="min-w-full text-xs text-start">
                   <thead className="bg-slate-50 dark:bg-slate-900 text-slate-600 dark:text-slate-300">
                     <tr>
                       <th className="px-4 py-2.5">File</th>
@@ -1362,8 +1386,9 @@ export const PdfToolWorkspace: React.FC<PdfToolWorkspaceProps> = ({ tool, isUrdu
           {tool.id === 'pdf-ocr' && (
             <div className="rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800/70 p-4 grid grid-cols-1 sm:grid-cols-3 gap-3">
               <div>
-                <label className="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1">OCR Language</label>
+                <label htmlFor="pdf-ocr-lang" className="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1">OCR Language</label>
                 <select
+                  id="pdf-ocr-lang"
                   value={ocrLang}
                   onChange={(e) => setOcrLang(e.target.value)}
                   className="w-full rounded-lg border border-slate-300 dark:border-slate-700 bg-slate-50 dark:bg-slate-900 px-3 py-2 text-sm"
@@ -1375,8 +1400,9 @@ export const PdfToolWorkspace: React.FC<PdfToolWorkspaceProps> = ({ tool, isUrdu
                 </select>
               </div>
               <div>
-                <label className="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1">Output Format</label>
+                <label htmlFor="pdf-ocr-fmt" className="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1">Output Format</label>
                 <select
+                  id="pdf-ocr-fmt"
                   value={ocrOutputFmt}
                   onChange={(e) => setOcrOutputFmt(e.target.value as 'txt' | 'docx')}
                   className="w-full rounded-lg border border-slate-300 dark:border-slate-700 bg-slate-50 dark:bg-slate-900 px-3 py-2 text-sm"
@@ -1386,10 +1412,11 @@ export const PdfToolWorkspace: React.FC<PdfToolWorkspaceProps> = ({ tool, isUrdu
                 </select>
               </div>
               <div>
-                <label className="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1">
+                <label htmlFor="pdf-ocr-range" className="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1">
                   Page Range (blank = all)
                 </label>
                 <input
+                  id="pdf-ocr-range"
                   type="text"
                   value={pageRangeInput}
                   onChange={(e) => setPageRangeInput(e.target.value)}

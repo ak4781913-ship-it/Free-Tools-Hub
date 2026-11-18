@@ -344,7 +344,7 @@ export const KeywordDensityTab: React.FC<KeywordDensityTabProps> = ({ result }) 
             {occurrenceData.occurrences.map((item, idx) => (
               <div
                 key={`${item.blockIndex}-${idx}`}
-                className="p-3 rounded-xl bg-slate-50 dark:bg-slate-850/60 border border-slate-200/80 dark:border-slate-800 hover:border-indigo-300 dark:hover:border-indigo-800 transition-colors flex items-start gap-3"
+                className="p-3 rounded-xl bg-slate-50 dark:bg-slate-800/60 border border-slate-200/80 dark:border-slate-800 hover:border-indigo-300 dark:hover:border-indigo-800 transition-colors flex items-start gap-3"
               >
                 <span className="inline-block px-1.5 py-0.5 rounded uppercase text-[10px] font-mono font-bold bg-slate-200 dark:bg-slate-800 text-slate-700 dark:text-slate-300 shrink-0 mt-0.5">
                   {item.blockTag}

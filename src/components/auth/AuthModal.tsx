@@ -79,7 +79,7 @@ export const AuthModal: React.FC = () => {
             </div>
             <div className="min-w-0">
               <p className="text-[10px] font-bold uppercase tracking-wider text-blue-700 dark:text-blue-400">
-                NEXORA · FreeTools Hub
+                MAWA · FreeTools Hub
               </p>
               <h2
                 id="auth-modal-title"

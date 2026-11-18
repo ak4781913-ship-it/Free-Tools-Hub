@@ -90,9 +90,9 @@ export const DailyGoalTracker: React.FC<DailyGoalTrackerProps> = ({
     <section
       id="daily-goal-tracker"
       aria-labelledby="daily-goal-tracker-heading"
-      className="no-print w-full max-w-7xl mx-auto pt-6 pb-2 px-4 sm:px-6 lg:px-8 min-w-0"
+      className="no-print w-full min-w-0"
     >
-      <div className="bg-white dark:bg-slate-900 rounded-2xl border border-slate-200/90 dark:border-slate-800 p-4 sm:p-6 transition-colors min-w-0">
+      <div className="bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 p-4 sm:p-6 transition-colors min-w-0">
         {/* Header Row: Title + Unboxed Metadata on Left, Target Controls on Right */}
         <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-4 pb-4 border-b border-slate-100 dark:border-slate-800/80 min-w-0">
           <div className="flex items-start sm:items-center gap-3 min-w-0">

@@ -230,7 +230,7 @@ export const CryptoConverterTool: React.FC = () => {
               >
                 <span
                   className={`w-1.5 h-1.5 rounded-full ${
-                    priceData.isLive ? 'bg-emerald-500 animate-pulse' : 'bg-slate-400'
+                    priceData.isLive ? 'bg-emerald-500' : 'bg-slate-400'
                   }`}
                 />
                 {priceData.isLive ? 'Market Feed Online' : 'Standard Baseline'}
@@ -248,7 +248,7 @@ export const CryptoConverterTool: React.FC = () => {
 
           {/* Refresh & Last Updated */}
           <div className="flex items-center gap-3">
-            <div className="text-right hidden sm:block">
+            <div className="text-end hidden sm:block">
               <p className="text-[11px] text-slate-400 dark:text-slate-500">Updated</p>
               <p className="text-xs font-medium font-mono text-slate-600 dark:text-slate-300">
                 {priceData.lastUpdated}

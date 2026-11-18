@@ -43,25 +43,14 @@ function classifyAppRoute(pathname: string): {
   };
 }
 
-function getRequestOriginCandidate(req?: Request): string {
-  if (!req) return '';
-  const forwardedHost = (req.headers['x-forwarded-host'] as string | undefined)
-    ?.split(',')[0]
-    ?.trim();
-  const host = forwardedHost || req.headers.host || '';
-  if (!host) return '';
-  const protoHeader = (req.headers['x-forwarded-proto'] as string | undefined)
-    ?.split(',')[0]
-    ?.trim()
-    .toLowerCase();
-  const protocol = protoHeader === 'http' || protoHeader === 'https' ? protoHeader : 'https';
-  return sanitizePublicOrigin(`${protocol}://${host}`);
-}
+let hasWarnedMissingProductionOrigin = false;
 
 /**
- * Returns configured production domain, verified request host, or fallback DEFAULT_PRODUCTION_URL.
+ * Returns explicitly configured trusted production origin (VITE_SITE_URL, SITE_URL, URL, or APP_URL).
+ * Never trusts unverified incoming Host or X-Forwarded-Host headers for canonical/sitemap generation.
+ * Falls back safely to DEFAULT_PRODUCTION_URL with a one-time warning when unset.
  */
-function resolveVerifiedProductionDomain(req?: Request): string {
+function resolveVerifiedProductionDomain(): string {
   const candidates = [
     process.env.VITE_SITE_URL,
     process.env.SITE_URL,
@@ -72,9 +61,11 @@ function resolveVerifiedProductionDomain(req?: Request): string {
     const clean = sanitizePublicOrigin(c);
     if (clean) return clean;
   }
-  const reqOrigin = getRequestOriginCandidate(req);
-  if (reqOrigin) {
-    return reqOrigin;
+  if (!hasWarnedMissingProductionOrigin) {
+    hasWarnedMissingProductionOrigin = true;
+    console.warn(
+      `[SEO Warning] VITE_SITE_URL / SITE_URL / URL / APP_URL is not configured. Ignoring unverified request Host/X-Forwarded-Host headers and falling back to ${DEFAULT_PRODUCTION_URL}. Set VITE_SITE_URL (and/or APP_URL) for custom production domains.`
+    );
   }
   return DEFAULT_PRODUCTION_URL;
 }
@@ -82,16 +73,16 @@ function resolveVerifiedProductionDomain(req?: Request): string {
 /**
  * Resolves active public site base URL for robots.txt and sitemap.xml.
  */
-function resolveBaseUrl(req: Request): string {
-  return resolveVerifiedProductionDomain(req);
+function resolveBaseUrl(): string {
+  return resolveVerifiedProductionDomain();
 }
 
 /**
  * If prerendered HTML used DEFAULT_PRODUCTION_URL at build time but runtime serves a different
- * verified public origin, rewrite canonical/OG/schema origin references cleanly.
+ * explicitly configured origin, rewrite canonical/OG/schema origin references cleanly.
  */
-function applyRuntimeDomainToHtml(html: string, req: Request): string {
-  const activeDomain = resolveVerifiedProductionDomain(req);
+function applyRuntimeDomainToHtml(html: string): string {
+  const activeDomain = resolveVerifiedProductionDomain();
   if (activeDomain && activeDomain !== DEFAULT_PRODUCTION_URL && html.includes(DEFAULT_PRODUCTION_URL)) {
     return html.split(DEFAULT_PRODUCTION_URL).join(activeDomain);
   }
@@ -105,12 +96,11 @@ function applyRuntimeDomainToHtml(html: string, req: Request): string {
 function injectRouteSeoIntoHtml(
   rawHtml: string,
   rawUrl: string,
-  status: 200 | 301 | 404,
-  req?: Request
+  status: 200 | 301 | 404
 ): string {
   const cleanPath = normalizeSeoPathname(rawUrl);
   const isNotFound = status === 404;
-  const canonicalBase = resolveVerifiedProductionDomain(req);
+  const canonicalBase = resolveVerifiedProductionDomain();
   const seo = getRouteSeoForPath(isNotFound ? '/404' : cleanPath, canonicalBase);
 
   const safeTitle = escapeXml(seo.title);
@@ -607,8 +597,8 @@ async function startServer() {
   });
 
   // 2. Dynamic Robots.txt
-  app.get('/robots.txt', (req: Request, res: Response) => {
-    const baseUrl = resolveBaseUrl(req);
+  app.get('/robots.txt', (_req: Request, res: Response) => {
+    const baseUrl = resolveBaseUrl();
     const body = [
       'User-agent: *',
       'Allow: /',
@@ -622,8 +612,8 @@ async function startServer() {
   });
 
   // 3. Dynamic XML Sitemap (strictly canonical, indexable 200 OK public routes only)
-  app.get('/sitemap.xml', (req: Request, res: Response) => {
-    const baseUrl = resolveBaseUrl(req);
+  app.get('/sitemap.xml', (_req: Request, res: Response) => {
+    const baseUrl = resolveBaseUrl();
     const entries = getAllCanonicalSitemapEntries(baseUrl);
 
     const xmlUrls = entries
@@ -719,7 +709,7 @@ async function startServer() {
         const url = req.originalUrl;
         const routeInfo = classifyAppRoute(url);
         const rawTemplate = fs.readFileSync(path.resolve(__dirname, 'index.html'), 'utf-8');
-        const seoTemplate = injectRouteSeoIntoHtml(rawTemplate, url, routeInfo.status, req);
+        const seoTemplate = injectRouteSeoIntoHtml(rawTemplate, url, routeInfo.status);
         let html = await vite.transformIndexHtml(url, seoTemplate);
         if (hmrDisabled) {
           html = html.replace(
@@ -799,8 +789,7 @@ async function startServer() {
         const notFoundHtmlPath = path.join(distDir, '404.html');
         if (fs.existsSync(notFoundHtmlPath)) {
           const notFoundHtml = applyRuntimeDomainToHtml(
-            fs.readFileSync(notFoundHtmlPath, 'utf-8'),
-            req
+            fs.readFileSync(notFoundHtmlPath, 'utf-8')
           );
           res
             .status(404)
@@ -821,8 +810,7 @@ async function startServer() {
           : null;
         if (matchedPath) {
           const prerenderedHtml = applyRuntimeDomainToHtml(
-            fs.readFileSync(matchedPath, 'utf-8'),
-            req
+            fs.readFileSync(matchedPath, 'utf-8')
           );
           res.status(200).set(htmlHeaders).send(prerenderedHtml);
           return;
@@ -830,7 +818,7 @@ async function startServer() {
       }
 
       const rawHtml = fs.readFileSync(indexHtmlPath, 'utf-8');
-      const seoHtml = injectRouteSeoIntoHtml(rawHtml, req.originalUrl, routeInfo.status, req);
+      const seoHtml = injectRouteSeoIntoHtml(rawHtml, req.originalUrl, routeInfo.status);
       res
         .status(routeInfo.status === 404 ? 404 : 200)
         .set({
@@ -856,6 +844,9 @@ async function startServer() {
     console.log(
       `FreeTools Hub server running on http://0.0.0.0:${PORT} (${isProduction ? 'production' : 'development'})`
     );
+    if (isProduction) {
+      resolveVerifiedProductionDomain();
+    }
   });
 
   const gracefulShutdown = (signal: string) => {

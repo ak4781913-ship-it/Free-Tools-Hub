@@ -1148,7 +1148,7 @@ export const metadata: Metadata = {
 
             {/* PREVIEW: DISCORD / SLACK EMBED */}
             {activePreview === 'slack' && (
-              <div className="p-4 bg-slate-900 rounded-xl font-sans border-l-4 border-indigo-500 text-white space-y-2">
+              <div className="p-4 bg-slate-900 rounded-xl font-sans border border-indigo-500/40 ring-1 ring-indigo-500/20 text-white space-y-2">
                 <span className="text-[11px] font-semibold text-slate-400 block">
                   {formData.siteName || displayDomain}
                 </span>

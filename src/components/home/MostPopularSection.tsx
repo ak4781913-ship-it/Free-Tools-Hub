@@ -2,6 +2,7 @@ import React, { useState, useEffect, useMemo } from 'react';
 import { useLanguage } from '../../context/LanguageContext';
 import { useFavorites } from '../../context/FavoritesContext';
 import { TOOLS_LIST } from '../../data/tools';
+import { getToolPrimaryPath } from '../../data/toolsRouting';
 import { ToolDefinition } from '../../types';
 import { getPopularToolStats, subscribeToToolAccess } from '../../utils/toolTracking';
 import { resolveToolIcon } from '../../utils/toolIcons';
@@ -58,7 +59,7 @@ export const MostPopularSection: React.FC<MostPopularSectionProps> = ({ onSelect
       {/* Header with Title and Unboxed Kicker */}
       <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-4 mb-6">
         <div>
-          <div className="inline-flex items-center gap-1.5 text-xs font-semibold uppercase tracking-wider text-amber-600 dark:text-amber-400 mb-1">
+          <div className="inline-flex items-center gap-1.5 text-xs font-semibold tracking-wide text-amber-600 dark:text-amber-400 mb-1">
             <Flame className="w-3.5 h-3.5 fill-amber-500 text-amber-500" />
             <span>{t.mostPopular.badge}</span>
           </div>
@@ -79,7 +80,7 @@ export const MostPopularSection: React.FC<MostPopularSectionProps> = ({ onSelect
           className="inline-flex items-center gap-1.5 text-xs font-semibold text-indigo-600 dark:text-indigo-400 hover:text-indigo-700 dark:hover:text-indigo-300 self-start sm:self-auto cursor-pointer group"
         >
           <span>{t.mostPopular.viewAll}</span>
-          <ArrowRight className={`w-3.5 h-3.5 transition-transform group-hover:translate-x-0.5 ${isUrdu ? '-scale-x-100' : ''}`} />
+          <ArrowRight className="w-3.5 h-3.5 transition-transform group-hover:ltr:translate-x-0.5 group-hover:rtl:-translate-x-0.5 rtl:rotate-180" />
         </button>
       </div>
 
@@ -104,28 +105,26 @@ export const MostPopularSection: React.FC<MostPopularSectionProps> = ({ onSelect
               : 'bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400 border-slate-200 dark:border-slate-700';
 
           return (
-            <div
+            <article
               key={tool.id}
-              onClick={() => onSelectTool(tool.id)}
-              className="group relative flex flex-col justify-between p-5 bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 hover:border-indigo-400 dark:hover:border-indigo-500 transition-all duration-200 hover:shadow-md cursor-pointer"
+              className="group relative flex flex-col justify-between p-4 sm:p-5 bg-white dark:bg-slate-900 rounded-xl border border-slate-200 dark:border-slate-800 hover:border-indigo-400 dark:hover:border-indigo-500 transition-colors duration-200 min-w-0"
             >
-              <div>
+              <div className="min-w-0">
                 {/* Top Row: Icon, Rank Tag, and Favorite Button */}
-                <div className="flex items-center justify-between mb-3.5">
-                  <div className="flex items-center gap-2.5">
-                    <div className="w-10 h-10 rounded-xl bg-indigo-50 dark:bg-indigo-950/60 text-indigo-600 dark:text-indigo-400 flex items-center justify-center transition-colors group-hover:bg-indigo-600 group-hover:text-white shadow-2xs">
+                <div className="flex items-center justify-between mb-3.5 min-w-0">
+                  <div className="flex items-center gap-2.5 min-w-0">
+                    <div className="w-10 h-10 rounded-lg bg-indigo-50 dark:bg-indigo-950/60 text-indigo-600 dark:text-indigo-400 flex items-center justify-center transition-colors group-hover:bg-indigo-600 group-hover:text-white shrink-0">
                       <ToolIcon className="w-5 h-5" />
                     </div>
-                    {/* Rank Indicator */}
                     <span
-                      className={`px-2 py-0.5 rounded-lg text-xs font-bold font-mono border ${rankColors}`}
+                      className={`px-2 py-0.5 rounded-lg text-xs font-bold font-mono tabular-nums border shrink-0 ${rankColors}`}
                       title={`Rank #${rank}`}
                     >
                       {t.mostPopular.rankPrefix}{rank}
                     </span>
                   </div>
 
-                  <div className="flex items-center gap-1">
+                  <div className="relative z-10 flex items-center gap-0.5 shrink-0 -me-1.5">
                     <button
                       type="button"
                       onClick={(e) => {
@@ -133,8 +132,8 @@ export const MostPopularSection: React.FC<MostPopularSectionProps> = ({ onSelect
                         toggleFavorite(tool.id);
                       }}
                       title={favorited ? (isUrdu ? 'پسندیدہ سے ہٹائیں' : 'Remove favorite') : (isUrdu ? 'پسندیدہ میں شامل کریں' : 'Add favorite')}
-                      aria-label="Toggle favorite"
-                      className="p-1.5 text-slate-400 hover:text-amber-500 transition-colors rounded-lg hover:bg-slate-100 dark:hover:bg-slate-800"
+                      aria-label={favorited ? `Remove ${title} from favorites` : `Add ${title} to favorites`}
+                      className="min-w-[36px] min-h-[36px] inline-flex items-center justify-center text-slate-400 hover:text-amber-500 transition-colors rounded-lg hover:bg-slate-100 dark:hover:bg-slate-800 cursor-pointer"
                     >
                       <Star
                         className={`w-4 h-4 transition-transform active:scale-125 ${
@@ -144,25 +143,36 @@ export const MostPopularSection: React.FC<MostPopularSectionProps> = ({ onSelect
                         }`}
                       />
                     </button>
-                    <div className="p-1 text-slate-400 opacity-0 group-hover:opacity-100 transition-opacity">
-                      <ArrowUpRight className={`w-4 h-4 text-slate-400 group-hover:text-indigo-600 dark:group-hover:text-indigo-400 ${isUrdu ? '-scale-x-100' : ''}`} />
+                    <div className="p-1 text-slate-400 opacity-0 group-hover:opacity-100 transition-opacity hidden sm:block" aria-hidden="true">
+                      <ArrowUpRight className="w-4 h-4 text-slate-400 group-hover:text-indigo-600 dark:group-hover:text-indigo-400" />
                     </div>
                   </div>
                 </div>
 
-                {/* Unboxed Metadata (Anti-slop) */}
-                <div className="text-[11px] font-medium text-slate-400 dark:text-slate-400 tracking-wider uppercase mb-1.5 flex items-center gap-2">
-                  <span>{categoryName}</span>
+                {/* Unboxed Metadata */}
+                <div className="text-[11px] font-medium text-slate-500 dark:text-slate-400 mb-1.5 flex items-center gap-2 min-w-0">
+                  <span className="truncate">{categoryName}</span>
                   <span aria-hidden="true">·</span>
-                  <span className="flex items-center gap-1 font-mono text-[10px] text-indigo-600 dark:text-indigo-400 font-semibold">
+                  <span className="flex items-center gap-1 font-mono tabular-nums text-[10px] text-indigo-600 dark:text-indigo-400 font-semibold shrink-0">
                     <Activity className="w-3 h-3" />
                     <span>{count} {t.mostPopular.usesLabel}</span>
                   </span>
                 </div>
 
                 {/* Card Title */}
-                <h3 className="text-base font-bold text-slate-900 dark:text-white group-hover:text-indigo-600 dark:group-hover:text-indigo-400 transition-colors line-clamp-1 mb-1.5">
-                  {title}
+                <h3 className="text-base font-bold text-slate-900 dark:text-white group-hover:text-indigo-600 dark:group-hover:text-indigo-400 transition-colors line-clamp-1 mb-1.5 break-words">
+                  <a
+                    href={getToolPrimaryPath(tool.id)}
+                    onClick={(e) => {
+                      if (!e.metaKey && !e.ctrlKey && !e.shiftKey && e.button === 0) {
+                        e.preventDefault();
+                        onSelectTool(tool.id);
+                      }
+                    }}
+                    className="after:absolute after:inset-0 focus:outline-none"
+                  >
+                    {title}
+                  </a>
                 </h3>
 
                 {/* Card Description */}
@@ -173,14 +183,15 @@ export const MostPopularSection: React.FC<MostPopularSectionProps> = ({ onSelect
 
               {/* Bottom Row */}
               <div className="mt-4 pt-3 border-t border-slate-100 dark:border-slate-800/80 flex items-center justify-between text-[11px]">
-                <span className="text-slate-400 font-mono text-[10px]">
-                  {isUrdu ? 'فوری اور مفت' : 'Instant · Free'}
+                <span className="text-slate-500 dark:text-slate-400 font-mono text-[10px]">
+                  {isUrdu ? 'فوری · مفت' : 'Instant · Free'}
                 </span>
-                <span className="text-indigo-600 dark:text-indigo-400 font-semibold group-hover:underline">
-                  {isUrdu ? 'ٹول کھولیں ←' : 'Open Tool →'}
+                <span className="inline-flex items-center gap-1 text-indigo-600 dark:text-indigo-400 font-semibold group-hover:underline">
+                  <span>{isUrdu ? 'ٹول کھولیں' : 'Open Tool'}</span>
+                  <ArrowRight className="w-3.5 h-3.5 rtl:rotate-180" />
                 </span>
               </div>
-            </div>
+            </article>
           );
         })}
       </div>

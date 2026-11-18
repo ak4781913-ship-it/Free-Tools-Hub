@@ -283,7 +283,7 @@ export const ShareModal: React.FC<ShareModalProps> = ({
             )}
           </label>
 
-          <div className="flex items-center gap-2 p-1.5 rounded-2xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-850 shadow-inner">
+          <div className="flex items-center gap-2 p-1.5 rounded-2xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800/70 shadow-inner">
             <input
               type="text"
               readOnly
@@ -342,7 +342,7 @@ export const ShareModal: React.FC<ShareModalProps> = ({
                 href={platform.href}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="flex items-center gap-2.5 p-2.5 rounded-xl border border-slate-200/80 dark:border-slate-800 bg-slate-50 dark:bg-slate-850 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors group cursor-pointer"
+                className="flex items-center gap-2.5 p-2.5 rounded-xl border border-slate-200/80 dark:border-slate-800 bg-slate-50 dark:bg-slate-800/70 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors group cursor-pointer"
                 title={`Share to ${platform.name}`}
               >
                 <div
@@ -370,7 +370,7 @@ export const ShareModal: React.FC<ShareModalProps> = ({
                   onClose();
                   onDownloadPdf();
                 }}
-                className="flex items-center gap-2.5 p-2.5 rounded-xl border border-indigo-200/90 dark:border-indigo-800/80 bg-indigo-50/70 dark:bg-indigo-950/40 hover:bg-indigo-100 dark:hover:bg-indigo-900/60 transition-colors cursor-pointer group text-left rtl:text-right"
+                className="flex items-center gap-2.5 p-2.5 rounded-xl border border-indigo-200/90 dark:border-indigo-800/80 bg-indigo-50/70 dark:bg-indigo-950/40 hover:bg-indigo-100 dark:hover:bg-indigo-900/60 transition-colors cursor-pointer group text-start"
                 title="Download A4 PDF Document"
               >
                 <div className="w-7 h-7 rounded-lg bg-indigo-600 text-white flex items-center justify-center shadow-xs group-hover:scale-105 transition-transform shrink-0">
@@ -394,13 +394,13 @@ export const ShareModal: React.FC<ShareModalProps> = ({
               className={`flex items-center gap-2.5 p-2.5 rounded-xl border transition-colors cursor-pointer group ${
                 showQR
                   ? 'border-indigo-400 dark:border-indigo-600 bg-indigo-50/60 dark:bg-indigo-950/40'
-                  : 'border-slate-200/80 dark:border-slate-800 bg-slate-50 dark:bg-slate-850 hover:bg-slate-100 dark:hover:bg-slate-800'
+                  : 'border-slate-200/80 dark:border-slate-800 bg-slate-50 dark:bg-slate-800/70 hover:bg-slate-100 dark:hover:bg-slate-800'
               }`}
             >
               <div className="w-7 h-7 rounded-lg bg-indigo-600 text-white flex items-center justify-center shadow-xs group-hover:scale-105 transition-transform shrink-0">
                 <QrCode className="w-4 h-4" />
               </div>
-              <div className="flex flex-col min-w-0 text-left rtl:text-right">
+              <div className="flex flex-col min-w-0 text-start">
                 <span className="text-xs font-bold text-slate-800 dark:text-slate-200">
                   {isUrdu ? 'کیو آر کوڈ' : 'QR Code'}
                 </span>
@@ -414,7 +414,7 @@ export const ShareModal: React.FC<ShareModalProps> = ({
 
         {/* 4. Optional QR Code Display for Mobile Scan */}
         {showQR && (
-          <div className="p-4 rounded-2xl bg-slate-50 dark:bg-slate-850 border border-slate-200 dark:border-slate-800 flex flex-col items-center justify-center gap-3 animate-in fade-in zoom-in-95 duration-200">
+          <div className="p-4 rounded-2xl bg-slate-50 dark:bg-slate-800/70 border border-slate-200 dark:border-slate-800 flex flex-col items-center justify-center gap-3 animate-in fade-in zoom-in-95 duration-200">
             <div className="p-2.5 bg-white rounded-xl shadow-xs border border-slate-200">
               {qrCodeUrl ? (
                 <img

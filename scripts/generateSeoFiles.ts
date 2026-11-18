@@ -129,6 +129,8 @@ export function resolveRouteLastmodMap(): Map<string, string> {
   return result;
 }
 
+let hasWarnedFallbackBaseUrl = false;
+
 export function resolveBuildBaseUrl(): string {
   const candidates = [
     process.env.VITE_SITE_URL,
@@ -140,6 +142,12 @@ export function resolveBuildBaseUrl(): string {
   for (const candidate of candidates) {
     const sanitized = sanitizePublicOrigin(candidate);
     if (sanitized) return sanitized;
+  }
+  if (!hasWarnedFallbackBaseUrl) {
+    hasWarnedFallbackBaseUrl = true;
+    console.warn(
+      `[SEO Warning] VITE_SITE_URL (or SITE_URL/URL/APP_URL) is not set. Falling back to ${DEFAULT_PRODUCTION_URL}. For Hostinger or custom domains, set VITE_SITE_URL before running npm run build.`
+    );
   }
   return DEFAULT_PRODUCTION_URL;
 }

@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { X, Settings, Moon, Sun, Shield, Trash2, Check, Cloud } from 'lucide-react';
 import { useTheme } from '../../../context/ThemeContext';
 import { useLanguage } from '../../../context/LanguageContext';
@@ -20,6 +20,17 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({ isOpen, onClose })
   const isUrdu = language === 'ur';
 
   const [confirmClearData, setConfirmClearData] = useState(false);
+
+  useEffect(() => {
+    if (!isOpen) return;
+    const handleEsc = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') {
+        onClose();
+      }
+    };
+    window.addEventListener('keydown', handleEsc);
+    return () => window.removeEventListener('keydown', handleEsc);
+  }, [isOpen, onClose]);
 
   if (!isOpen) return null;
 
@@ -94,7 +105,7 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({ isOpen, onClose })
                 }`}
               >
                 <Sun className="w-4 h-4 text-amber-500 shrink-0" />
-                <div className="text-left rtl:text-right">
+                <div className="text-start">
                   <div className="font-bold">{isUrdu ? 'لائٹ موڈ' : 'Light Mode'}</div>
                   <div className="text-[10px] text-slate-500 font-normal">Clean white & blue</div>
                 </div>
@@ -110,7 +121,7 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({ isOpen, onClose })
                 }`}
               >
                 <Moon className="w-4 h-4 text-blue-400 shrink-0" />
-                <div className="text-left rtl:text-right">
+                <div className="text-start">
                   <div className="font-bold">{isUrdu ? 'ڈارک موڈ' : 'Dark Mode'}</div>
                   <div className="text-[10px] text-slate-400 font-normal">Deep navy slate</div>
                 </div>

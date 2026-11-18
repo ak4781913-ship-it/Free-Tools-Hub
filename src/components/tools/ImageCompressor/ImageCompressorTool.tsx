@@ -1885,7 +1885,7 @@ export const ImageCompressorTool: React.FC = () => {
                   <Tag className="w-3.5 h-3.5 text-teal-400" />
                   <span>Rename Batch</span>
                   {(renamePrefix || renameSuffix || items.some((it) => it.customName)) && (
-                    <span className="w-1.5 h-1.5 rounded-full bg-teal-400 animate-pulse" />
+                    <span className="w-1.5 h-1.5 rounded-full bg-teal-400" />
                   )}
                 </button>
 
@@ -2411,7 +2411,7 @@ export const ImageCompressorTool: React.FC = () => {
                       )}
                       <span>{stripExif ? 'EXIF Stripped' : 'EXIF Retained'}</span>
                       {activeItem.exifData?.hasExif && (
-                        <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
+                        <span className="w-1.5 h-1.5 rounded-full bg-emerald-500" />
                       )}
                     </button>
 

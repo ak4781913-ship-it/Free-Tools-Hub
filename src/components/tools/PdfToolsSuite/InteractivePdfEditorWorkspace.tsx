@@ -210,43 +210,56 @@ export const InteractivePdfEditorWorkspace: React.FC<InteractivePdfEditorWorkspa
 
     const blob = new Blob([raw], { type: file.type || 'image/png' });
     const url = URL.createObjectURL(blob);
+    let urlTransferred = false;
+    let canvas: HTMLCanvasElement | null = null;
 
-    const img = await new Promise<HTMLImageElement>((resolve, reject) => {
-      const el = new Image();
-      el.onload = () => resolve(el);
-      el.onerror = () => reject(new Error('Failed to load image file.'));
-      el.src = url;
-    });
+    try {
+      const img = await new Promise<HTMLImageElement>((resolve, reject) => {
+        const el = new Image();
+        el.onload = () => resolve(el);
+        el.onerror = () => reject(new Error('Failed to load image file.'));
+        el.src = url;
+      });
 
-    const aspect = (img.naturalWidth || 100) / Math.max(1, img.naturalHeight || 100);
+      const aspect = (img.naturalWidth || 100) / Math.max(1, img.naturalHeight || 100);
 
-    if (sig === 'jpg' || sig === 'png') {
+      if (sig === 'jpg' || sig === 'png') {
+        urlTransferred = true;
+        return {
+          bytes: raw,
+          mimeType: sig === 'jpg' ? 'image/jpeg' : 'image/png',
+          previewUrl: url,
+          aspect,
+        };
+      }
+
+      // Normalize WebP -> PNG
+      canvas = document.createElement('canvas');
+      canvas.width = img.naturalWidth || 300;
+      canvas.height = img.naturalHeight || 300;
+      const ctx = canvas.getContext('2d');
+      if (!ctx) throw new Error('Canvas unavailable.');
+      ctx.drawImage(img, 0, 0);
+      const pngBlob = await new Promise<Blob>((resolve, reject) => {
+        canvas!.toBlob((b) => (b ? resolve(b) : reject(new Error('PNG encode failed'))), 'image/png');
+      });
+      const pngBytes = new Uint8Array(await pngBlob.arrayBuffer());
       return {
-        bytes: raw,
-        mimeType: sig === 'jpg' ? 'image/jpeg' : 'image/png',
-        previewUrl: url,
+        bytes: pngBytes,
+        mimeType: 'image/png',
+        previewUrl: URL.createObjectURL(pngBlob),
         aspect,
       };
+    } finally {
+      if (canvas) {
+        canvas.width = 0;
+        canvas.height = 0;
+        canvas = null;
+      }
+      if (!urlTransferred) {
+        URL.revokeObjectURL(url);
+      }
     }
-
-    // Normalize WebP -> PNG
-    const canvas = document.createElement('canvas');
-    canvas.width = img.naturalWidth || 300;
-    canvas.height = img.naturalHeight || 300;
-    const ctx = canvas.getContext('2d');
-    if (!ctx) throw new Error('Canvas unavailable.');
-    ctx.drawImage(img, 0, 0);
-    const pngBlob = await new Promise<Blob>((resolve, reject) => {
-      canvas.toBlob((b) => (b ? resolve(b) : reject(new Error('PNG encode failed'))), 'image/png');
-    });
-    URL.revokeObjectURL(url);
-    const pngBytes = new Uint8Array(await pngBlob.arrayBuffer());
-    return {
-      bytes: pngBytes,
-      mimeType: 'image/png',
-      previewUrl: URL.createObjectURL(pngBlob),
-      aspect,
-    };
   };
 
   const handleUploadImageOverlay = async (e: React.ChangeEvent<HTMLInputElement>) => {

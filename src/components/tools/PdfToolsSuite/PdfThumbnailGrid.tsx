@@ -153,16 +153,30 @@ export const PdfThumbnailGrid: React.FC<PdfThumbnailGridProps> = ({
               ? 'border-blue-600 ring-2 ring-blue-600/20 bg-blue-50/40 dark:bg-blue-950/20'
               : 'border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800/70';
 
+          const isInteractiveSelect = mode === 'select' || mode === 'delete';
+
           return (
             <div
               key={`${pageNum}_${slotIdx}`}
+              role={isInteractiveSelect ? 'button' : undefined}
+              tabIndex={isInteractiveSelect ? 0 : undefined}
+              aria-pressed={isInteractiveSelect ? isSelected : undefined}
+              aria-label={isInteractiveSelect ? `Page ${pageNum}` : undefined}
               onClick={() => {
-                if ((mode === 'select' || mode === 'delete') && onTogglePage) {
+                if (isInteractiveSelect && onTogglePage) {
+                  onTogglePage(pageNum);
+                }
+              }}
+              onKeyDown={(e) => {
+                if (isInteractiveSelect && onTogglePage && (e.key === 'Enter' || e.key === ' ')) {
+                  e.preventDefault();
                   onTogglePage(pageNum);
                 }
               }}
               className={`group rounded-xl border p-2 flex flex-col gap-2 transition-all ${
-                mode === 'select' || mode === 'delete' ? 'cursor-pointer hover:border-blue-400' : ''
+                isInteractiveSelect
+                  ? 'cursor-pointer hover:border-blue-400 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500'
+                  : ''
               } ${borderClass}`}
             >
               <div className="relative aspect-[3/4] rounded-lg bg-slate-100 dark:bg-slate-900 overflow-hidden flex items-center justify-center">
@@ -177,9 +191,9 @@ export const PdfThumbnailGrid: React.FC<PdfThumbnailGridProps> = ({
                   <span className="text-xs font-semibold text-slate-400 tabular-nums">P.{pageNum}</span>
                 )}
 
-                {(mode === 'select' || mode === 'delete') && (
+                {isInteractiveSelect && (
                   <span
-                    className={`absolute top-1.5 right-1.5 w-6 h-6 rounded-md flex items-center justify-center text-white text-xs font-bold shadow ${
+                    className={`absolute top-1.5 end-1.5 w-6 h-6 rounded-md flex items-center justify-center text-white text-xs font-bold shadow ${
                       isSelected
                         ? mode === 'delete'
                           ? 'bg-red-600'
@@ -224,7 +238,7 @@ export const PdfThumbnailGrid: React.FC<PdfThumbnailGridProps> = ({
                     title="Move Earlier"
                     className="p-1.5 rounded bg-slate-100 dark:bg-slate-900 text-slate-600 dark:text-slate-300 disabled:opacity-35"
                   >
-                    <ArrowLeft className="w-3 h-3" />
+                    <ArrowLeft className="w-3 h-3 rtl:rotate-180" />
                   </button>
                   <button
                     type="button"
@@ -250,7 +264,7 @@ export const PdfThumbnailGrid: React.FC<PdfThumbnailGridProps> = ({
                     title="Move Later"
                     className="p-1.5 rounded bg-slate-100 dark:bg-slate-900 text-slate-600 dark:text-slate-300 disabled:opacity-35"
                   >
-                    <ArrowRight className="w-3 h-3" />
+                    <ArrowRight className="w-3 h-3 rtl:rotate-180" />
                   </button>
                 </div>
               )}

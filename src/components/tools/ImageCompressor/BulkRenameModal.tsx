@@ -53,6 +53,18 @@ export const BulkRenameModal: React.FC<BulkRenameModalProps> = ({
     }
   }, [isOpen, initialPrefix, initialSuffix, selectedBatchIds.size, items.length]);
 
+  // Close on Escape key
+  useEffect(() => {
+    if (!isOpen) return;
+    const handleEsc = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') {
+        onClose();
+      }
+    };
+    window.addEventListener('keydown', handleEsc);
+    return () => window.removeEventListener('keydown', handleEsc);
+  }, [isOpen, onClose]);
+
   if (!isOpen) return null;
 
   const targetItems = applyOnlyToSelected && selectedBatchIds.size > 0
@@ -209,10 +221,10 @@ export const BulkRenameModal: React.FC<BulkRenameModalProps> = ({
               <button
                 type="button"
                 onClick={() => setNamingMode('original')}
-                className={`p-3 rounded-xl border text-left cursor-pointer transition-all ${
+                className={`p-3 rounded-xl border text-start cursor-pointer transition-all ${
                   namingMode === 'original'
                     ? 'border-emerald-500 bg-emerald-50/50 dark:bg-emerald-950/40 ring-1 ring-emerald-500/30'
-                    : 'border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-850 hover:border-slate-300'
+                    : 'border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-800/70 hover:border-slate-300'
                 }`}
               >
                 <div className="flex items-center gap-2 font-bold text-slate-900 dark:text-white">
@@ -230,10 +242,10 @@ export const BulkRenameModal: React.FC<BulkRenameModalProps> = ({
               <button
                 type="button"
                 onClick={() => setNamingMode('sequence')}
-                className={`p-3 rounded-xl border text-left cursor-pointer transition-all ${
+                className={`p-3 rounded-xl border text-start cursor-pointer transition-all ${
                   namingMode === 'sequence'
                     ? 'border-emerald-500 bg-emerald-50/50 dark:bg-emerald-950/40 ring-1 ring-emerald-500/30'
-                    : 'border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-850 hover:border-slate-300'
+                    : 'border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-800/70 hover:border-slate-300'
                 }`}
               >
                 <div className="flex items-center gap-2 font-bold text-slate-900 dark:text-white">

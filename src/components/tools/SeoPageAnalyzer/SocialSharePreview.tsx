@@ -283,7 +283,7 @@ ${shareImage ? `<meta name="twitter:image" content="${shareImage}" />` : ''}`;
 
             {/* 4. Slack / Messaging Rich Preview */}
             {platform === 'chat' && (
-              <div className="w-full max-w-lg bg-white dark:bg-slate-900 p-4 rounded-xl border-l-4 border-indigo-500 border border-slate-200 dark:border-slate-800 space-y-2 shadow-md">
+              <div className="w-full max-w-lg bg-white dark:bg-slate-900 p-4 rounded-xl border border-slate-200 dark:border-slate-800 border-s-4 border-s-indigo-500 space-y-2 shadow-md">
                 <div className="flex items-center gap-1.5 text-xs font-bold text-slate-500">
                   <Globe className="w-3.5 h-3.5" />
                   <span>{domain}</span>

@@ -222,10 +222,10 @@ export const OnboardingTour: React.FC<OnboardingTourProps> = ({
         />
       )}
 
-      {/* 2. Spotlight Border Glow Indicator around Target */}
+      {/* 2. Spotlight Border Indicator around Target */}
       {targetRect && (
         <div
-          className="pointer-events-none fixed rounded-2xl border-2 border-indigo-500 shadow-[0_0_25px_rgba(99,102,241,0.6)] animate-pulse transition-all duration-300"
+          className="pointer-events-none fixed rounded-2xl border-2 border-indigo-500 ring-4 ring-indigo-500/25 transition-all duration-300"
           style={{
             top: spotlightTop,
             left: spotlightLeft,
@@ -271,7 +271,7 @@ export const OnboardingTour: React.FC<OnboardingTourProps> = ({
                     .replace('{total}', String(TOUR_STEPS.length))}
                 </span>
                 {step.shortcutBadge && (
-                  <span className="ml-2 px-1.5 py-0.5 rounded bg-slate-100 dark:bg-slate-800 text-[10px] font-mono font-semibold text-slate-600 dark:text-slate-300 border border-slate-200 dark:border-slate-700">
+                  <span className="ms-2 px-1.5 py-0.5 rounded bg-slate-100 dark:bg-slate-800 text-[10px] font-mono font-semibold text-slate-600 dark:text-slate-300 border border-slate-200 dark:border-slate-700">
                     {step.shortcutBadge}
                   </span>
                 )}

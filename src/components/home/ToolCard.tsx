@@ -3,7 +3,7 @@ import { ToolDefinition } from '../../types';
 import { getToolPrimaryPath } from '../../data/toolsRouting';
 import { useLanguage } from '../../context/LanguageContext';
 import { useFavorites } from '../../context/FavoritesContext';
-import { Star, ArrowUpRight, CheckCircle2 } from 'lucide-react';
+import { Star, ArrowUpRight, ArrowRight, CheckCircle2 } from 'lucide-react';
 import { resolveToolIcon } from '../../utils/toolIcons';
 import { getToolRating, subscribeToToolRating, ToolRatingData } from '../../utils/toolRatingStorage';
 
@@ -52,7 +52,7 @@ export const ToolCard: React.FC<ToolCardProps> = ({ tool, onSelect }) => {
             <IconComponent className="w-5 h-5" />
           </div>
 
-          <div className="flex items-center gap-0.5 relative z-10 shrink-0 -mr-1.5 rtl:mr-0 rtl:-ml-1.5">
+          <div className="flex items-center gap-0.5 relative z-10 shrink-0 -me-1.5">
             <button
               type="button"
               onClick={(e) => {
@@ -131,8 +131,9 @@ export const ToolCard: React.FC<ToolCardProps> = ({ tool, onSelect }) => {
             {isUrdu ? 'فوری · مفت' : 'Free · Browser-Based'}
           </span>
         )}
-        <span className="text-blue-700 dark:text-blue-400 font-semibold group-hover:underline shrink-0">
-          {isUrdu ? 'ٹول کھولیں ←' : 'Open Tool →'}
+        <span className="inline-flex items-center gap-1 text-blue-700 dark:text-blue-400 font-semibold group-hover:underline shrink-0">
+          <span>{isUrdu ? 'ٹول کھولیں' : 'Open Tool'}</span>
+          <ArrowRight className="w-3.5 h-3.5 rtl:rotate-180" />
         </span>
       </div>
     </article>

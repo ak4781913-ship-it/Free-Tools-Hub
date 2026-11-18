@@ -205,6 +205,72 @@ const ToolWorkspaceSkeleton: React.FC = () => (
   </div>
 );
 
+interface ErrorBoundaryProps {
+  children: React.ReactNode;
+  onResetHome: () => void;
+}
+
+interface ErrorBoundaryState {
+  hasError: boolean;
+  errorMessage: string;
+}
+
+class WorkspaceErrorBoundary extends React.Component<ErrorBoundaryProps, ErrorBoundaryState> {
+  constructor(props: ErrorBoundaryProps) {
+    super(props);
+    this.state = { hasError: false, errorMessage: '' };
+  }
+
+  static getDerivedStateFromError(error: Error): ErrorBoundaryState {
+    return {
+      hasError: true,
+      errorMessage: error?.message || 'Unexpected rendering error occurred.',
+    };
+  }
+
+  componentDidCatch(error: Error, info: React.ErrorInfo): void {
+    console.error('[WorkspaceErrorBoundary]', error, info.componentStack);
+  }
+
+  render() {
+    if (this.state.hasError) {
+      return (
+        <div className="max-w-xl mx-auto my-16 p-6 sm:p-8 rounded-2xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 text-center space-y-4">
+          <h2 className="text-lg font-bold text-slate-900 dark:text-white">
+            Something went wrong while rendering this view
+          </h2>
+          <p className="text-xs text-slate-600 dark:text-slate-400 leading-relaxed">
+            {this.state.errorMessage}
+          </p>
+          <div className="flex items-center justify-center gap-3 pt-1">
+            <button
+              type="button"
+              onClick={() => this.setState({ hasError: false, errorMessage: '' })}
+              className="px-4 py-2 rounded-lg text-xs font-semibold bg-blue-700 hover:bg-blue-800 text-white transition-colors cursor-pointer"
+            >
+              Try Again
+            </button>
+            <button
+              type="button"
+              onClick={() => {
+                this.setState({ hasError: false, errorMessage: '' });
+                this.props.onResetHome();
+              }}
+              className="px-4 py-2 rounded-lg text-xs font-semibold border border-slate-300 dark:border-slate-700 text-slate-700 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors cursor-pointer"
+            >
+              Back to Homepage
+            </button>
+          </div>
+        </div>
+      );
+    }
+    return this.props.children;
+  }
+}
+
+const SIDEBAR_COLLAPSED_KEY = 'freetools_hub_sidebar_collapsed';
+const LEGACY_SIDEBAR_COLLAPSED_KEY = 'abbaspro_sidebar_collapsed';
+
 const MainApp: React.FC = () => {
   const { language } = useLanguage();
   const { addRecentTool, isDrawerOpen, closeDrawer, toggleDrawer } = useFavorites();
@@ -251,7 +317,9 @@ const MainApp: React.FC = () => {
   // Responsive Sidebar state (persistent preference stored in localStorage)
   const [isSidebarCollapsed, setIsSidebarCollapsed] = useState<boolean>(() => {
     try {
-      return localStorage.getItem('abbaspro_sidebar_collapsed') === 'true';
+      const current = localStorage.getItem(SIDEBAR_COLLAPSED_KEY);
+      if (current !== null) return current === 'true';
+      return localStorage.getItem(LEGACY_SIDEBAR_COLLAPSED_KEY) === 'true';
     } catch {
       return false;
     }
@@ -262,7 +330,8 @@ const MainApp: React.FC = () => {
     setIsSidebarCollapsed((prev) => {
       const next = !prev;
       try {
-        localStorage.setItem('abbaspro_sidebar_collapsed', String(next));
+        localStorage.setItem(SIDEBAR_COLLAPSED_KEY, String(next));
+        localStorage.removeItem(LEGACY_SIDEBAR_COLLAPSED_KEY);
         if (typeof window !== 'undefined') {
           window.dispatchEvent(new CustomEvent('freetools_workspace_mutated'));
         }
@@ -274,7 +343,12 @@ const MainApp: React.FC = () => {
   useEffect(() => {
     const handleCloudHydration = () => {
       try {
-        setIsSidebarCollapsed(localStorage.getItem('abbaspro_sidebar_collapsed') === 'true');
+        const current = localStorage.getItem(SIDEBAR_COLLAPSED_KEY);
+        setIsSidebarCollapsed(
+          current !== null
+            ? current === 'true'
+            : localStorage.getItem(LEGACY_SIDEBAR_COLLAPSED_KEY) === 'true'
+        );
       } catch {}
     };
     window.addEventListener('freetools_cloud_hydrated', handleCloudHydration);
@@ -592,7 +666,7 @@ const MainApp: React.FC = () => {
     <div className="min-h-screen w-full max-w-full min-w-0 flex bg-slate-50 dark:bg-slate-950 text-slate-900 dark:text-slate-100 transition-colors">
       <a
         href="#main-content"
-        className="sr-only focus:not-sr-only focus:fixed focus:top-2 focus:left-2 focus:z-[100] focus:px-4 focus:py-2 focus:bg-blue-700 focus:text-white focus:rounded-lg focus:text-xs focus:font-bold focus:shadow-lg"
+        className="sr-only focus:not-sr-only focus:fixed focus:top-2 focus:start-2 focus:z-[100] focus:px-4 focus:py-2 focus:bg-blue-700 focus:text-white focus:rounded-lg focus:text-xs focus:font-bold focus:shadow-lg"
       >
         Skip to main content
       </a>
@@ -632,9 +706,10 @@ const MainApp: React.FC = () => {
 
         {/* Main Route View Content Area */}
         <main id="main-content" className="flex-1 w-full max-w-full min-w-0">
+          <WorkspaceErrorBoundary onResetHome={() => navigateTo('/')}>
           {/* Route 1: Modern Cards Dashboard ("/") */}
           {currentPath === '/' && (
-            <div className="w-full max-w-7xl mx-auto p-4 sm:p-6 lg:p-8 space-y-8 min-w-0">
+            <div className="w-full max-w-7xl mx-auto p-4 sm:p-6 lg:p-8 space-y-7 min-w-0">
               {/* 1. Welcome Banner */}
               <WelcomeBanner
                 onExploreClick={() => navigateTo('/tools')}
@@ -798,6 +873,7 @@ const MainApp: React.FC = () => {
             </div>
           </div>
         )}
+          </WorkspaceErrorBoundary>
       </main>
 
       {/* Footer with crawlable links (Collapsed in Reader Mode) */}

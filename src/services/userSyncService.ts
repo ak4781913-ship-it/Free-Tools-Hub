@@ -270,7 +270,10 @@ export function sanitizeWorkspaceSnapshot(raw: Partial<WorkspaceSyncSnapshot>): 
 export function readLocalWorkspaceSnapshot(): WorkspaceSyncSnapshot {
   const themeRaw = localStorage.getItem('freetools_hub_theme');
   const langRaw = localStorage.getItem('freetools_hub_lang');
-  const sidebarCollapsed = localStorage.getItem('abbaspro_sidebar_collapsed') === 'true';
+  const sidebarRaw =
+    localStorage.getItem('freetools_hub_sidebar_collapsed') ??
+    localStorage.getItem('abbaspro_sidebar_collapsed');
+  const sidebarCollapsed = sidebarRaw === 'true';
 
   const favorites = safeReadJson<string[]>('freetools_hub_favorites', DEFAULT_FAVORITES);
   const history = safeReadJson<HistoryEntry[]>('freetools_hub_history', []);
@@ -319,7 +322,8 @@ export function applyWorkspaceSnapshotToLocal(snapshot: WorkspaceSyncSnapshot): 
   try {
     localStorage.setItem('freetools_hub_theme', clean.theme);
     localStorage.setItem('freetools_hub_lang', clean.language);
-    localStorage.setItem('abbaspro_sidebar_collapsed', String(clean.sidebarCollapsed));
+    localStorage.setItem('freetools_hub_sidebar_collapsed', String(clean.sidebarCollapsed));
+    localStorage.removeItem('abbaspro_sidebar_collapsed');
     localStorage.setItem('freetools_hub_favorites', JSON.stringify(clean.favorites));
     localStorage.setItem('freetools_hub_history', JSON.stringify(clean.history));
     localStorage.setItem('freetools_hub_recents', JSON.stringify(clean.recentTools));
@@ -505,6 +509,7 @@ export function clearSyncedUserWorkspaceOnSignOut(): void {
     localStorage.setItem('freetools_hub_print_history', JSON.stringify([]));
     localStorage.setItem('freetools_color_palette', JSON.stringify(DEFAULT_SAVED_COLORS));
     localStorage.removeItem('freetools_recent_colors');
+    localStorage.removeItem('abbaspro_sidebar_collapsed');
   } catch {
     // ignore
   }

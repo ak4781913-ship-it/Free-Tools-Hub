@@ -1,16 +1,64 @@
 import tailwindcss from '@tailwindcss/vite';
 import react from '@vitejs/plugin-react';
 import path from 'path';
-import { defineConfig, Plugin } from 'vite';
+import { defineConfig, loadEnv, Plugin } from 'vite';
 import { VitePWA } from 'vite-plugin-pwa';
 
-function injectGoogleVerificationPlugin(): Plugin {
+const DEFAULT_FALLBACK_SITE_ORIGIN = 'https://freetoolshub1.netlify.app';
+
+function resolvePublicSiteOrigin(env: Record<string, string>): string {
+  const candidates = [
+    env.VITE_SITE_URL,
+    env.SITE_URL,
+    env.URL,
+    env.DEPLOY_PRIME_URL,
+    env.APP_URL,
+  ];
+  for (const candidate of candidates) {
+    const raw = (candidate || '').trim();
+    if (!raw) continue;
+    try {
+      const parsed = new URL(raw);
+      if (parsed.protocol !== 'https:' && parsed.protocol !== 'http:') continue;
+      const host = parsed.hostname.toLowerCase();
+      if (
+        !host ||
+        host === 'localhost' ||
+        host === '127.0.0.1' ||
+        host === '0.0.0.0' ||
+        host.endsWith('.local') ||
+        host.endsWith('.internal')
+      ) {
+        continue;
+      }
+      return parsed.origin.replace(/\/+$/, '');
+    } catch {
+      continue;
+    }
+  }
+  return '';
+}
+
+function replaceCanonicalSiteUrlPlugin(env: Record<string, string>): Plugin {
+  return {
+    name: 'replace-canonical-site-url',
+    transformIndexHtml(html) {
+      const configuredOrigin = resolvePublicSiteOrigin(env);
+      if (!configuredOrigin || configuredOrigin === DEFAULT_FALLBACK_SITE_ORIGIN) {
+        return html;
+      }
+      return html.split(DEFAULT_FALLBACK_SITE_ORIGIN).join(configuredOrigin);
+    },
+  };
+}
+
+function injectGoogleVerificationPlugin(env: Record<string, string>): Plugin {
   return {
     name: 'inject-google-site-verification',
     transformIndexHtml(html) {
       const token = (
-        process.env.VITE_GOOGLE_SITE_VERIFICATION ||
-        process.env.GOOGLE_SITE_VERIFICATION ||
+        env.VITE_GOOGLE_SITE_VERIFICATION ||
+        env.GOOGLE_SITE_VERIFICATION ||
         ''
       ).trim();
       if (!token) {
@@ -33,12 +81,14 @@ function injectGoogleVerificationPlugin(): Plugin {
   };
 }
 
-export default defineConfig(() => {
+export default defineConfig(({ mode }) => {
+  const env = { ...loadEnv(mode, process.cwd(), ''), ...process.env } as Record<string, string>;
   return {
     plugins: [
       react(),
       tailwindcss(),
-      injectGoogleVerificationPlugin(),
+      replaceCanonicalSiteUrlPlugin(env),
+      injectGoogleVerificationPlugin(env),
       VitePWA({
         registerType: 'autoUpdate',
         includeAssets: [
@@ -146,6 +196,49 @@ export default defineConfig(() => {
     resolve: {
       alias: {
         '@': path.resolve(import.meta.dirname, '.'),
+      },
+    },
+    build: {
+      chunkSizeWarningLimit: 900,
+      rollupOptions: {
+        output: {
+          manualChunks(id) {
+            if (!id.includes('node_modules')) return undefined;
+            if (id.includes('/react-dom/') || id.includes('/react/') || id.includes('/scheduler/')) {
+              return 'react-vendor';
+            }
+            if (id.includes('/firebase/') || id.includes('/@firebase/')) {
+              return 'firebase-vendor';
+            }
+            if (id.includes('/recharts/') || id.includes('/d3-') || id.includes('/victory-vendor/')) {
+              return 'charts-vendor';
+            }
+            if (id.includes('/pdfjs-dist/')) {
+              return 'pdfjs-vendor';
+            }
+            if (
+              id.includes('/pdf-lib/') ||
+              id.includes('/jspdf/') ||
+              id.includes('/@neslinesli93/qpdf-wasm/') ||
+              id.includes('/@pdfsmaller/pdf-encrypt-lite/')
+            ) {
+              return 'pdf-core';
+            }
+            if (id.includes('/xlsx/')) {
+              return 'office-xlsx';
+            }
+            if (id.includes('/docx/')) {
+              return 'office-docx';
+            }
+            if (id.includes('/jszip/') || id.includes('/mammoth/')) {
+              return 'office-docs';
+            }
+            if (id.includes('/tesseract.js/')) {
+              return 'ocr-vendor';
+            }
+            return undefined;
+          },
+        },
       },
     },
     server: {

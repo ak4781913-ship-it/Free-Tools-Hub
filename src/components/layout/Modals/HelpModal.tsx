@@ -1,5 +1,5 @@
-import React from 'react';
-import { X, HelpCircle, BookOpen, Compass, ExternalLink, ShieldCheck, Mail, ArrowRight } from 'lucide-react';
+import React, { useEffect } from 'react';
+import { X, HelpCircle, Compass, Mail } from 'lucide-react';
 import { useLanguage } from '../../../context/LanguageContext';
 
 interface HelpModalProps {
@@ -18,11 +18,22 @@ export const HelpModal: React.FC<HelpModalProps> = ({
   const { language } = useLanguage();
   const isUrdu = language === 'ur';
 
+  useEffect(() => {
+    if (!isOpen) return;
+    const handleEsc = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') {
+        onClose();
+      }
+    };
+    window.addEventListener('keydown', handleEsc);
+    return () => window.removeEventListener('keydown', handleEsc);
+  }, [isOpen, onClose]);
+
   if (!isOpen) return null;
 
   const faqs = [
     {
-      q: isUrdu ? 'کیا تمام ٹولز مفت ہیں؟' : 'Are all AbbasPro tools 100% free?',
+      q: isUrdu ? 'کیا تمام ٹولز مفت ہیں؟' : 'Are all MAWA FreeTools Hub tools 100% free?',
       a: isUrdu
         ? 'ہاں! تمام ٹولز بشمول سی وی بلڈر اور یو اے ای گریجویٹی بغیر کسی سبسکرپشن کے مفت ہیں۔'
         : 'Yes. All 28 tools run completely free in your browser with zero subscription or mandatory sign-up.',
@@ -34,7 +45,7 @@ export const HelpModal: React.FC<HelpModalProps> = ({
         : 'Everything executes client-side within your browser sandbox. None of your resume drafts, salary figures, or images are sent to external databases.',
     },
     {
-      q: isUrdu ? 'کیا میں آف لائن بھی کام کر سکتا ہوں؟' : 'Can I use AbbasPro offline?',
+      q: isUrdu ? 'کیا میں آف لائن بھی کام کر سکتا ہوں؟' : 'Can I use FreeTools Hub offline?',
       a: isUrdu
         ? 'جی ہاں، پروگریسو ویب ایپ (PWA) کے ذریعے زیادہ تر ٹولز آف لائن بھی کام کرتے ہیں۔'
         : 'Yes. With our built-in Progressive Web App (PWA) support, calculators, text tools, and offline engines work without an internet connection.',
@@ -89,13 +100,13 @@ export const HelpModal: React.FC<HelpModalProps> = ({
                 onClose();
                 onNavigateTo('/tools');
               }}
-              className="p-3 rounded-2xl border border-slate-200 dark:border-slate-800 bg-slate-50/60 dark:bg-slate-800/40 hover:bg-slate-100 text-left rtl:text-right transition-colors"
+              className="p-3 rounded-2xl border border-slate-200 dark:border-slate-800 bg-slate-50/60 dark:bg-slate-800/40 hover:bg-slate-100 dark:hover:bg-slate-800 text-start transition-colors cursor-pointer"
             >
               <Compass className="w-4 h-4 text-blue-600 mb-1" />
               <div className="text-xs font-bold text-slate-900 dark:text-white">
                 {isUrdu ? 'ٹولز ڈائرکٹری' : 'All 28 Tools'}
               </div>
-              <div className="text-[11px] text-slate-500">
+              <div className="text-[11px] text-slate-500 dark:text-slate-400">
                 {isUrdu ? 'تمام ٹولز کی فہرست' : 'Browse full directory'}
               </div>
             </button>
@@ -106,13 +117,13 @@ export const HelpModal: React.FC<HelpModalProps> = ({
                 onClose();
                 onOpenFeedback();
               }}
-              className="p-3 rounded-2xl border border-slate-200 dark:border-slate-800 bg-slate-50/60 dark:bg-slate-800/40 hover:bg-slate-100 text-left rtl:text-right transition-colors"
+              className="p-3 rounded-2xl border border-slate-200 dark:border-slate-800 bg-slate-50/60 dark:bg-slate-800/40 hover:bg-slate-100 dark:hover:bg-slate-800 text-start transition-colors cursor-pointer"
             >
               <Mail className="w-4 h-4 text-indigo-600 mb-1" />
               <div className="text-xs font-bold text-slate-900 dark:text-white">
                 {isUrdu ? 'رپورٹ یا فیڈ بیک' : 'Send Feedback'}
               </div>
-              <div className="text-[11px] text-slate-500">
+              <div className="text-[11px] text-slate-500 dark:text-slate-400">
                 {isUrdu ? 'نئے فیچر کی تجویز دیں' : 'Report an issue or idea'}
               </div>
             </button>
@@ -145,9 +156,9 @@ export const HelpModal: React.FC<HelpModalProps> = ({
               onClose();
               onNavigateTo('/about');
             }}
-            className="text-xs font-semibold text-blue-700 dark:text-blue-400 hover:underline"
+            className="text-xs font-semibold text-blue-700 dark:text-blue-400 hover:underline cursor-pointer"
           >
-            {isUrdu ? 'ہمارے بارے میں مزید پڑھیں' : 'About AbbasPro Architecture'}
+            {isUrdu ? 'ہمارے بارے میں مزید پڑھیں' : 'About MAWA Architecture'}
           </button>
 
           <button

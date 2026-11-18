@@ -717,7 +717,7 @@ export const ToolPageLayout: React.FC<ToolPageLayoutProps> = ({
                 type="button"
                 onClick={handleToggleReaderMode}
                 role="switch"
-                aria-checked={false}
+                aria-checked={isReaderMode}
                 title={
                   isUrdu
                     ? 'ریڈر موڈ: خلفشار سے پاک فوکس موڈ (Alt + R)'
@@ -962,9 +962,17 @@ export const ToolPageLayout: React.FC<ToolPageLayoutProps> = ({
                 </div>
               </div>
 
-              <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-emerald-50 dark:bg-emerald-950/40 text-emerald-700 dark:text-emerald-300 border border-emerald-200 dark:border-emerald-800 text-xs font-semibold self-start sm:self-auto">
-                <ShieldCheck className="w-3.5 h-3.5" />
-                <span>{tool.id === 'seo-page-analyzer' ? 'Read-Only Public HTML Fetch' : '100% Client-Side Private'}</span>
+              <div className="inline-flex items-center gap-1.5 text-emerald-700 dark:text-emerald-400 text-xs font-semibold self-start sm:self-auto shrink-0">
+                <ShieldCheck className="w-4 h-4 shrink-0" />
+                <span>
+                  {tool.id === 'seo-page-analyzer'
+                    ? isUrdu
+                      ? 'صرف عوامی HTML کی پڑھائی'
+                      : 'Read-Only Public HTML Fetch'
+                    : isUrdu
+                    ? '100% کلائنٹ سائیڈ پرائیویٹ'
+                    : '100% Client-Side Private'}
+                </span>
               </div>
             </div>
 
@@ -1050,7 +1058,7 @@ export const ToolPageLayout: React.FC<ToolPageLayoutProps> = ({
                       </span>
                       <span>{tip.title}</span>
                     </div>
-                    <p className="text-xs text-slate-600 dark:text-slate-400 leading-relaxed pl-6.5">
+                    <p className="text-xs text-slate-600 dark:text-slate-400 leading-relaxed ps-6.5">
                       {tip.desc}
                     </p>
                   </div>
@@ -1253,7 +1261,7 @@ export const ToolPageLayout: React.FC<ToolPageLayoutProps> = ({
           <button
             type="button"
             onClick={() => setShowToast(false)}
-            className="p-1 rounded-lg text-slate-400 hover:text-white hover:bg-slate-800 dark:hover:bg-slate-700 transition-colors shrink-0 cursor-pointer ml-auto"
+            className="p-1 rounded-lg text-slate-400 hover:text-white hover:bg-slate-800 dark:hover:bg-slate-700 transition-colors shrink-0 cursor-pointer ms-auto"
             aria-label={isUrdu ? 'نوٹیفکیشن بند کریں' : 'Dismiss notification'}
           >
             <X className="w-3.5 h-3.5" />

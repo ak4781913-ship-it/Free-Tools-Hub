@@ -93,6 +93,7 @@ const CALCULATOR_TOOL_IDS = new Set([
 const AI_PROMPT_TOOL_IDS = new Set([
   'gemini-photo-prompt',
   'ai-video-prompt',
+  'seo-meta-generator',
 ]);
 
 export const ToolsGrid: React.FC<ToolsGridProps> = ({

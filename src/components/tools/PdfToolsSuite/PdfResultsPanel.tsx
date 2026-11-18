@@ -3,7 +3,7 @@
  * SPDX-License-Identifier: Apache-2.0
  */
 
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import {
   Archive,
   Check,
@@ -41,6 +41,16 @@ export const PdfResultsPanel: React.FC<PdfResultsPanelProps> = ({
   const [expandedPdfUrl, setExpandedPdfUrl] = useState<string | null>(
     artifacts.length === 1 && artifacts[0].mimeType === 'application/pdf' ? artifacts[0].url : null
   );
+
+  useEffect(() => {
+    if (artifacts.length === 1 && artifacts[0].mimeType === 'application/pdf') {
+      setExpandedPdfUrl(artifacts[0].url);
+    } else {
+      setExpandedPdfUrl((prev) =>
+        prev && artifacts.some((a) => a.url === prev && a.mimeType === 'application/pdf') ? prev : null
+      );
+    }
+  }, [artifacts]);
 
   if (artifacts.length === 0 && !statusBanner && !compressionStats) {
     return null;
@@ -305,7 +315,7 @@ export const PdfResultsPanel: React.FC<PdfResultsPanelProps> = ({
                         {sheet.sheetName}
                       </div>
                       <div className="overflow-x-auto max-h-60">
-                        <table className="min-w-full text-xs text-left border-collapse">
+                        <table className="min-w-full text-xs text-start border-collapse">
                           <tbody>
                             {sheet.rows.slice(0, 15).map((row, rIdx) => (
                               <tr
@@ -319,7 +329,7 @@ export const PdfResultsPanel: React.FC<PdfResultsPanelProps> = ({
                                 {row.map((cell, cIdx) => (
                                   <td
                                     key={cIdx}
-                                    className="px-2.5 py-1.5 text-slate-700 dark:text-slate-300 border-r border-slate-100 dark:border-slate-800 last:border-r-0 max-w-[220px] truncate"
+                                    className="px-2.5 py-1.5 text-slate-700 dark:text-slate-300 border-e border-slate-100 dark:border-slate-800 last:border-e-0 max-w-[220px] truncate"
                                   >
                                     {cell}
                                   </td>

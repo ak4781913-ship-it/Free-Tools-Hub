@@ -321,6 +321,7 @@ async function normalizeImageToEmbeddable(
   const blob = new Blob([blobCopy.buffer], { type: 'image/webp' });
   const imgUrl = URL.createObjectURL(blob);
 
+  let canvas: HTMLCanvasElement | null = null;
   try {
     const img = await new Promise<HTMLImageElement>((resolve, reject) => {
       const el = new Image();
@@ -329,7 +330,7 @@ async function normalizeImageToEmbeddable(
       el.src = imgUrl;
     });
 
-    const canvas = document.createElement('canvas');
+    canvas = document.createElement('canvas');
     canvas.width = img.naturalWidth || img.width;
     canvas.height = img.naturalHeight || img.height;
     const ctx = canvas.getContext('2d');
@@ -337,11 +338,16 @@ async function normalizeImageToEmbeddable(
     ctx.drawImage(img, 0, 0);
 
     const pngBlob = await new Promise<Blob>((resolve, reject) => {
-      canvas.toBlob((b) => (b ? resolve(b) : reject(new Error('PNG conversion failed'))), 'image/png');
+      canvas!.toBlob((b) => (b ? resolve(b) : reject(new Error('PNG conversion failed'))), 'image/png');
     });
     const pngBytes = new Uint8Array(await pngBlob.arrayBuffer());
     return { bytes: pngBytes, type: 'png' };
   } finally {
+    if (canvas) {
+      canvas.width = 0;
+      canvas.height = 0;
+      canvas = null;
+    }
     URL.revokeObjectURL(imgUrl);
   }
 }

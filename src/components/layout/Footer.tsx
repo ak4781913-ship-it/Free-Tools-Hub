@@ -88,7 +88,7 @@ export const Footer: React.FC<FooterProps> = ({
                   onClick={(e) => handleLinkClick('/tools/cv-maker', e)}
                   className="hover:text-blue-700 dark:hover:text-blue-400 transition-colors"
                 >
-                  CV & Resume Generator
+                  {isUrdu ? 'سی وی اور ریزیومے جنریٹر' : 'CV & Resume Generator'}
                 </a>
               </li>
               <li>
@@ -97,7 +97,7 @@ export const Footer: React.FC<FooterProps> = ({
                   onClick={(e) => handleLinkClick('/tools/uae-salary-calculator', e)}
                   className="hover:text-blue-700 dark:hover:text-blue-400 transition-colors"
                 >
-                  UAE Salary Calculator
+                  {isUrdu ? 'یو اے ای سیلری کیلکولیٹر' : 'UAE Salary Calculator'}
                 </a>
               </li>
               <li>
@@ -106,7 +106,7 @@ export const Footer: React.FC<FooterProps> = ({
                   onClick={(e) => handleLinkClick('/tools/uae-gratuity-calculator', e)}
                   className="hover:text-blue-700 dark:hover:text-blue-400 transition-colors"
                 >
-                  UAE Gratuity Calculator
+                  {isUrdu ? 'یو اے ای گریجویٹی کیلکولیٹر' : 'UAE Gratuity Calculator'}
                 </a>
               </li>
               <li>
@@ -115,7 +115,7 @@ export const Footer: React.FC<FooterProps> = ({
                   onClick={(e) => handleLinkClick('/tools/ai-photo-prompt-generator', e)}
                   className="hover:text-blue-700 dark:hover:text-blue-400 transition-colors"
                 >
-                  AI Image Prompt Generator
+                  {isUrdu ? 'اے آئی فوٹو پرامپٹ جنریٹر' : 'AI Image Prompt Generator'}
                 </a>
               </li>
               <li>
@@ -124,7 +124,7 @@ export const Footer: React.FC<FooterProps> = ({
                   onClick={(e) => handleLinkClick('/tools/ai-video-prompt-generator', e)}
                   className="hover:text-blue-700 dark:hover:text-blue-400 transition-colors"
                 >
-                  AI Video Prompt Generator
+                  {isUrdu ? 'اے آئی ویڈیو پرامپٹ جنریٹر' : 'AI Video Prompt Generator'}
                 </a>
               </li>
               <li>
@@ -133,16 +133,17 @@ export const Footer: React.FC<FooterProps> = ({
                   onClick={(e) => handleLinkClick('/tools/pdf-tools-suite', e)}
                   className="hover:text-blue-700 dark:hover:text-blue-400 transition-colors"
                 >
-                  PDF Tools Suite (43 Tools)
+                  {isUrdu ? 'پی ڈی ایف ٹولز سوٹ (43 ٹولز)' : 'PDF Tools Suite (43 Tools)'}
                 </a>
               </li>
               <li>
                 <a
                   href="/tools"
                   onClick={(e) => handleLinkClick('/tools', e)}
-                  className="font-semibold text-blue-700 dark:text-blue-400 hover:underline"
+                  className="font-semibold text-blue-700 dark:text-blue-400 hover:underline inline-flex items-center gap-1"
                 >
-                  Browse All {TOOLS_LIST.length} Tools →
+                  <span>{isUrdu ? `تمام ${TOOLS_LIST.length} ٹولز دیکھیں` : `Browse All ${TOOLS_LIST.length} Tools`}</span>
+                  <span aria-hidden="true" className="rtl:inline-block rtl:rotate-180">→</span>
                 </a>
               </li>
             </ul>
@@ -160,7 +161,7 @@ export const Footer: React.FC<FooterProps> = ({
                   onClick={(e) => handleLinkClick('/tools/seo-page-analyzer', e)}
                   className="hover:text-blue-700 dark:hover:text-blue-400 transition-colors"
                 >
-                  SEO Page Analyzer
+                  {isUrdu ? 'ایس ای او پیج اینالائزر' : 'SEO Page Analyzer'}
                 </a>
               </li>
               <li>
@@ -169,7 +170,7 @@ export const Footer: React.FC<FooterProps> = ({
                   onClick={(e) => handleLinkClick('/tools/image-compressor', e)}
                   className="hover:text-blue-700 dark:hover:text-blue-400 transition-colors"
                 >
-                  Image Compressor
+                  {isUrdu ? 'امیج کمپریسر' : 'Image Compressor'}
                 </a>
               </li>
               <li>
@@ -178,7 +179,7 @@ export const Footer: React.FC<FooterProps> = ({
                   onClick={(e) => handleLinkClick('/tools/qr-code-generator', e)}
                   className="hover:text-blue-700 dark:hover:text-blue-400 transition-colors"
                 >
-                  QR Code Generator
+                  {isUrdu ? 'کیو آر کوڈ جنریٹر' : 'QR Code Generator'}
                 </a>
               </li>
               <li>
@@ -187,7 +188,7 @@ export const Footer: React.FC<FooterProps> = ({
                   onClick={(e) => handleLinkClick('/tools/json-formatter', e)}
                   className="hover:text-blue-700 dark:hover:text-blue-400 transition-colors"
                 >
-                  JSON Formatter & Validator
+                  {isUrdu ? 'جیسن فارمیٹر' : 'JSON Formatter & Validator'}
                 </a>
               </li>
               <li>
@@ -196,7 +197,7 @@ export const Footer: React.FC<FooterProps> = ({
                   onClick={(e) => handleLinkClick('/tools/loan-calculator', e)}
                   className="hover:text-blue-700 dark:hover:text-blue-400 transition-colors"
                 >
-                  Loan & EMI Calculator
+                  {isUrdu ? 'قرض و ای ایم آئی کیلکولیٹر' : 'Loan & EMI Calculator'}
                 </a>
               </li>
               <li>
@@ -205,7 +206,7 @@ export const Footer: React.FC<FooterProps> = ({
                   onClick={(e) => handleLinkClick('/tools/unit-converter', e)}
                   className="hover:text-blue-700 dark:hover:text-blue-400 transition-colors"
                 >
-                  Universal Unit Converter
+                  {isUrdu ? 'یونیورسل یونٹ کنورٹر' : 'Universal Unit Converter'}
                 </a>
               </li>
             </ul>
@@ -278,7 +279,7 @@ export const Footer: React.FC<FooterProps> = ({
 
         {/* Hairline divider & bottom bar */}
         <div className="mt-10 pt-6 border-t border-slate-200/80 dark:border-slate-800 flex flex-col md:flex-row items-center justify-between gap-4 text-xs text-slate-500 dark:text-slate-400">
-          <p>© {new Date().getFullYear()} NEXORA · FreeTools Hub. All rights reserved.</p>
+          <p>© {new Date().getFullYear()} MAWA · FreeTools Hub. {isUrdu ? 'جملہ حقوق محفوظ ہیں۔' : 'All rights reserved.'}</p>
 
           <div className="flex items-center gap-3 flex-wrap justify-center">
             {onStartTour && (
@@ -328,7 +329,7 @@ export const Footer: React.FC<FooterProps> = ({
                   className="hover:text-blue-700 dark:hover:text-blue-400 transition-colors cursor-pointer inline-flex items-center gap-1"
                 >
                   <Keyboard className="w-3.5 h-3.5" />
-                  <span>Shortcuts (?)</span>
+                  <span>{isUrdu ? 'کی بورڈ شارٹ کٹس (?)' : 'Shortcuts (?)'}</span>
                 </button>
               </>
             )}

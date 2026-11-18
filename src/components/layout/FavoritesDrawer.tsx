@@ -137,18 +137,10 @@ export const FavoritesDrawer: React.FC<FavoritesDrawerProps> = ({ onNavigate }) 
       />
 
       {/* Slide-over panel container */}
-      <div
-        className={`fixed inset-y-0 ${
-          isUrdu ? 'left-0' : 'right-0'
-        } w-full sm:max-w-md max-w-full flex`}
-      >
+      <div className="fixed inset-y-0 end-0 w-full sm:max-w-md max-w-full flex">
         <div
           ref={drawerRef}
-          className={`w-full max-w-full sm:max-w-md bg-white dark:bg-slate-900 shadow-2xl border-slate-200 dark:border-slate-800 flex flex-col h-full duration-250 ease-out ${
-            isUrdu
-              ? 'border-r animate-in slide-in-from-left'
-              : 'border-l animate-in slide-in-from-right'
-          }`}
+          className="w-full max-w-full sm:max-w-md bg-white dark:bg-slate-900 shadow-2xl border-s border-slate-200 dark:border-slate-800 flex flex-col h-full duration-250 ease-out ltr:animate-in ltr:slide-in-from-right rtl:animate-in rtl:slide-in-from-left"
         >
           {/* Drawer Header */}
           <div className="p-4 sm:p-5 border-b border-slate-200 dark:border-slate-800 flex items-center justify-between gap-2 min-w-0">
@@ -179,7 +171,7 @@ export const FavoritesDrawer: React.FC<FavoritesDrawerProps> = ({ onNavigate }) 
           {/* Search Bar */}
           <div className="p-3.5 border-b border-slate-100 dark:border-slate-800 bg-slate-50/70 dark:bg-slate-950/40">
             <div className="relative">
-              <Search className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 pointer-events-none" />
+              <Search className="w-4 h-4 absolute start-3 top-1/2 -translate-y-1/2 text-slate-400 pointer-events-none" />
               <input
                 type="text"
                 aria-label="Filter saved or recent tools"
@@ -192,14 +184,14 @@ export const FavoritesDrawer: React.FC<FavoritesDrawerProps> = ({ onNavigate }) 
                     ? 'ٹولز فلٹر کریں...'
                     : 'Filter tools...'
                 }
-                className="w-full pl-9 pr-9 py-2 text-xs bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl focus:outline-none focus:ring-2 focus:ring-indigo-500 text-slate-900 dark:text-white placeholder-slate-400"
+                className="w-full ps-9 pe-9 py-2 text-xs bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl focus:outline-none focus:ring-2 focus:ring-indigo-500 text-slate-900 dark:text-white placeholder-slate-400"
               />
               {searchQuery && (
                 <button
                   type="button"
                   aria-label="Clear filter query"
                   onClick={() => setSearchQuery('')}
-                  className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600"
+                  className="absolute end-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 cursor-pointer"
                 >
                   <X className="w-3.5 h-3.5" />
                 </button>
@@ -267,14 +259,17 @@ export const FavoritesDrawer: React.FC<FavoritesDrawerProps> = ({ onNavigate }) 
                     return (
                       <div
                         key={`drawer-fav-${tool.id}`}
-                        onClick={() => handleLaunch(tool.id)}
-                        className="group flex items-center justify-between gap-3 p-3 bg-white dark:bg-slate-800/60 rounded-xl border border-slate-200 dark:border-slate-800 hover:border-amber-400 dark:hover:border-amber-500 hover:shadow-xs transition-all cursor-pointer"
+                        className="group flex items-center justify-between gap-2 p-2.5 bg-white dark:bg-slate-800/60 rounded-xl border border-slate-200 dark:border-slate-800 hover:border-amber-400 dark:hover:border-amber-500 transition-colors"
                       >
-                        <div className="flex items-center gap-3 min-w-0">
+                        <button
+                          type="button"
+                          onClick={() => handleLaunch(tool.id)}
+                          className="flex items-center gap-3 min-w-0 flex-1 text-start cursor-pointer"
+                        >
                           <div className="w-9 h-9 rounded-lg bg-amber-50 dark:bg-amber-950/40 text-amber-600 dark:text-amber-400 flex items-center justify-center shrink-0">
                             <ToolIcon className="w-4 h-4" />
                           </div>
-                          <div className="min-w-0">
+                          <div className="min-w-0 flex-1">
                             <h4 className="text-xs font-bold text-slate-900 dark:text-white truncate group-hover:text-amber-600 dark:group-hover:text-amber-400 transition-colors">
                               {isUrdu ? tool.nameUrdu : tool.name}
                             </h4>
@@ -282,24 +277,26 @@ export const FavoritesDrawer: React.FC<FavoritesDrawerProps> = ({ onNavigate }) 
                               {isUrdu ? tool.categoryNameUrdu : tool.categoryName}
                             </p>
                           </div>
-                        </div>
+                        </button>
 
-                        <div className="flex items-center gap-1.5 shrink-0">
+                        <div className="flex items-center gap-1 shrink-0">
                           <button
                             type="button"
-                            onClick={(e) => {
-                              e.stopPropagation();
-                              removeFavorite(tool.id);
-                            }}
+                            onClick={() => removeFavorite(tool.id)}
                             title={isUrdu ? 'پسندیدہ سے ہٹائیں' : 'Unpin'}
                             aria-label={`Unpin ${tool.name}`}
-                            className="p-1.5 text-amber-500 hover:text-slate-400 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-700 transition-colors"
+                            className="p-1.5 text-amber-500 hover:text-slate-400 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-700 transition-colors cursor-pointer"
                           >
                             <Star className="w-4 h-4 fill-amber-400 text-amber-400" />
                           </button>
-                          <div className="p-1 text-slate-400 group-hover:text-indigo-600 dark:group-hover:text-indigo-400">
-                            <ArrowRight className="w-4 h-4 group-hover:translate-x-0.5 transition-transform" />
-                          </div>
+                          <button
+                            type="button"
+                            onClick={() => handleLaunch(tool.id)}
+                            aria-label={`Open ${tool.name}`}
+                            className="p-1 text-slate-400 group-hover:text-indigo-600 dark:group-hover:text-indigo-400 cursor-pointer"
+                          >
+                            <ArrowRight className="w-4 h-4 rtl:rotate-180 group-hover:translate-x-0.5 rtl:group-hover:-translate-x-0.5 transition-transform" />
+                          </button>
                         </div>
                       </div>
                     );
@@ -352,14 +349,17 @@ export const FavoritesDrawer: React.FC<FavoritesDrawerProps> = ({ onNavigate }) 
                       return (
                         <div
                           key={`drawer-rec-${tool.id}`}
-                          onClick={() => handleLaunch(tool.id)}
-                          className="group flex items-center justify-between gap-3 p-3 bg-white dark:bg-slate-800/60 rounded-xl border border-slate-200 dark:border-slate-800 hover:border-indigo-400 dark:hover:border-indigo-500 hover:shadow-xs transition-all cursor-pointer"
+                          className="group flex items-center justify-between gap-2 p-2.5 bg-white dark:bg-slate-800/60 rounded-xl border border-slate-200 dark:border-slate-800 hover:border-indigo-400 dark:hover:border-indigo-500 transition-colors"
                         >
-                          <div className="flex items-center gap-3 min-w-0">
+                          <button
+                            type="button"
+                            onClick={() => handleLaunch(tool.id)}
+                            className="flex items-center gap-3 min-w-0 flex-1 text-start cursor-pointer"
+                          >
                             <div className="w-9 h-9 rounded-lg bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 flex items-center justify-center shrink-0">
                               <ToolIcon className="w-4 h-4" />
                             </div>
-                            <div className="min-w-0">
+                            <div className="min-w-0 flex-1">
                               <h4 className="text-xs font-bold text-slate-900 dark:text-white truncate group-hover:text-indigo-600 dark:group-hover:text-indigo-400 transition-colors">
                                 {isUrdu ? tool.nameUrdu : tool.name}
                               </h4>
@@ -367,17 +367,14 @@ export const FavoritesDrawer: React.FC<FavoritesDrawerProps> = ({ onNavigate }) 
                                 {isUrdu ? tool.categoryNameUrdu : tool.categoryName}
                               </p>
                             </div>
-                          </div>
+                          </button>
 
-                          <div className="flex items-center gap-1.5 shrink-0">
+                          <div className="flex items-center gap-1 shrink-0">
                             <button
                               type="button"
                               aria-label={isFavorite(tool.id) ? `Unpin ${tool.name}` : `Pin ${tool.name}`}
-                              onClick={(e) => {
-                                e.stopPropagation();
-                                toggleFavorite(tool.id);
-                              }}
-                              className="p-1.5 text-slate-400 hover:text-amber-500 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-700 transition-colors"
+                              onClick={() => toggleFavorite(tool.id)}
+                              className="p-1.5 text-slate-400 hover:text-amber-500 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-700 transition-colors cursor-pointer"
                             >
                               <Star
                                 className={`w-4 h-4 ${
@@ -387,7 +384,14 @@ export const FavoritesDrawer: React.FC<FavoritesDrawerProps> = ({ onNavigate }) 
                                 }`}
                               />
                             </button>
-                            <ArrowRight className="w-4 h-4 text-slate-400 group-hover:text-indigo-600 dark:group-hover:text-indigo-400 group-hover:translate-x-0.5 transition-transform" />
+                            <button
+                              type="button"
+                              onClick={() => handleLaunch(tool.id)}
+                              aria-label={`Open ${tool.name}`}
+                              className="p-1 text-slate-400 group-hover:text-indigo-600 dark:group-hover:text-indigo-400 cursor-pointer"
+                            >
+                              <ArrowRight className="w-4 h-4 rtl:rotate-180 group-hover:translate-x-0.5 rtl:group-hover:-translate-x-0.5 transition-transform" />
+                            </button>
                           </div>
                         </div>
                       );
@@ -428,9 +432,10 @@ export const FavoritesDrawer: React.FC<FavoritesDrawerProps> = ({ onNavigate }) 
                       key={`drawer-all-${tool.id}`}
                       className="flex items-center justify-between gap-3 p-2.5 bg-white dark:bg-slate-800/40 rounded-xl border border-slate-200/80 dark:border-slate-800 hover:bg-slate-50 dark:hover:bg-slate-800/80 transition-colors"
                     >
-                      <div
+                      <button
+                        type="button"
                         onClick={() => handleLaunch(tool.id)}
-                        className="flex items-center gap-2.5 min-w-0 cursor-pointer flex-1"
+                        className="flex items-center gap-2.5 min-w-0 cursor-pointer flex-1 text-start"
                       >
                         <div className="w-8 h-8 rounded-lg bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 flex items-center justify-center shrink-0">
                           <ToolIcon className="w-4 h-4" />
@@ -443,7 +448,7 @@ export const FavoritesDrawer: React.FC<FavoritesDrawerProps> = ({ onNavigate }) 
                             {isUrdu ? tool.categoryNameUrdu : tool.categoryName}
                           </span>
                         </div>
-                      </div>
+                      </button>
 
                       <button
                         type="button"

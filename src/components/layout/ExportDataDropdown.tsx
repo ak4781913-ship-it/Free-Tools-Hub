@@ -80,7 +80,7 @@ export const ExportDataDropdown: React.FC<ExportDataDropdownProps> = ({
   };
 
   return (
-    <div className="relative inline-block text-left" ref={dropdownRef}>
+    <div className="relative inline-block text-start" ref={dropdownRef}>
       {/* Trigger Button */}
       <button
         type="button"
@@ -118,7 +118,7 @@ export const ExportDataDropdown: React.FC<ExportDataDropdownProps> = ({
           }`}
         >
           {/* Header */}
-          <div className="px-4 py-3 bg-slate-50 dark:bg-slate-850 border-b border-slate-100 dark:border-slate-800">
+          <div className="px-4 py-3 bg-slate-50 dark:bg-slate-800/70 border-b border-slate-100 dark:border-slate-800">
             <div className="flex items-center justify-between">
               <span className="text-xs font-bold text-slate-900 dark:text-white flex items-center gap-1.5">
                 <Download className="w-3.5 h-3.5 text-emerald-600 dark:text-emerald-400" />
@@ -193,7 +193,7 @@ export const ExportDataDropdown: React.FC<ExportDataDropdownProps> = ({
           </div>
 
           {/* Privacy Footer */}
-          <div className="px-3 py-2 bg-slate-50 dark:bg-slate-850/60 border-t border-slate-100 dark:border-slate-800/80 flex items-center gap-1.5 text-[10px] text-slate-500 dark:text-slate-400">
+          <div className="px-3 py-2 bg-slate-50 dark:bg-slate-800/60 border-t border-slate-100 dark:border-slate-800/80 flex items-center gap-1.5 text-[10px] text-slate-500 dark:text-slate-400">
             <ShieldCheck className="w-3.5 h-3.5 text-emerald-500 shrink-0" />
             <span>
               {isUrdu

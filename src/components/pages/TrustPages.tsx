@@ -162,10 +162,10 @@ export const TrustPageView: React.FC<TrustPageViewProps> = ({ page, onNavigateTo
             <header className="space-y-3 border-b border-slate-100 dark:border-slate-800 pb-6">
               <div className="inline-flex items-center gap-2 text-xs font-semibold text-blue-700 dark:text-blue-400">
                 <Info className="w-4 h-4" />
-                <span>NEXORA · FreeTools Hub Platform Overview</span>
+                <span>{isUrdu ? 'ماوا · فری ٹولز ہب پلیٹ فارم کا تعارف' : 'MAWA · FreeTools Hub Platform Overview'}</span>
               </div>
               <h1 className="text-2xl sm:text-3xl font-extrabold text-slate-900 dark:text-white tracking-tight">
-                {isUrdu ? 'فری ٹولز ہب کے بارے میں' : 'About FreeTools Hub by NEXORA'}
+                {isUrdu ? 'فری ٹولز ہب کے بارے میں' : 'About FreeTools Hub by MAWA'}
               </h1>
               <p className="text-sm sm:text-base text-slate-600 dark:text-slate-300 leading-relaxed max-w-3xl">
                 {isUrdu
@@ -210,7 +210,7 @@ export const TrustPageView: React.FC<TrustPageViewProps> = ({ page, onNavigateTo
               <h2 className="text-lg font-bold text-slate-900 dark:text-white">
                 What You Can Do on FreeTools Hub
               </h2>
-              <ul className="list-disc pl-5 space-y-2 text-xs sm:text-sm">
+              <ul className="list-disc ps-5 space-y-2 text-xs sm:text-sm">
                 <li>
                   <strong>Career & CV Preparation:</strong> Create ATS-readable resumes using structured templates with live A4 preview, JSON draft backup, and direct PDF export.
                 </li>
@@ -237,7 +237,7 @@ export const TrustPageView: React.FC<TrustPageViewProps> = ({ page, onNavigateTo
                 }}
                 className="px-4 py-2.5 rounded-lg bg-blue-700 hover:bg-blue-800 text-white text-xs font-semibold transition-colors"
               >
-                Explore All {TOOLS_LIST.length} Tools
+                {isUrdu ? `تمام ${TOOLS_LIST.length} ٹولز دیکھیں` : `Explore All ${TOOLS_LIST.length} Tools`}
               </a>
               <a
                 href="/contact"
@@ -249,7 +249,7 @@ export const TrustPageView: React.FC<TrustPageViewProps> = ({ page, onNavigateTo
                 }}
                 className="px-4 py-2.5 rounded-lg bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-800 dark:text-slate-200 text-xs font-semibold transition-colors"
               >
-                Contact or Report an Issue
+                {isUrdu ? 'رابطہ کریں یا مسئلہ رپورٹ کریں' : 'Contact or Report an Issue'}
               </a>
             </div>
           </article>
@@ -313,7 +313,7 @@ export const TrustPageView: React.FC<TrustPageViewProps> = ({ page, onNavigateTo
                       htmlFor="contact-name"
                       className="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1"
                     >
-                      Your Name *
+                      {isUrdu ? 'آپ کا نام *' : 'Your Name *'}
                     </label>
                     <input
                       id="contact-name"
@@ -321,7 +321,7 @@ export const TrustPageView: React.FC<TrustPageViewProps> = ({ page, onNavigateTo
                       required
                       value={contactForm.name}
                       onChange={(e) => setContactForm({ ...contactForm, name: e.target.value })}
-                      placeholder="Alex Khan"
+                      placeholder={isUrdu ? 'اپنا نام درج کریں' : 'Your Name'}
                       className="w-full px-3 py-2 text-sm rounded-lg border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-600"
                     />
                   </div>
@@ -331,7 +331,7 @@ export const TrustPageView: React.FC<TrustPageViewProps> = ({ page, onNavigateTo
                       htmlFor="contact-email"
                       className="block text-xs font-semibold text-slate-700 dark:text-slate-300 mb-1"
                     >
-                      Email Address *
+                      {isUrdu ? 'ای میل ایڈریس *' : 'Email Address *'}
                     </label>
                     <input
                       id="contact-email"
@@ -339,7 +339,7 @@ export const TrustPageView: React.FC<TrustPageViewProps> = ({ page, onNavigateTo
                       required
                       value={contactForm.email}
                       onChange={(e) => setContactForm({ ...contactForm, email: e.target.value })}
-                      placeholder="alex@example.com"
+                      placeholder="name@example.com"
                       className="w-full px-3 py-2 text-sm rounded-lg border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-600"
                     />
                   </div>
@@ -403,10 +403,10 @@ export const TrustPageView: React.FC<TrustPageViewProps> = ({ page, onNavigateTo
                 <span>Data Handling & Browser Storage Transparency</span>
               </div>
               <h1 className="text-2xl sm:text-3xl font-extrabold text-slate-900 dark:text-white tracking-tight">
-                Privacy Policy
+                {isUrdu ? 'رازداری کی پالیسی' : 'Privacy Policy'}
               </h1>
               <p className="text-xs text-slate-500">
-                Effective for NEXORA · FreeTools Hub Web Application
+                {isUrdu ? 'ماوا · فری ٹولز ہب ویب ایپلیکیشن کے لیے نافذ العمل' : 'Effective for MAWA · FreeTools Hub Web Application'}
               </p>
             </header>
 
@@ -426,7 +426,7 @@ export const TrustPageView: React.FC<TrustPageViewProps> = ({ page, onNavigateTo
               <p>
                 Certain optional features make standard network requests strictly to fulfill their stated function:
               </p>
-              <ul className="list-disc pl-5 space-y-1 text-xs sm:text-sm">
+              <ul className="list-disc ps-5 space-y-1 text-xs sm:text-sm">
                 <li>
                   <strong>SEO Page Analyzer (URL Mode):</strong> When you explicitly enter a public URL to audit, the application fetches that target webpage&apos;s public HTML headers and markup to analyze its meta tags.
                 </li>

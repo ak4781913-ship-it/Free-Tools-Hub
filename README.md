@@ -1,4 +1,4 @@
-# FreeTools Hub (Published by NEXORA)
+# FreeTools Hub (Published by MAWA)
 
 > Production-ready, privacy-first browser utilities suite featuring **28 core tools** (including a **43-tool PDF Tools Suite**) spanning Career & CV Generation, UAE Financial Calculators, Studio AI Prompt Architects, Developer Utilities, Media Processing, and Everyday Converters.
 
@@ -119,6 +119,8 @@ All 35 indexable canonical URLs (1 homepage + 6 static trust/directory pages + 2
 
 ---
 
-## 📄 License & Attribution
+## 📄 License, Compatibility & Attribution
 
-Published by **NEXORA** (`FreeTools Hub`). Released for public use under the Terms of Use published on the site.
+- **Local Storage Compatibility**: Returning users upgrading from earlier versions retain their collapsed-sidebar preference via a silent read/migration fallback (`abbaspro_sidebar_collapsed` → `freetools_hub_sidebar_collapsed`) in `src/App.tsx` and `src/services/userSyncService.ts`. No legacy brand strings appear anywhere in the public UI or SEO metadata.
+- Published by **MAWA** (`FreeTools Hub`). Released for public use under the Terms of Use published on the site.
+

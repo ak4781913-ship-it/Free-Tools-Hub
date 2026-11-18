@@ -8,10 +8,10 @@ import { TOOL_ROUTES, ToolRouteConfig, findToolBySlugOrId } from './toolsRouting
 
 export const DEFAULT_PRODUCTION_URL = 'https://freetoolshub1.netlify.app';
 export const SITE_NAME = 'FreeTools Hub';
-export const ORGANIZATION_NAME = 'NEXORA';
+export const ORGANIZATION_NAME = 'MAWA';
 export const ORGANIZATION_ALTERNATE_NAMES = [
   'FreeTools Hub',
-  'NEXORA FreeTools Hub',
+  'MAWA FreeTools Hub',
   'Free Tools Hub',
 ];
 
@@ -94,10 +94,10 @@ export const STATIC_PAGES_SEO: StaticPageSeoConfig[] = [
   {
     path: '/about',
     slug: 'about',
-    title: 'About FreeTools Hub – Privacy & Architecture | NEXORA',
-    description: 'Learn how NEXORA builds FreeTools Hub: fast, browser-based career, PDF, UAE financial, AI prompt, and developer tools with client-side privacy.',
-    h1: 'About FreeTools Hub by NEXORA',
-    summary: 'FreeTools Hub is engineered and published by NEXORA with a privacy-first client-side architecture so calculations, PDF processing, and document generation run locally in your browser.',
+    title: 'About FreeTools Hub – Privacy & Architecture | MAWA',
+    description: 'Learn how MAWA builds FreeTools Hub: fast, browser-based career, PDF, UAE financial, AI prompt, and developer tools with client-side privacy.',
+    h1: 'About FreeTools Hub by MAWA',
+    summary: 'FreeTools Hub is engineered and published by MAWA with a privacy-first client-side architecture so calculations, PDF processing, and document generation run locally in your browser.',
     schemaType: 'AboutPage',
     changefreq: 'monthly',
     priority: '0.7',
@@ -105,8 +105,8 @@ export const STATIC_PAGES_SEO: StaticPageSeoConfig[] = [
   {
     path: '/contact',
     slug: 'contact',
-    title: 'Contact & Support – FreeTools Hub | NEXORA',
-    description: 'Contact NEXORA / FreeTools Hub to report calculation issues, suggest new browser tools, or share technical feedback.',
+    title: 'Contact & Support – FreeTools Hub | MAWA',
+    description: 'Contact MAWA / FreeTools Hub to report calculation issues, suggest new browser tools, or share technical feedback.',
     h1: 'Contact FreeTools Hub & Support',
     summary: 'Have feedback, found a bug in a calculation or PDF workflow, or want to request a new productivity utility? Send your feedback directly to our engineering team.',
     schemaType: 'ContactPage',
@@ -127,7 +127,7 @@ export const STATIC_PAGES_SEO: StaticPageSeoConfig[] = [
   {
     path: '/terms',
     slug: 'terms',
-    title: 'Terms of Use – FreeTools Hub | NEXORA',
+    title: 'Terms of Use – FreeTools Hub | MAWA',
     description: 'Review the FreeTools Hub Terms of Use covering free personal and commercial usage, user output ownership, and acceptable conduct.',
     h1: 'Terms of Use',
     summary: 'By accessing FreeTools Hub, you agree to fair and lawful usage. All CVs, PDFs, prompts, and exported outputs generated on your device remain 100% your own property.',
