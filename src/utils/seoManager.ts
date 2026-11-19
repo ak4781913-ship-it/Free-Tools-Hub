@@ -14,8 +14,8 @@ import {
 } from '../data/seoRegistry';
 
 /**
- * Resolves the canonical public origin without ever stripping production domains
- * like freetoolshub1.netlify.app when VITE_SITE_URL is unset.
+ * Resolves the canonical public origin, rejecting preview/staging hosts (*.netlify.app, *.pages.dev, localhost)
+ * and falling back to DEFAULT_PRODUCTION_URL (https://freetools.mawa.blog) when VITE_SITE_URL is unset.
  */
 export function getVerifiedProductionBaseUrl(): string {
   const envUrl =

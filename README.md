@@ -55,7 +55,7 @@ Open [http://localhost:3000](http://localhost:3000) in your browser.
 | :--- | :--- |
 | `bun run dev` / `npm run dev` | Runs the full-stack dev server (`server.ts`) on port 3000 |
 | `bun run seo:generate` / `npm run seo:generate` | Regenerates `sitemap.xml`, `robots.txt`, `404.html`, `site.webmanifest`, `_redirects`, and syncs `netlify.toml` |
-| `bun run build` / `npm run build` | Generates SEO assets, builds Vite bundle, prerenders 35 HTML pages in `dist/`, and compiles `server.js` |
+| `bun run build` / `npm run build` | Generates SEO assets, builds Vite bundle, prerenders 68 HTML pages in `dist/`, and compiles `server.js` |
 | `bun run lint` / `npm run lint` | Runs TypeScript type checking (`tsc --noEmit`) across all files |
 | `bun run preview` / `npm run preview` | Runs Vite static preview on the compiled `dist/` bundle |
 | `bun run start` / `npm start` | Runs the compiled production Express server (`node server.js`) against `dist/` on `0.0.0.0:$PORT` |
@@ -78,7 +78,7 @@ FreeTools Hub is ready for **Hostinger Node.js 22 Web App Hosting** with `npm` a
 
 ## 🌐 Netlify Deployment & CI Workflow
 
-FreeTools Hub also supports **Netlify Git Integration** (`https://freetoolshub1.netlify.app/`), while GitHub Actions (`.github/workflows/deploy-netlify.yml`) runs **CI validation** (`bun install --frozen-lockfile`, `bun run lint`, `bun run build`, and SEO output checks) without triggering competing duplicate production deploys.
+FreeTools Hub also supports **Netlify Git Integration**, while GitHub Actions (`.github/workflows/deploy-netlify.yml`) runs **CI validation** (`bun install --frozen-lockfile`, `bun run lint`, `bun run build`, and SEO output checks) without triggering competing duplicate production deploys.
 
 ### Netlify Configuration (`netlify.toml`)
 - **Build command**: `bun run build`
@@ -86,7 +86,7 @@ FreeTools Hub also supports **Netlify Git Integration** (`https://freetoolshub1.
 - **Functions directory**: `netlify/functions`
 - **Pinned runtime**: `BUN_VERSION = "1.4.4"`, `NODE_VERSION = "22"`
 - **Environment variables** (under Netlify **Site configuration > Environment variables**):
-  - `VITE_SITE_URL`: `https://freetoolshub1.netlify.app`
+  - `VITE_SITE_URL`: `https://freetools.mawa.blog`
   - `VITE_GOOGLE_SITE_VERIFICATION`: Optional override token for Search Console verification
   - `VITE_CONTACT_EMAIL`: Optional owner support email
 
@@ -115,7 +115,7 @@ All `/api/analyze-seo` runtimes (`server.ts`/`server.js`, `netlify/functions/ana
 
 ## 🗂️ Single-Source Canonical Routing & Redirects
 
-All 35 indexable canonical URLs (1 homepage + 6 static trust/directory pages + 28 tools) and 38 legacy 301 alias redirects are defined once in `src/data/toolsRouting.ts` and `src/data/seoRegistry.ts`. Running `npm run seo:generate` or `npm run build` automatically synchronizes `netlify.toml`, `public/_redirects`, `dist/_redirects`, `sitemap.xml`, `robots.txt`, and `server.js`.
+All 68 indexable canonical URLs (1 homepage + 7 static trust/directory/guides index pages + 7 category hubs + 28 core tools + 15 dedicated PDF landing pages + 10 editorial guides) and legacy 301 alias redirects are defined once in `src/data/toolsRouting.ts`, `src/data/pdfLandingRoutes.ts`, `src/data/categorySeoData.ts`, `src/data/guidesData.ts`, and `src/data/seoRegistry.ts`. Running `npm run seo:generate` or `npm run build` automatically synchronizes `netlify.toml`, `public/_redirects`, `dist/_redirects`, `sitemap.xml`, `robots.txt`, and `server.js`.
 
 ---
 

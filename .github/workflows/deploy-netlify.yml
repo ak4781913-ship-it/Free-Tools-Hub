@@ -74,6 +74,10 @@ jobs:
           test -f dist/_redirects
           test -f dist/index.html
           test -f dist/tools/pdf-tools-suite.html
+          test -f dist/tools/merge-pdf.html
+          test -f dist/categories/uae-calculators.html
+          test -f dist/guides.html
+          test -f dist/guides/uae-gratuity-calculation-guide-2026.html
           test -f dist/about.html
 
       - name: Optional Manual Deploy to Netlify Production

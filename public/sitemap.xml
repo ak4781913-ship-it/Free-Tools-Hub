@@ -1,178 +1,343 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   <url>
-    <loc>https://freetoolshub1.netlify.app/</loc>
+    <loc>https://freetools.mawa.blog/</loc>
     <changefreq>weekly</changefreq>
     <priority>1.0</priority>
   </url>
   <url>
-    <loc>https://freetoolshub1.netlify.app/tools</loc>
+    <loc>https://freetools.mawa.blog/tools</loc>
     <changefreq>weekly</changefreq>
     <priority>0.9</priority>
   </url>
   <url>
-    <loc>https://freetoolshub1.netlify.app/about</loc>
+    <loc>https://freetools.mawa.blog/guides</loc>
+    <changefreq>weekly</changefreq>
+    <priority>0.85</priority>
+  </url>
+  <url>
+    <loc>https://freetools.mawa.blog/about</loc>
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
-    <loc>https://freetoolshub1.netlify.app/contact</loc>
+    <loc>https://freetools.mawa.blog/contact</loc>
     <changefreq>monthly</changefreq>
     <priority>0.7</priority>
   </url>
   <url>
-    <loc>https://freetoolshub1.netlify.app/privacy</loc>
+    <loc>https://freetools.mawa.blog/privacy</loc>
     <changefreq>yearly</changefreq>
     <priority>0.5</priority>
   </url>
   <url>
-    <loc>https://freetoolshub1.netlify.app/terms</loc>
+    <loc>https://freetools.mawa.blog/terms</loc>
     <changefreq>yearly</changefreq>
     <priority>0.5</priority>
   </url>
   <url>
-    <loc>https://freetoolshub1.netlify.app/disclaimer</loc>
+    <loc>https://freetools.mawa.blog/disclaimer</loc>
     <changefreq>yearly</changefreq>
     <priority>0.5</priority>
   </url>
   <url>
-    <loc>https://freetoolshub1.netlify.app/tools/cv-maker</loc>
+    <loc>https://freetools.mawa.blog/categories/ai-tools</loc>
+    <changefreq>weekly</changefreq>
+    <priority>0.85</priority>
+  </url>
+  <url>
+    <loc>https://freetools.mawa.blog/categories/career-cv</loc>
+    <changefreq>weekly</changefreq>
+    <priority>0.85</priority>
+  </url>
+  <url>
+    <loc>https://freetools.mawa.blog/categories/uae-calculators</loc>
+    <changefreq>weekly</changefreq>
+    <priority>0.85</priority>
+  </url>
+  <url>
+    <loc>https://freetools.mawa.blog/categories/photo-image</loc>
+    <changefreq>weekly</changefreq>
+    <priority>0.85</priority>
+  </url>
+  <url>
+    <loc>https://freetools.mawa.blog/categories/video-content</loc>
+    <changefreq>weekly</changefreq>
+    <priority>0.85</priority>
+  </url>
+  <url>
+    <loc>https://freetools.mawa.blog/categories/pdf-tools</loc>
+    <changefreq>weekly</changefreq>
+    <priority>0.85</priority>
+  </url>
+  <url>
+    <loc>https://freetools.mawa.blog/categories/other-utilities</loc>
+    <changefreq>weekly</changefreq>
+    <priority>0.85</priority>
+  </url>
+  <url>
+    <loc>https://freetools.mawa.blog/tools/cv-maker</loc>
     <changefreq>weekly</changefreq>
     <priority>0.9</priority>
   </url>
   <url>
-    <loc>https://freetoolshub1.netlify.app/tools/uae-gratuity-calculator</loc>
+    <loc>https://freetools.mawa.blog/tools/uae-gratuity-calculator</loc>
     <changefreq>weekly</changefreq>
     <priority>0.9</priority>
   </url>
   <url>
-    <loc>https://freetoolshub1.netlify.app/tools/uae-salary-calculator</loc>
+    <loc>https://freetools.mawa.blog/tools/uae-salary-calculator</loc>
     <changefreq>weekly</changefreq>
     <priority>0.9</priority>
   </url>
   <url>
-    <loc>https://freetoolshub1.netlify.app/tools/ai-photo-prompt-generator</loc>
+    <loc>https://freetools.mawa.blog/tools/ai-photo-prompt-generator</loc>
     <changefreq>weekly</changefreq>
     <priority>0.9</priority>
   </url>
   <url>
-    <loc>https://freetoolshub1.netlify.app/tools/ai-video-prompt-generator</loc>
+    <loc>https://freetools.mawa.blog/tools/ai-video-prompt-generator</loc>
     <changefreq>weekly</changefreq>
     <priority>0.9</priority>
   </url>
   <url>
-    <loc>https://freetoolshub1.netlify.app/tools/markdown-editor</loc>
+    <loc>https://freetools.mawa.blog/tools/markdown-editor</loc>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://freetoolshub1.netlify.app/tools/seo-page-analyzer</loc>
+    <loc>https://freetools.mawa.blog/tools/seo-page-analyzer</loc>
     <changefreq>weekly</changefreq>
     <priority>0.9</priority>
   </url>
   <url>
-    <loc>https://freetoolshub1.netlify.app/tools/seo-meta-generator</loc>
+    <loc>https://freetools.mawa.blog/tools/seo-meta-generator</loc>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://freetoolshub1.netlify.app/tools/word-counter</loc>
+    <loc>https://freetools.mawa.blog/tools/word-counter</loc>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://freetoolshub1.netlify.app/tools/text-case-converter</loc>
+    <loc>https://freetools.mawa.blog/tools/text-case-converter</loc>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://freetoolshub1.netlify.app/tools/image-compressor</loc>
+    <loc>https://freetools.mawa.blog/tools/image-compressor</loc>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://freetoolshub1.netlify.app/tools/qr-code-generator</loc>
+    <loc>https://freetools.mawa.blog/tools/qr-code-generator</loc>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://freetoolshub1.netlify.app/tools/color-picker</loc>
+    <loc>https://freetools.mawa.blog/tools/color-picker</loc>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://freetoolshub1.netlify.app/tools/loan-calculator</loc>
+    <loc>https://freetools.mawa.blog/tools/loan-calculator</loc>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://freetoolshub1.netlify.app/tools/currency-converter</loc>
+    <loc>https://freetools.mawa.blog/tools/currency-converter</loc>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://freetoolshub1.netlify.app/tools/crypto-converter</loc>
+    <loc>https://freetools.mawa.blog/tools/crypto-converter</loc>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://freetoolshub1.netlify.app/tools/percentage-calculator</loc>
+    <loc>https://freetools.mawa.blog/tools/percentage-calculator</loc>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://freetoolshub1.netlify.app/tools/discount-calculator</loc>
+    <loc>https://freetools.mawa.blog/tools/discount-calculator</loc>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://freetoolshub1.netlify.app/tools/unit-converter</loc>
+    <loc>https://freetools.mawa.blog/tools/unit-converter</loc>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://freetoolshub1.netlify.app/tools/password-generator</loc>
+    <loc>https://freetools.mawa.blog/tools/password-generator</loc>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://freetoolshub1.netlify.app/tools/password-strength</loc>
+    <loc>https://freetools.mawa.blog/tools/password-strength</loc>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://freetoolshub1.netlify.app/tools/age-calculator</loc>
+    <loc>https://freetools.mawa.blog/tools/age-calculator</loc>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://freetoolshub1.netlify.app/tools/date-difference</loc>
+    <loc>https://freetools.mawa.blog/tools/date-difference</loc>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://freetoolshub1.netlify.app/tools/bmi-calculator</loc>
+    <loc>https://freetools.mawa.blog/tools/bmi-calculator</loc>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://freetoolshub1.netlify.app/tools/timezone-converter</loc>
+    <loc>https://freetools.mawa.blog/tools/timezone-converter</loc>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://freetoolshub1.netlify.app/tools/json-formatter</loc>
+    <loc>https://freetools.mawa.blog/tools/json-formatter</loc>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://freetoolshub1.netlify.app/tools/base64-converter</loc>
+    <loc>https://freetools.mawa.blog/tools/base64-converter</loc>
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://freetoolshub1.netlify.app/tools/pdf-tools-suite</loc>
+    <loc>https://freetools.mawa.blog/tools/pdf-tools-suite</loc>
     <changefreq>weekly</changefreq>
     <priority>0.9</priority>
+  </url>
+  <url>
+    <loc>https://freetools.mawa.blog/tools/merge-pdf</loc>
+    <changefreq>weekly</changefreq>
+    <priority>0.85</priority>
+  </url>
+  <url>
+    <loc>https://freetools.mawa.blog/tools/compress-pdf</loc>
+    <changefreq>weekly</changefreq>
+    <priority>0.85</priority>
+  </url>
+  <url>
+    <loc>https://freetools.mawa.blog/tools/pdf-to-word</loc>
+    <changefreq>weekly</changefreq>
+    <priority>0.85</priority>
+  </url>
+  <url>
+    <loc>https://freetools.mawa.blog/tools/pdf-to-excel</loc>
+    <changefreq>weekly</changefreq>
+    <priority>0.85</priority>
+  </url>
+  <url>
+    <loc>https://freetools.mawa.blog/tools/pdf-to-jpg</loc>
+    <changefreq>weekly</changefreq>
+    <priority>0.85</priority>
+  </url>
+  <url>
+    <loc>https://freetools.mawa.blog/tools/jpg-to-pdf</loc>
+    <changefreq>weekly</changefreq>
+    <priority>0.85</priority>
+  </url>
+  <url>
+    <loc>https://freetools.mawa.blog/tools/split-pdf</loc>
+    <changefreq>weekly</changefreq>
+    <priority>0.85</priority>
+  </url>
+  <url>
+    <loc>https://freetools.mawa.blog/tools/pdf-to-png</loc>
+    <changefreq>weekly</changefreq>
+    <priority>0.85</priority>
+  </url>
+  <url>
+    <loc>https://freetools.mawa.blog/tools/protect-pdf</loc>
+    <changefreq>weekly</changefreq>
+    <priority>0.85</priority>
+  </url>
+  <url>
+    <loc>https://freetools.mawa.blog/tools/ocr-pdf</loc>
+    <changefreq>weekly</changefreq>
+    <priority>0.85</priority>
+  </url>
+  <url>
+    <loc>https://freetools.mawa.blog/tools/edit-pdf</loc>
+    <changefreq>weekly</changefreq>
+    <priority>0.85</priority>
+  </url>
+  <url>
+    <loc>https://freetools.mawa.blog/tools/word-to-pdf</loc>
+    <changefreq>weekly</changefreq>
+    <priority>0.85</priority>
+  </url>
+  <url>
+    <loc>https://freetools.mawa.blog/tools/excel-to-pdf</loc>
+    <changefreq>weekly</changefreq>
+    <priority>0.85</priority>
+  </url>
+  <url>
+    <loc>https://freetools.mawa.blog/tools/pdf-watermark</loc>
+    <changefreq>weekly</changefreq>
+    <priority>0.85</priority>
+  </url>
+  <url>
+    <loc>https://freetools.mawa.blog/tools/pdf-page-numbers</loc>
+    <changefreq>weekly</changefreq>
+    <priority>0.85</priority>
+  </url>
+  <url>
+    <loc>https://freetools.mawa.blog/guides/uae-gratuity-calculation-guide-2026</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://freetools.mawa.blog/guides/uae-salary-breakdown-basic-vs-allowances</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://freetools.mawa.blog/guides/how-to-build-ats-friendly-cv-uae-global</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://freetools.mawa.blog/guides/how-to-merge-split-compress-pdf-privately-in-browser</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://freetools.mawa.blog/guides/how-to-convert-pdf-to-word-or-excel-locally</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://freetools.mawa.blog/guides/how-to-ocr-scanned-pdfs-locally</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://freetools.mawa.blog/guides/how-to-protect-and-unlock-pdfs-safely</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://freetools.mawa.blog/guides/how-to-audit-webpage-on-page-seo</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://freetools.mawa.blog/guides/how-to-generate-strong-passwords-and-check-entropy</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
+    <loc>https://freetools.mawa.blog/guides/how-to-write-consistent-ai-image-and-video-prompts</loc>
+    <changefreq>monthly</changefreq>
+    <priority>0.8</priority>
   </url>
 </urlset>

@@ -10,7 +10,10 @@ import { FavoritesProvider, useFavorites } from './context/FavoritesContext';
 import { ToastProvider } from './context/ToastContext';
 import { AuthProvider } from './context/AuthContext';
 import { TOOLS_LIST } from './data/tools';
-import { findToolBySlugOrId, getToolPrimaryPath } from './data/toolsRouting';
+import { TOOL_ROUTES, ToolCategoryGroup, findToolBySlugOrId, getToolPrimaryPath } from './data/toolsRouting';
+import { findPdfLandingRoute } from './data/pdfLandingRoutes';
+import { findCategoryLandingBySlug, getCategoryLandingPath } from './data/categorySeoData';
+import { findGuideBySlug } from './data/guidesData';
 import { getRouteSeoForPath } from './data/seoRegistry';
 import { applyRouteSeo, getSiteBaseUrl } from './utils/seoManager';
 
@@ -56,6 +59,16 @@ const AccountModal = lazy(() =>
 // Dedicated Pages
 import { ToolsDirectoryPage } from './components/pages/ToolsDirectoryPage';
 import { TrustPageView, TrustPageType } from './components/pages/TrustPages';
+
+const CategoryLandingPage = lazy(() =>
+  import('./components/pages/CategoryLandingPage').then((m) => ({ default: m.CategoryLandingPage }))
+);
+const GuidesIndexPage = lazy(() =>
+  import('./components/pages/GuidesIndexPage').then((m) => ({ default: m.GuidesIndexPage }))
+);
+const GuideArticlePage = lazy(() =>
+  import('./components/pages/GuideArticlePage').then((m) => ({ default: m.GuideArticlePage }))
+);
 
 // Home & Modern Dashboard components
 import { WelcomeBanner } from './components/home/WelcomeBanner';
@@ -279,7 +292,8 @@ const MainApp: React.FC = () => {
     const initial = parseCurrentPath();
     if (initial.startsWith('/tools/') && initial !== '/tools') {
       const slug = initial.replace(/^\/tools\//, '');
-      const config = findToolBySlugOrId(slug);
+      const pdfLanding = findPdfLandingRoute(slug);
+      const config = pdfLanding ? TOOL_ROUTES['pdf-tools-suite'] : findToolBySlugOrId(slug);
       if (config) {
         logToolAccess(config.id);
         recordToolUseForDailyGoal(config.id);
@@ -367,7 +381,8 @@ const MainApp: React.FC = () => {
   useEffect(() => {
     if (currentPath.startsWith('/tools/') && currentPath !== '/tools') {
       const slug = currentPath.replace(/^\/tools\//, '');
-      const config = findToolBySlugOrId(slug);
+      const pdfLanding = findPdfLandingRoute(slug);
+      const config = pdfLanding ? TOOL_ROUTES['pdf-tools-suite'] : findToolBySlugOrId(slug);
       if (config) {
         addRecentTool(config.id);
       }
@@ -392,7 +407,8 @@ const MainApp: React.FC = () => {
 
       if (path.startsWith('/tools/') && path !== '/tools') {
         const slug = path.replace(/^\/tools\//, '');
-        const config = findToolBySlugOrId(slug);
+        const pdfLanding = findPdfLandingRoute(slug);
+        const config = pdfLanding ? TOOL_ROUTES['pdf-tools-suite'] : findToolBySlugOrId(slug);
         if (config) {
           addRecentTool(config.id);
           logToolAccess(config.id);
@@ -411,7 +427,7 @@ const MainApp: React.FC = () => {
 
   /**
    * Dedicated page navigation router:
-   * Supports "/", "/tools", "/about", "/contact", "/privacy", "/terms", "/tools/:slug", and legacy "tool:<id>"
+   * Supports "/", "/tools", "/categories/:slug", "/guides", "/guides/:slug", "/about", "/contact", "/privacy", "/terms", "/disclaimer", "/tools/:slug", PDF sub-tool paths, and legacy "tool:<id>"
    */
   const navigateTo = (pathOrId: string) => {
     let targetPath = '/';
@@ -428,13 +444,28 @@ const MainApp: React.FC = () => {
       targetPath = '/';
     } else if (cleanInput === '/tools' || cleanInput === 'tools') {
       targetPath = '/tools';
+    } else if (cleanInput === '/guides' || cleanInput === 'guides') {
+      targetPath = '/guides';
+    } else if (cleanInput.startsWith('/guides/')) {
+      const normalized = normalizeRoutePath(cleanInput);
+      const guideMatch = findGuideBySlug(normalized);
+      targetPath = guideMatch ? guideMatch.path : normalized;
+    } else if (cleanInput.startsWith('/categories/')) {
+      const normalized = normalizeRoutePath(cleanInput);
+      const catMatch = findCategoryLandingBySlug(normalized);
+      targetPath = catMatch ? catMatch.path : normalized;
     } else if (TRUST_PATHS.has(normalizeRoutePath(cleanInput))) {
       targetPath = normalizeRoutePath(cleanInput);
     } else if (cleanInput.startsWith('/tools/')) {
       const normalized = normalizeRoutePath(cleanInput);
       const slug = normalized.replace(/^\/tools\//, '');
-      const resolved = findToolBySlugOrId(slug);
-      targetPath = resolved ? resolved.primaryPath : normalized;
+      const pdfLanding = findPdfLandingRoute(slug);
+      if (pdfLanding) {
+        targetPath = pdfLanding.primaryPath;
+      } else {
+        const resolved = findToolBySlugOrId(slug);
+        targetPath = resolved ? resolved.primaryPath : normalized;
+      }
     } else if (cleanInput.startsWith('tool:')) {
       const id = cleanInput.replace('tool:', '');
       targetPath = getToolPrimaryPath(id);
@@ -445,11 +476,16 @@ const MainApp: React.FC = () => {
       if (resolved) {
         targetPath = resolved.primaryPath;
       } else {
-        targetPath = normalizeRoutePath(cleanInput.startsWith('/') ? cleanInput : `/tools/${cleanInput}`);
+        const pdfLanding = findPdfLandingRoute(cleanInput);
+        targetPath = pdfLanding
+          ? pdfLanding.primaryPath
+          : normalizeRoutePath(cleanInput.startsWith('/') ? cleanInput : `/tools/${cleanInput}`);
       }
     }
 
-    const fullUrl = targetPath === '/tools' && targetQuery ? `${targetPath}${targetQuery}` : targetPath;
+    const shouldPreserveQuery =
+      (targetPath === '/tools' || targetPath === '/tools/pdf-tools-suite') && Boolean(targetQuery);
+    const fullUrl = shouldPreserveQuery ? `${targetPath}${targetQuery}` : targetPath;
     if (targetPath === '/tools') {
       try {
         const params = new URLSearchParams(targetQuery);
@@ -479,7 +515,8 @@ const MainApp: React.FC = () => {
 
     if (targetPath.startsWith('/tools/') && targetPath !== '/tools') {
       const slug = targetPath.replace(/^\/tools\//, '');
-      const config = findToolBySlugOrId(slug);
+      const pdfLanding = findPdfLandingRoute(slug);
+      const config = pdfLanding ? TOOL_ROUTES['pdf-tools-suite'] : findToolBySlugOrId(slug);
       if (config) {
         addRecentTool(config.id);
         logToolAccess(config.id);
@@ -609,33 +646,60 @@ const MainApp: React.FC = () => {
     : null;
 
   const isDirectoryPage = currentPath === '/tools';
+  const isGuidesIndexPage = currentPath === '/guides';
+  const isGuideDetailPage = currentPath.startsWith('/guides/') && currentPath !== '/guides';
+  const activeGuide = isGuideDetailPage ? findGuideBySlug(currentPath) : null;
+  const isCategoryPage = currentPath.startsWith('/categories/') && currentPath !== '/categories';
+  const activeCategory = isCategoryPage ? findCategoryLandingBySlug(currentPath) : null;
+
   const isToolPage = currentPath.startsWith('/tools/') && currentPath !== '/tools';
   const isReaderModeActive = isReaderMode && isToolPage;
   const toolSlug = isToolPage ? currentPath.replace(/^\/tools\//, '') : null;
-  const activeRouteConfig = toolSlug ? findToolBySlugOrId(toolSlug) : null;
+  const activePdfLanding = toolSlug ? findPdfLandingRoute(toolSlug) : null;
+  const activeRouteConfig = activePdfLanding
+    ? TOOL_ROUTES['pdf-tools-suite']
+    : toolSlug
+    ? findToolBySlugOrId(toolSlug)
+    : null;
   const activeToolDef = activeRouteConfig ? TOOLS_LIST.find((t) => t.id === activeRouteConfig.id) : null;
 
   const isNotFound =
     currentPath !== '/' &&
     !isDirectoryPage &&
     !isTrustPage &&
+    !isGuidesIndexPage &&
+    !activeGuide &&
+    !activeCategory &&
     (!activeToolDef || !activeRouteConfig);
 
   // Canonicalize legacy client-side alias paths (e.g., #/tools/qr-generator -> /tools/qr-code-generator)
   useEffect(() => {
-    if (isToolPage && activeRouteConfig && currentPath !== activeRouteConfig.primaryPath) {
+    if (isToolPage && activePdfLanding && currentPath !== activePdfLanding.primaryPath) {
+      try {
+        window.history.replaceState({ path: activePdfLanding.primaryPath }, '', activePdfLanding.primaryPath);
+        setCurrentPath(activePdfLanding.primaryPath);
+      } catch {}
+      return;
+    }
+    if (isToolPage && !activePdfLanding && activeRouteConfig && currentPath !== activeRouteConfig.primaryPath) {
       try {
         window.history.replaceState({ path: activeRouteConfig.primaryPath }, '', activeRouteConfig.primaryPath);
         setCurrentPath(activeRouteConfig.primaryPath);
       } catch {}
     }
-  }, [isToolPage, activeRouteConfig, currentPath]);
+  }, [isToolPage, activePdfLanding, activeRouteConfig, currentPath]);
 
   // Centralized Technical SEO (Title, Meta Description, Canonical, Robots, OpenGraph, Twitter, JSON-LD)
   useEffect(() => {
     const siteBaseUrl = getSiteBaseUrl();
     const seoTargetPath = isNotFound
       ? '/404'
+      : activePdfLanding
+      ? activePdfLanding.primaryPath
+      : activeCategory
+      ? activeCategory.path
+      : activeGuide
+      ? activeGuide.path
       : isToolPage && activeRouteConfig
       ? activeRouteConfig.primaryPath
       : currentPath;
@@ -649,7 +713,7 @@ const MainApp: React.FC = () => {
       ogType: resolvedSeo.ogType,
       jsonLd: resolvedSeo.jsonLd,
     });
-  }, [currentPath, isToolPage, activeRouteConfig, isNotFound]);
+  }, [currentPath, isToolPage, activePdfLanding, activeCategory, activeGuide, activeRouteConfig, isNotFound]);
 
   const toggleReaderMode = () => {
     setIsReaderMode((prev) => {
@@ -727,7 +791,9 @@ const MainApp: React.FC = () => {
 
               {/* 4. Tool Category Cards Section */}
               <CategoryCardsSection
-                onSelectCategory={(categoryId) => navigateTo(`/tools?category=${categoryId}`)}
+                onSelectCategory={(categoryId) =>
+                  navigateTo(getCategoryLandingPath(categoryId as ToolCategoryGroup))
+                }
                 onViewAllTools={() => navigateTo('/tools')}
               />
 
@@ -787,11 +853,32 @@ const MainApp: React.FC = () => {
             <TrustPageView page={activeTrustPage} onNavigateTo={navigateTo} />
           )}
 
-        {/* Route 4: Dedicated Individual Tool Pages ("/tools/:slug") */}
+          {/* Route 3b: Dedicated Category Landing Pages ("/categories/:slug") */}
+          {activeCategory && (
+            <Suspense fallback={<ToolWorkspaceSkeleton />}>
+              <CategoryLandingPage category={activeCategory} onNavigateTo={navigateTo} />
+            </Suspense>
+          )}
+
+          {/* Route 3c: Editorial Guides Hub ("/guides") & Individual Articles ("/guides/:slug") */}
+          {isGuidesIndexPage && (
+            <Suspense fallback={<ToolWorkspaceSkeleton />}>
+              <GuidesIndexPage onNavigateTo={navigateTo} />
+            </Suspense>
+          )}
+
+          {activeGuide && (
+            <Suspense fallback={<ToolWorkspaceSkeleton />}>
+              <GuideArticlePage guide={activeGuide} onNavigateTo={navigateTo} />
+            </Suspense>
+          )}
+
+        {/* Route 4: Dedicated Individual Tool & PDF Landing Pages ("/tools/:slug") */}
         {isToolPage && activeToolDef && activeRouteConfig && (
           <ToolPageLayout
             tool={activeToolDef}
             routeConfig={activeRouteConfig}
+            pdfLanding={activePdfLanding}
             onNavigateTo={navigateTo}
             isReaderMode={isReaderModeActive}
             onToggleReaderMode={toggleReaderMode}
@@ -824,7 +911,13 @@ const MainApp: React.FC = () => {
               {activeToolDef.id === 'json-formatter' && <JsonFormatterTool />}
               {activeToolDef.id === 'base64-converter' && <Base64ConverterTool />}
               {activeToolDef.id === 'color-picker' && <ColorPickerTool />}
-              {activeToolDef.id === 'pdf-tools-suite' && <PdfToolsSuiteTool />}
+              {activeToolDef.id === 'pdf-tools-suite' && (
+                <PdfToolsSuiteTool
+                  initialSubToolId={activePdfLanding?.subToolId ?? null}
+                  landingConfig={activePdfLanding}
+                  onNavigateTo={navigateTo}
+                />
+              )}
             </Suspense>
           </ToolPageLayout>
         )}

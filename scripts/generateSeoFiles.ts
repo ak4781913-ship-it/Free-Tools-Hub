@@ -19,6 +19,9 @@ import {
 } from '../src/data/seoRegistry';
 import { TOOLS_LIST } from '../src/data/tools';
 import { TOOL_ROUTES } from '../src/data/toolsRouting';
+import { PDF_LANDING_ROUTES } from '../src/data/pdfLandingRoutes';
+import { CATEGORY_LANDINGS } from '../src/data/categorySeoData';
+import { EDITORIAL_GUIDES } from '../src/data/guidesData';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -63,6 +66,7 @@ const TOOL_SOURCE_PATHS: Record<string, string[]> = {
 const STATIC_PAGE_SOURCE_PATHS: Record<string, string[]> = {
   '/': ['src/App.tsx', 'src/components/home', 'src/data/seoRegistry.ts'],
   '/tools': ['src/components/pages/ToolsDirectoryPage.tsx', 'src/data/tools.ts', 'src/data/toolsRouting.ts'],
+  '/guides': ['src/components/pages/GuidesIndexPage.tsx', 'src/data/guidesData.ts'],
   '/about': ['src/components/pages/TrustPages.tsx'],
   '/contact': ['src/components/pages/TrustPages.tsx'],
   '/privacy': ['src/components/pages/TrustPages.tsx'],
@@ -123,6 +127,27 @@ export function resolveRouteLastmodMap(): Map<string, string> {
         result.set(route.primaryPath, dateStr);
       }
     }
+
+    const pdfSuiteDate = queryLastmodForPaths(['src/data/pdfLandingRoutes.ts', 'src/components/tools/PdfToolsSuite']);
+    if (pdfSuiteDate) {
+      for (const pdfRoute of PDF_LANDING_ROUTES) {
+        result.set(pdfRoute.primaryPath, pdfSuiteDate);
+      }
+    }
+
+    const catDate = queryLastmodForPaths(['src/data/categorySeoData.ts', 'src/components/pages/CategoryLandingPage.tsx']);
+    if (catDate) {
+      for (const cat of CATEGORY_LANDINGS) {
+        result.set(cat.path, catDate);
+      }
+    }
+
+    const guideDate = queryLastmodForPaths(['src/data/guidesData.ts', 'src/components/pages/GuideArticlePage.tsx']);
+    if (guideDate) {
+      for (const guide of EDITORIAL_GUIDES) {
+        result.set(guide.path, guideDate);
+      }
+    }
   } catch {
     // Git not available in container environment — omit lastmod rather than fabricating build timestamps.
   }
@@ -135,9 +160,8 @@ export function resolveBuildBaseUrl(): string {
   const candidates = [
     process.env.VITE_SITE_URL,
     process.env.SITE_URL,
-    process.env.URL, // Automatically set by Netlify during production builds
-    process.env.DEPLOY_PRIME_URL,
     process.env.APP_URL,
+    process.env.URL,
   ];
   for (const candidate of candidates) {
     const sanitized = sanitizePublicOrigin(candidate);
@@ -146,7 +170,7 @@ export function resolveBuildBaseUrl(): string {
   if (!hasWarnedFallbackBaseUrl) {
     hasWarnedFallbackBaseUrl = true;
     console.warn(
-      `[SEO Warning] VITE_SITE_URL (or SITE_URL/URL/APP_URL) is not set. Falling back to ${DEFAULT_PRODUCTION_URL}. For Hostinger or custom domains, set VITE_SITE_URL before running npm run build.`
+      `[SEO Warning] VITE_SITE_URL (or SITE_URL/APP_URL) is not set or points to a preview host. Falling back to ${DEFAULT_PRODUCTION_URL}.`
     );
   }
   return DEFAULT_PRODUCTION_URL;
@@ -304,6 +328,7 @@ export function build404Html(baseUrl: string): string {
         </p>
         <div class="actions">
           <a class="btn btn-pri" href="/tools">Browse All ${TOOLS_LIST.length} Tools</a>
+          <a class="btn btn-sec" href="/guides">Browse Guides</a>
           <a class="btn btn-sec" href="/">Back to Homepage</a>
         </div>
         <nav class="links" aria-label="Popular Tools">
@@ -355,6 +380,44 @@ export function buildWebManifestJson(): string {
   return `${JSON.stringify(manifest, null, 2)}\n`;
 }
 
+function getAllAliasRedirectPairs(): { from: string; to: string }[] {
+  const pairs: { from: string; to: string }[] = [];
+  for (const route of Object.values(TOOL_ROUTES)) {
+    for (const alias of route.aliases) {
+      if (alias === route.primarySlug) continue;
+      pairs.push({ from: `/tools/${alias}`, to: route.primaryPath });
+    }
+  }
+  for (const pdfRoute of PDF_LANDING_ROUTES) {
+    for (const alias of pdfRoute.aliases) {
+      if (alias === pdfRoute.primarySlug) continue;
+      pairs.push({ from: `/tools/${alias}`, to: pdfRoute.primaryPath });
+    }
+  }
+  return pairs;
+}
+
+function getAllPublicSubroutes(): { routePath: string; flatHtmlPath: string }[] {
+  const items: { routePath: string; flatHtmlPath: string }[] = [];
+  const subStaticPages = STATIC_PAGES_SEO.filter((p) => p.slug !== '');
+  for (const page of subStaticPages) {
+    items.push({ routePath: page.path, flatHtmlPath: `/${page.slug}.html` });
+  }
+  for (const cat of CATEGORY_LANDINGS) {
+    items.push({ routePath: cat.path, flatHtmlPath: `/categories/${cat.slug}.html` });
+  }
+  for (const route of Object.values(TOOL_ROUTES)) {
+    items.push({ routePath: route.primaryPath, flatHtmlPath: `/tools/${route.primarySlug}.html` });
+  }
+  for (const pdfRoute of PDF_LANDING_ROUTES) {
+    items.push({ routePath: pdfRoute.primaryPath, flatHtmlPath: `/tools/${pdfRoute.primarySlug}.html` });
+  }
+  for (const guide of EDITORIAL_GUIDES) {
+    items.push({ routePath: guide.path, flatHtmlPath: `/guides/${guide.slug}.html` });
+  }
+  return items;
+}
+
 export function buildRedirectsTxt(): string {
   const aliasLines: string[] = [
     `# ${ORGANIZATION_NAME} · ${SITE_NAME} - Generated Single-Source-of-Truth Routing Rules`,
@@ -362,28 +425,19 @@ export function buildRedirectsTxt(): string {
     '# 1. 301 Permanent Redirects for Legacy Tool Aliases',
   ];
 
-  for (const route of Object.values(TOOL_ROUTES)) {
-    for (const alias of route.aliases) {
-      if (alias === route.primarySlug) continue;
-      aliasLines.push(`/tools/${alias}  ${route.primaryPath}  301!`);
-    }
+  for (const pair of getAllAliasRedirectPairs()) {
+    aliasLines.push(`${pair.from}  ${pair.to}  301!`);
   }
 
   aliasLines.push('', '# 2. 301 Trailing-Slash Canonicalization for Public Subpages');
-  const subStaticPages = STATIC_PAGES_SEO.filter((p) => p.slug !== '');
-  for (const page of subStaticPages) {
-    aliasLines.push(`${page.path}/  ${page.path}  301!`);
-  }
-  for (const route of Object.values(TOOL_ROUTES)) {
-    aliasLines.push(`${route.primaryPath}/  ${route.primaryPath}  301!`);
+  const publicSubroutes = getAllPublicSubroutes();
+  for (const item of publicSubroutes) {
+    aliasLines.push(`${item.routePath}/  ${item.routePath}  301!`);
   }
 
   aliasLines.push('', '# 3. 200 OK Direct Serves for Prerendered Flat HTML Subpages');
-  for (const page of subStaticPages) {
-    aliasLines.push(`${page.path}  /${page.slug}.html  200!`);
-  }
-  for (const route of Object.values(TOOL_ROUTES)) {
-    aliasLines.push(`${route.primaryPath}  /tools/${route.primarySlug}.html  200!`);
+  for (const item of publicSubroutes) {
+    aliasLines.push(`${item.routePath}  ${item.flatHtmlPath}  200!`);
   }
 
   aliasLines.push(
@@ -404,37 +458,24 @@ export function buildNetlifyRedirectsSection(): string {
     '# 1. 301 Permanent Redirects for legacy tool aliases',
   ];
 
-  for (const route of Object.values(TOOL_ROUTES)) {
-    for (const alias of route.aliases) {
-      if (alias === route.primarySlug) continue;
-      blocks.push(
-        `[[redirects]]`,
-        `  from = "/tools/${alias}"`,
-        `  to = "${route.primaryPath}"`,
-        `  status = 301`,
-        `  force = true`,
-        ''
-      );
-    }
-  }
-
-  blocks.push('# 2. 301 Trailing-Slash Canonicalization for Public Subpages');
-  const subStaticPages = STATIC_PAGES_SEO.filter((p) => p.slug !== '');
-  for (const page of subStaticPages) {
+  for (const pair of getAllAliasRedirectPairs()) {
     blocks.push(
       `[[redirects]]`,
-      `  from = "${page.path}/"`,
-      `  to = "${page.path}"`,
+      `  from = "${pair.from}"`,
+      `  to = "${pair.to}"`,
       `  status = 301`,
       `  force = true`,
       ''
     );
   }
-  for (const route of Object.values(TOOL_ROUTES)) {
+
+  blocks.push('# 2. 301 Trailing-Slash Canonicalization for Public Subpages');
+  const publicSubroutes = getAllPublicSubroutes();
+  for (const item of publicSubroutes) {
     blocks.push(
       `[[redirects]]`,
-      `  from = "${route.primaryPath}/"`,
-      `  to = "${route.primaryPath}"`,
+      `  from = "${item.routePath}/"`,
+      `  to = "${item.routePath}"`,
       `  status = 301`,
       `  force = true`,
       ''
@@ -452,21 +493,11 @@ export function buildNetlifyRedirectsSection(): string {
   );
 
   blocks.push('# 4. Direct 200 OK serves for prerendered flat HTML subpages (eliminates folder 301 redirects)');
-  for (const page of subStaticPages) {
+  for (const item of publicSubroutes) {
     blocks.push(
       `[[redirects]]`,
-      `  from = "${page.path}"`,
-      `  to = "/${page.slug}.html"`,
-      `  status = 200`,
-      `  force = true`,
-      ''
-    );
-  }
-  for (const route of Object.values(TOOL_ROUTES)) {
-    blocks.push(
-      `[[redirects]]`,
-      `  from = "${route.primaryPath}"`,
-      `  to = "/tools/${route.primarySlug}.html"`,
+      `  from = "${item.routePath}"`,
+      `  to = "${item.flatHtmlPath}"`,
       `  status = 200`,
       `  force = true`,
       ''

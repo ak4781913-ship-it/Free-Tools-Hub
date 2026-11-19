@@ -378,7 +378,7 @@ async function startServer() {
   const isProduction =
     process.env.NODE_ENV === 'production' ||
     process.env.npm_lifecycle_event === 'start' ||
-    (isCompiledServerJs && process.env.NODE_ENV !== 'development');
+    (isCompiledServerJs && process.env.FORCE_VITE_DEV !== 'true');
 
   // Common iframe- & popup-safe security headers
   app.use((_req, res, next) => {

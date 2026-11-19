@@ -484,7 +484,7 @@ export const TOOL_ROUTES: Record<string, ToolRouteConfig> = {
     id: 'pdf-tools-suite',
     primarySlug: 'pdf-tools-suite',
     primaryPath: '/tools/pdf-tools-suite',
-    aliases: ['pdf-tools-suite', 'pdf-tools', 'pdf-suite', 'pdf-editor', 'pdf-converter'],
+    aliases: ['pdf-tools-suite', 'pdf-tools', 'pdf-suite', 'pdf-converter'],
     categoryGroup: 'pdf-tools',
     categoryGroupLabel: 'PDF Tools Suite',
     categoryGroupLabelUrdu: 'پی ڈی ایف ٹولز سوٹ',

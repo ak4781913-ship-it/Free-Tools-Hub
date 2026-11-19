@@ -25,6 +25,14 @@ import {
 import { PDF_SUITE_TEXT } from './pdfSuiteTranslations';
 import { PdfIcon } from './PdfIcon';
 import { PdfToolWorkspace } from './PdfToolWorkspace';
+import {
+  PDF_LANDING_ROUTES,
+  PdfLandingRouteConfig,
+} from '../../../data/pdfLandingRoutes';
+
+const LANDING_BY_SUBTOOL_ID = new Map<PdfSubToolId, PdfLandingRouteConfig>(
+  PDF_LANDING_ROUTES.map((route) => [route.subToolId, route])
+);
 
 function readSubToolFromUrl(): PdfSubToolId | null {
   if (typeof window === 'undefined') return null;
@@ -35,38 +43,84 @@ function readSubToolFromUrl(): PdfSubToolId | null {
   return match ? match.id : null;
 }
 
-export const PdfToolsSuiteTool: React.FC = () => {
+export interface PdfToolsSuiteToolProps {
+  initialSubToolId?: PdfSubToolId | null;
+  landingConfig?: PdfLandingRouteConfig | null;
+  onNavigateTo?: (path: string) => void;
+}
+
+export const PdfToolsSuiteTool: React.FC<PdfToolsSuiteToolProps> = ({
+  initialSubToolId = null,
+  landingConfig = null,
+  onNavigateTo,
+}) => {
   const { language } = useLanguage();
   const isUrdu = language === 'ur';
   const t = isUrdu ? PDF_SUITE_TEXT.ur : PDF_SUITE_TEXT.en;
 
-  const [activeToolId, setActiveToolId] = useState<PdfSubToolId | null>(() => readSubToolFromUrl());
+  const [activeToolId, setActiveToolId] = useState<PdfSubToolId | null>(
+    () => initialSubToolId ?? readSubToolFromUrl()
+  );
   const [selectedCategory, setSelectedCategory] = useState<PdfCategoryId | 'all'>('all');
   const [searchQuery, setSearchQuery] = useState('');
   const [showQuickSwitcher, setShowQuickSwitcher] = useState(false);
 
-  // Sync sub-tool selection with `?tool=` query param (preserves /tools/pdf-tools-suite canonical path)
+  // Sync active sub-tool when dedicated route prop changes
+  useEffect(() => {
+    if (initialSubToolId) {
+      setActiveToolId(initialSubToolId);
+      setShowQuickSwitcher(false);
+    } else if (landingConfig === null) {
+      setActiveToolId(readSubToolFromUrl());
+    }
+  }, [initialSubToolId, landingConfig]);
+
+  // Navigate to dedicated landing URL when available, or manage `?tool=` query param on /tools/pdf-tools-suite
   const selectSubTool = (id: PdfSubToolId | null) => {
-    setActiveToolId(id);
     setShowQuickSwitcher(false);
+    if (!id) {
+      setActiveToolId(null);
+      if (landingConfig && onNavigateTo) {
+        onNavigateTo('/tools/pdf-tools-suite');
+        return;
+      }
+      if (typeof window !== 'undefined') {
+        const url = new URL(window.location.href);
+        url.searchParams.delete('tool');
+        window.history.replaceState({}, '', `${url.pathname}${url.search}`);
+      }
+      return;
+    }
+
+    const dedicatedRoute = LANDING_BY_SUBTOOL_ID.get(id);
+    if (dedicatedRoute && onNavigateTo) {
+      setActiveToolId(id);
+      onNavigateTo(dedicatedRoute.primaryPath);
+      return;
+    }
+
+    setActiveToolId(id);
+    if (landingConfig && onNavigateTo) {
+      onNavigateTo(`/tools/pdf-tools-suite?tool=${id}`);
+      return;
+    }
+
     if (typeof window !== 'undefined') {
       const url = new URL(window.location.href);
-      if (id) {
-        url.searchParams.set('tool', id);
-      } else {
-        url.searchParams.delete('tool');
-      }
+      url.searchParams.set('tool', id);
       window.history.replaceState({}, '', `${url.pathname}${url.search}`);
     }
   };
 
   useEffect(() => {
     const handlePop = () => {
-      setActiveToolId(readSubToolFromUrl());
+      if (!initialSubToolId) {
+        setActiveToolId(readSubToolFromUrl());
+      }
     };
     window.addEventListener('popstate', handlePop);
     return () => window.removeEventListener('popstate', handlePop);
-  }, []);
+  }, [initialSubToolId]);
 
   const popularTools = useMemo(
     () => PDF_TOOLS_CATALOG.filter((item) => item.isPopular),
@@ -96,11 +150,19 @@ export const PdfToolsSuiteTool: React.FC = () => {
 
   const renderToolCard = (tool: PdfToolDescriptor) => {
     const cat = PDF_CATEGORIES.find((c) => c.id === tool.category);
+    const dedicatedRoute = LANDING_BY_SUBTOOL_ID.get(tool.id);
+    const href = dedicatedRoute ? dedicatedRoute.primaryPath : `/tools/pdf-tools-suite?tool=${tool.id}`;
+
     return (
-      <button
+      <a
         key={tool.id}
-        type="button"
-        onClick={() => selectSubTool(tool.id)}
+        href={href}
+        onClick={(e) => {
+          if (!e.metaKey && !e.ctrlKey && !e.shiftKey && e.button === 0) {
+            e.preventDefault();
+            selectSubTool(tool.id);
+          }
+        }}
         className="group text-start rounded-xl border border-slate-200 dark:border-slate-700/80 bg-white dark:bg-slate-900/80 p-4 sm:p-5 hover:border-blue-500 dark:hover:border-blue-400 hover:shadow-md transition-all flex flex-col justify-between gap-3 min-w-0 w-full cursor-pointer"
       >
         <div className="space-y-2.5 min-w-0 w-full">
@@ -132,7 +194,7 @@ export const PdfToolsSuiteTool: React.FC = () => {
             <ArrowRight className="w-3.5 h-3.5 rtl:rotate-180" />
           </span>
         </div>
-      </button>
+      </a>
     );
   };
 
@@ -141,19 +203,27 @@ export const PdfToolsSuiteTool: React.FC = () => {
   // =========================================================================
   if (activeTool) {
     const activeCat = PDF_CATEGORIES.find((c) => c.id === activeTool.category);
+    const activeLanding =
+      landingConfig && landingConfig.subToolId === activeTool.id ? landingConfig : null;
+
     return (
       <div className="space-y-5" dir={isUrdu ? 'rtl' : 'ltr'}>
         {/* Top Sub-Tool Navigation Header */}
         <div className="rounded-2xl border border-slate-200 dark:border-slate-700/80 bg-white dark:bg-slate-900/80 p-4 sm:p-5 space-y-4">
           <div className="flex flex-wrap items-center justify-between gap-3">
-            <button
-              type="button"
-              onClick={() => selectSubTool(null)}
+            <a
+              href="/tools/pdf-tools-suite"
+              onClick={(e) => {
+                if (!e.metaKey && !e.ctrlKey && !e.shiftKey && e.button === 0) {
+                  e.preventDefault();
+                  selectSubTool(null);
+                }
+              }}
               className="inline-flex items-center gap-2 rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 hover:bg-slate-100 dark:hover:bg-slate-700 px-3.5 py-2 text-xs sm:text-sm font-semibold text-slate-700 dark:text-slate-200 transition-colors min-h-[40px]"
             >
               <ArrowLeft className="w-4 h-4 rtl:rotate-180" />
               {t.backToSuite} ({PDF_TOOLS_CATALOG.length})
-            </button>
+            </a>
 
             <div className="relative">
               <button
@@ -210,10 +280,14 @@ export const PdfToolsSuiteTool: React.FC = () => {
                 </span>
               </div>
               <h1 className="mt-0.5 text-lg sm:text-xl font-extrabold text-slate-900 dark:text-white">
-                {isUrdu ? activeTool.nameUrdu : activeTool.name}
+                {isUrdu
+                  ? activeTool.nameUrdu
+                  : activeLanding?.h1 || activeTool.name}
               </h1>
               <p className="mt-1 text-xs sm:text-sm text-slate-600 dark:text-slate-300">
-                {isUrdu ? activeTool.descriptionUrdu : activeTool.description}
+                {isUrdu
+                  ? activeTool.descriptionUrdu
+                  : activeLanding?.introSummary || activeTool.description}
               </p>
             </div>
           </div>
@@ -326,7 +400,7 @@ export const PdfToolsSuiteTool: React.FC = () => {
               <Sparkles className="w-5 h-5" />
             </div>
             <div>
-              <h3 className="text-base sm:text-lg font-bold text-slate-900 dark:text-white">{t.popularTitle}</h3>
+              <h2 className="text-base sm:text-lg font-bold text-slate-900 dark:text-white">{t.popularTitle}</h2>
               <p className="text-xs text-slate-500 dark:text-slate-400">{t.popularSubtitle}</p>
             </div>
           </div>
@@ -340,7 +414,7 @@ export const PdfToolsSuiteTool: React.FC = () => {
       {normalizedQuery || selectedCategory !== 'all' ? (
         filteredTools.length > 0 ? (
           <section className="space-y-4">
-            <h3 className="text-base font-bold text-slate-900 dark:text-white tabular-nums">
+            <h2 className="text-base font-bold text-slate-900 dark:text-white tabular-nums">
               {selectedCategory !== 'all'
                 ? (() => {
                     const cat = PDF_CATEGORIES.find((c) => c.id === selectedCategory);
@@ -349,14 +423,14 @@ export const PdfToolsSuiteTool: React.FC = () => {
                 : isUrdu
                 ? `${filteredTools.length} ٹولز ملے`
                 : `${filteredTools.length} Matching PDF Tools`}
-            </h3>
+            </h2>
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-3.5">
               {filteredTools.map(renderToolCard)}
             </div>
           </section>
         ) : (
           <div className="rounded-2xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900/60 p-8 text-center space-y-3">
-            <h4 className="text-base font-bold text-slate-900 dark:text-white">{t.emptySearchTitle}</h4>
+            <h2 className="text-base font-bold text-slate-900 dark:text-white">{t.emptySearchTitle}</h2>
             <p className="text-sm text-slate-500 dark:text-slate-400">{t.emptySearchDesc}</p>
             <button
               type="button"
@@ -382,9 +456,9 @@ export const PdfToolsSuiteTool: React.FC = () => {
                       <PdfIcon name={cat.iconName} className="w-5 h-5" />
                     </div>
                     <div>
-                      <h3 className="text-base sm:text-lg font-extrabold text-slate-900 dark:text-white">
+                      <h2 className="text-base sm:text-lg font-extrabold text-slate-900 dark:text-white">
                         {cat.code}. {isUrdu ? cat.nameUrdu : cat.name}
-                      </h3>
+                      </h2>
                       <p className="text-xs text-slate-500 dark:text-slate-400">
                         {isUrdu ? cat.descriptionUrdu : cat.description}
                       </p>
@@ -402,6 +476,40 @@ export const PdfToolsSuiteTool: React.FC = () => {
           })}
         </div>
       )}
+
+      {/* Crawlable Dedicated PDF Landing URLs Directory */}
+      <section className="rounded-2xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900/70 p-5 sm:p-6 space-y-3">
+        <div>
+          <h2 className="text-sm sm:text-base font-bold text-slate-900 dark:text-white">
+            {isUrdu ? 'مخصوص پی ڈی ایف ٹول صفحات' : 'Direct Dedicated PDF Tool Workspaces'}
+          </h2>
+          <p className="text-xs text-slate-500 dark:text-slate-400">
+            {isUrdu
+              ? 'تیز رسائی اور بک مارکنگ کے لیے براہِ راست پی ڈی ایف ٹول لنکس:'
+              : 'Bookmarkable direct workspaces for the most searched browser-local PDF operations:'}
+          </p>
+        </div>
+        <div className="flex flex-wrap gap-2">
+          {PDF_LANDING_ROUTES.map((route) => {
+            const matched = getPdfToolById(route.subToolId);
+            return (
+              <a
+                key={route.primarySlug}
+                href={route.primaryPath}
+                onClick={(e) => {
+                  if (!e.metaKey && !e.ctrlKey && !e.shiftKey && e.button === 0) {
+                    e.preventDefault();
+                    selectSubTool(route.subToolId);
+                  }
+                }}
+                className="rounded-lg border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800/80 hover:border-blue-500 hover:text-blue-700 dark:hover:text-blue-300 px-3 py-1.5 text-xs font-semibold text-slate-700 dark:text-slate-200 transition-colors"
+              >
+                {matched ? (isUrdu ? matched.nameUrdu : matched.name) : route.h1}
+              </a>
+            );
+          })}
+        </div>
+      </section>
     </div>
   );
 };

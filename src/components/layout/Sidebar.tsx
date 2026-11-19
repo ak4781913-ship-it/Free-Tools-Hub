@@ -17,10 +17,8 @@ import {
   ChevronLeft,
   X,
   Compass,
-  Star,
-  ExternalLink,
   Shield,
-  Layers,
+  BookOpen,
 } from 'lucide-react';
 import { TOOLS_LIST } from '../../data/tools';
 import { TOOL_ROUTES, getToolPrimaryPath } from '../../data/toolsRouting';
@@ -76,14 +74,14 @@ export const Sidebar: React.FC<SidebarProps> = ({
     }));
   };
 
-  // Structured categories matching user prompt and real tools
+  // Structured categories mapped to indexable /categories/* hubs and real tools
   const navCategories: NavCategory[] = [
     {
       id: 'ai-tools',
       label: 'AI Tools',
       labelUrdu: 'اے آئی ٹولز',
       icon: Sparkles,
-      path: '/tools?category=ai-tools',
+      path: '/categories/ai-tools',
       toolIds: ['gemini-photo-prompt', 'ai-video-prompt', 'seo-meta-generator'],
     },
     {
@@ -91,7 +89,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
       label: 'Photo Tools',
       labelUrdu: 'تصویری ٹولز',
       icon: ImageIcon,
-      path: '/tools?category=photo-image',
+      path: '/categories/photo-image',
       toolIds: ['image-compressor', 'qr-generator', 'color-picker'],
     },
     {
@@ -99,7 +97,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
       label: 'Video Tools',
       labelUrdu: 'ویڈیو ٹولز',
       icon: Video,
-      path: '/tools?category=video-content',
+      path: '/categories/video-content',
       toolIds: ['ai-video-prompt', 'markdown-editor'],
     },
     {
@@ -107,7 +105,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
       label: 'Developer Tools',
       labelUrdu: 'ڈویلپر ٹولز',
       icon: Code,
-      path: '/tools?category=other-utilities',
+      path: '/categories/other-utilities',
       toolIds: ['json-formatter', 'base64-converter', 'seo-page-analyzer', 'password-generator'],
     },
     {
@@ -115,7 +113,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
       label: 'PDF & Documents',
       labelUrdu: 'پی ڈی ایف اور دستاویزات',
       icon: FileText,
-      path: '/tools/pdf-tools-suite',
+      path: '/categories/pdf-tools',
       toolIds: ['pdf-tools-suite', 'resume-builder', 'markdown-editor'],
     },
     {
@@ -123,7 +121,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
       label: 'Calculators',
       labelUrdu: 'کیلکولیٹرز',
       icon: Calculator,
-      path: '/tools?category=uae-calculators',
+      path: '/categories/uae-calculators',
       toolIds: [
         'uae-salary-calculator',
         'uae-gratuity',
@@ -143,7 +141,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
       label: 'CV & Resume Tools',
       labelUrdu: 'سی وی اور ریزیومے',
       icon: Briefcase,
-      path: '/tools/cv-maker',
+      path: '/categories/career-cv',
       toolIds: ['resume-builder'],
     },
     {
@@ -151,7 +149,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
       label: 'Text Tools',
       labelUrdu: 'متن ٹولز',
       icon: Type,
-      path: '/tools?category=video-content',
+      path: '/categories/video-content',
       toolIds: ['word-counter', 'text-case-converter', 'markdown-editor'],
     },
     {
@@ -159,7 +157,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
       label: 'Productivity Tools',
       labelUrdu: 'پروڈکٹیوٹی ٹولز',
       icon: Gauge,
-      path: '/tools?category=other-utilities',
+      path: '/categories/other-utilities',
       toolIds: ['timezone-converter', 'password-generator', 'password-strength', 'unit-converter', 'qr-generator'],
     },
   ];
@@ -293,6 +291,31 @@ export const Sidebar: React.FC<SidebarProps> = ({
                 {TOOLS_LIST.length}
               </span>
             </div>
+          )}
+        </a>
+
+        {/* Guides & Tutorials Hub */}
+        <a
+          href="/guides"
+          onClick={(e) => handleNav('/guides', e)}
+          title={isCollapsed ? (isUrdu ? 'گائیڈز اور ٹیوٹوریلز' : 'Guides & Tutorials') : undefined}
+          className={`flex items-center gap-3 px-3 py-2.5 rounded-xl text-xs font-semibold transition-all group ${
+            currentPath === '/guides' || currentPath.startsWith('/guides/')
+              ? 'bg-blue-50 dark:bg-blue-950/60 text-blue-700 dark:text-blue-400 shadow-2xs ring-1 ring-blue-600/20'
+              : 'text-slate-700 dark:text-slate-300 hover:bg-slate-100/80 dark:hover:bg-slate-800/80 hover:text-slate-900 dark:hover:text-white'
+          }`}
+        >
+          <BookOpen
+            className={`w-4 h-4 shrink-0 transition-transform group-hover:scale-110 ${
+              currentPath === '/guides' || currentPath.startsWith('/guides/')
+                ? 'text-blue-700 dark:text-blue-400'
+                : 'text-slate-400 dark:text-slate-500'
+            }`}
+          />
+          {!isCollapsed && (
+            <span className="truncate flex-1">
+              {isUrdu ? 'گائیڈز اور ٹیوٹوریلز' : 'Guides & Tutorials'}
+            </span>
           )}
         </a>
 

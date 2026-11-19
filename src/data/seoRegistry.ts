@@ -5,8 +5,12 @@
 
 import { TOOLS_LIST } from './tools';
 import { TOOL_ROUTES, ToolRouteConfig, findToolBySlugOrId } from './toolsRouting';
+import { TOOL_KEYWORD_STRATEGY } from './keywordStrategy';
+import { PDF_LANDING_ROUTES, PdfLandingRouteConfig, findPdfLandingRoute } from './pdfLandingRoutes';
+import { CATEGORY_LANDINGS, CategoryLandingConfig, findCategoryLandingBySlug, getCategoryLandingPath } from './categorySeoData';
+import { EDITORIAL_GUIDES, EditorialGuide, findGuideBySlug } from './guidesData';
 
-export const DEFAULT_PRODUCTION_URL = 'https://freetoolshub1.netlify.app';
+export const DEFAULT_PRODUCTION_URL = 'https://freetools.mawa.blog';
 export const SITE_NAME = 'FreeTools Hub';
 export const ORGANIZATION_NAME = 'MAWA';
 export const ORGANIZATION_ALTERNATE_NAMES = [
@@ -92,6 +96,19 @@ export const STATIC_PAGES_SEO: StaticPageSeoConfig[] = [
     priority: '0.9',
   },
   {
+    path: '/guides',
+    slug: 'guides',
+    title: 'Practical Guides & UAE Calculator Tutorials | FreeTools Hub',
+    description:
+      'Original step-by-step guides for UAE end-of-service gratuity, ATS CV formatting, local browser PDF workflows, on-page SEO audits, and password entropy.',
+    h1: 'Practical Guides, Calculators & Workflow Tutorials',
+    summary:
+      'Read detailed, technical walkthroughs written for UAE professionals, job seekers, developers, and everyday PDF or privacy-conscious web workflows.',
+    schemaType: 'CollectionPage',
+    changefreq: 'weekly',
+    priority: '0.85',
+  },
+  {
     path: '/about',
     slug: 'about',
     title: 'About FreeTools Hub – Privacy & Architecture | MAWA',
@@ -150,7 +167,7 @@ export const STATIC_PAGES_SEO: StaticPageSeoConfig[] = [
 
 export const NOT_FOUND_SEO = {
   title: 'Page Not Found (404) | FreeTools Hub',
-  description: 'The requested page or tool could not be found on FreeTools Hub. Browse all 28 free online tools and calculators.',
+  description: `The requested page or tool could not be found on FreeTools Hub. Browse all ${TOOLS_LIST.length} free online tools and calculators.`,
   robots: 'noindex, follow' as const,
 };
 
@@ -188,7 +205,11 @@ export function sanitizePublicOrigin(candidate?: string | null): string {
       host === '0.0.0.0' ||
       host.endsWith('.localhost') ||
       host.endsWith('.local') ||
-      host.endsWith('.run.app')
+      host.endsWith('.internal') ||
+      host.endsWith('.run.app') ||
+      host.endsWith('.netlify.app') ||
+      host.endsWith('.pages.dev') ||
+      host.endsWith('.hostingersite.com')
     ) {
       return '';
     }
@@ -217,9 +238,8 @@ export interface SitemapUrlEntry {
 
 /**
  * Single authoritative generator of canonical, indexable public URLs for sitemap.xml.
- * Automatically picks up all static routes in STATIC_PAGES_SEO and all canonical tool routes in TOOL_ROUTES.
+ * Includes static pages, 28 core tools, 15 PDF sub-tool landing pages, 7 category landing pages, and 10 guides.
  * Excludes aliases, /api/*, /.netlify/*, /404, and query-parameter URLs.
- * Emits route-specific lastmod only when verified; omits lastmod when unavailable.
  */
 export function getAllCanonicalSitemapEntries(
   baseUrl: string = DEFAULT_PRODUCTION_URL,
@@ -242,6 +262,19 @@ export function getAllCanonicalSitemapEntries(
     });
   }
 
+  for (const cat of CATEGORY_LANDINGS) {
+    if (seenPaths.has(cat.path)) continue;
+    seenPaths.add(cat.path);
+    const routeLastmod = lastmodByPath?.get(cat.path);
+    entries.push({
+      path: cat.path,
+      loc: `${cleanBase}${cat.path}`,
+      ...(routeLastmod ? { lastmod: routeLastmod } : {}),
+      changefreq: 'weekly',
+      priority: '0.85',
+    });
+  }
+
   for (const route of Object.values(TOOL_ROUTES)) {
     const toolPath = route.primaryPath;
     if (!toolPath || !toolPath.startsWith('/tools/') || toolPath.includes('?')) continue;
@@ -254,6 +287,33 @@ export function getAllCanonicalSitemapEntries(
       ...(routeLastmod ? { lastmod: routeLastmod } : {}),
       changefreq: HIGH_PRIORITY_TOOL_SLUGS.has(route.primarySlug) ? 'weekly' : 'monthly',
       priority: HIGH_PRIORITY_TOOL_SLUGS.has(route.primarySlug) ? '0.9' : '0.8',
+    });
+  }
+
+  for (const pdfRoute of PDF_LANDING_ROUTES) {
+    const pdfPath = pdfRoute.primaryPath;
+    if (seenPaths.has(pdfPath)) continue;
+    seenPaths.add(pdfPath);
+    const routeLastmod = lastmodByPath?.get(pdfPath);
+    entries.push({
+      path: pdfPath,
+      loc: `${cleanBase}${pdfPath}`,
+      ...(routeLastmod ? { lastmod: routeLastmod } : {}),
+      changefreq: 'weekly',
+      priority: '0.85',
+    });
+  }
+
+  for (const guide of EDITORIAL_GUIDES) {
+    if (seenPaths.has(guide.path)) continue;
+    seenPaths.add(guide.path);
+    const routeLastmod = lastmodByPath?.get(guide.path);
+    entries.push({
+      path: guide.path,
+      loc: `${cleanBase}${guide.path}`,
+      ...(routeLastmod ? { lastmod: routeLastmod } : {}),
+      changefreq: 'monthly',
+      priority: '0.8',
     });
   }
 
@@ -273,6 +333,14 @@ export function getLegacyAliasMap(): Map<string, string> {
       }
     }
   }
+  for (const pdfRoute of PDF_LANDING_ROUTES) {
+    for (const alias of pdfRoute.aliases) {
+      const lower = alias.toLowerCase();
+      if (lower !== pdfRoute.primarySlug.toLowerCase()) {
+        map.set(lower, pdfRoute.primaryPath);
+      }
+    }
+  }
   return map;
 }
 
@@ -281,6 +349,9 @@ export function classifyPublicRoute(rawPathname: string): {
   cleanPath: string;
   redirectTo?: string;
   toolRoute?: ToolRouteConfig;
+  pdfLandingRoute?: PdfLandingRouteConfig;
+  categoryLanding?: CategoryLandingConfig;
+  guide?: EditorialGuide;
   staticPage?: StaticPageSeoConfig;
 } {
   const cleanPath = normalizeSeoPathname(rawPathname);
@@ -290,11 +361,75 @@ export function classifyPublicRoute(rawPathname: string): {
     return { status: 200, cleanPath, staticPage };
   }
 
+  if (cleanPath.startsWith('/categories/')) {
+    const slug = cleanPath.slice('/categories/'.length);
+    if (!slug || slug.includes('/')) {
+      return { status: 404, cleanPath };
+    }
+    const categoryLanding = findCategoryLandingBySlug(slug);
+    if (categoryLanding) {
+      if (cleanPath.toLowerCase() !== categoryLanding.path.toLowerCase()) {
+        return {
+          status: 301,
+          cleanPath,
+          redirectTo: categoryLanding.path,
+          categoryLanding,
+        };
+      }
+      return {
+        status: 200,
+        cleanPath: categoryLanding.path,
+        categoryLanding,
+      };
+    }
+  }
+
+  if (cleanPath.startsWith('/guides/')) {
+    const slug = cleanPath.slice('/guides/'.length);
+    if (!slug || slug.includes('/')) {
+      return { status: 404, cleanPath };
+    }
+    const guide = findGuideBySlug(slug);
+    if (guide) {
+      if (cleanPath.toLowerCase() !== guide.path.toLowerCase()) {
+        return {
+          status: 301,
+          cleanPath,
+          redirectTo: guide.path,
+          guide,
+        };
+      }
+      return {
+        status: 200,
+        cleanPath: guide.path,
+        guide,
+      };
+    }
+  }
+
   if (cleanPath.startsWith('/tools/')) {
     const slug = cleanPath.slice('/tools/'.length);
     if (!slug || slug.includes('/')) {
       return { status: 404, cleanPath };
     }
+
+    const pdfLanding = findPdfLandingRoute(slug);
+    if (pdfLanding) {
+      if (cleanPath.toLowerCase() !== pdfLanding.primaryPath.toLowerCase()) {
+        return {
+          status: 301,
+          cleanPath,
+          redirectTo: pdfLanding.primaryPath,
+          pdfLandingRoute: pdfLanding,
+        };
+      }
+      return {
+        status: 200,
+        cleanPath: pdfLanding.primaryPath,
+        pdfLandingRoute: pdfLanding,
+      };
+    }
+
     const matched = findToolBySlugOrId(slug);
     if (matched) {
       if (cleanPath.toLowerCase() !== matched.primaryPath.toLowerCase()) {
@@ -414,10 +549,12 @@ export function buildJsonLdForPath(
   if (classified.toolRoute) {
     const route = classified.toolRoute;
     const tool = TOOLS_LIST.find((t) => t.id === route.id);
+    const strategy = TOOL_KEYWORD_STRATEGY[route.id];
     const toolName = tool?.name || route.primarySlug;
     const toolUrl = `${cleanBase}${route.primaryPath}`;
+    const catLandingPath = getCategoryLandingPath(route.categoryGroup);
 
-    return [
+    const schemas: Record<string, unknown>[] = [
       getOrganizationSchema(cleanBase),
       {
         '@context': 'https://schema.org',
@@ -425,7 +562,7 @@ export function buildJsonLdForPath(
         name: toolName,
         ...(tool?.nameUrdu ? { alternateName: tool.nameUrdu } : {}),
         url: toolUrl,
-        description: route.seoDescription,
+        description: strategy?.metaDescription || route.seoDescription,
         applicationCategory: 'UtilitiesApplication',
         operatingSystem: 'Any (Web Browser)',
         browserRequirements: 'Requires JavaScript and modern HTML5 support.',
@@ -452,8 +589,8 @@ export function buildJsonLdForPath(
           {
             '@type': 'ListItem',
             position: 2,
-            name: 'All Tools',
-            item: `${cleanBase}/tools`,
+            name: route.categoryGroupLabel,
+            item: `${cleanBase}${catLandingPath}`,
           },
           {
             '@type': 'ListItem',
@@ -464,6 +601,235 @@ export function buildJsonLdForPath(
         ],
       },
     ];
+
+    if (strategy?.faqs && strategy.faqs.length > 0) {
+      schemas.push({
+        '@context': 'https://schema.org',
+        '@type': 'FAQPage',
+        mainEntity: strategy.faqs.map((faq) => ({
+          '@type': 'Question',
+          name: faq.q,
+          acceptedAnswer: {
+            '@type': 'Answer',
+            text: faq.a,
+          },
+        })),
+      });
+    }
+
+    return schemas;
+  }
+
+  if (classified.pdfLandingRoute) {
+    const pdfRoute = classified.pdfLandingRoute;
+    const toolUrl = `${cleanBase}${pdfRoute.primaryPath}`;
+    const schemas: Record<string, unknown>[] = [
+      getOrganizationSchema(cleanBase),
+      {
+        '@context': 'https://schema.org',
+        '@type': 'WebApplication',
+        name: pdfRoute.h1,
+        url: toolUrl,
+        description: pdfRoute.seoDescription,
+        applicationCategory: 'UtilitiesApplication',
+        operatingSystem: 'Any (Web Browser)',
+        browserRequirements: 'Requires JavaScript, HTML5 Canvas, and WebAssembly support.',
+        isAccessibleForFree: true,
+        offers: {
+          '@type': 'Offer',
+          price: '0',
+          priceCurrency: 'USD',
+        },
+        publisher: {
+          '@id': `${cleanBase}/#organization`,
+        },
+      },
+      {
+        '@context': 'https://schema.org',
+        '@type': 'BreadcrumbList',
+        itemListElement: [
+          {
+            '@type': 'ListItem',
+            position: 1,
+            name: 'Home',
+            item: `${cleanBase}/`,
+          },
+          {
+            '@type': 'ListItem',
+            position: 2,
+            name: 'PDF Tools Suite',
+            item: `${cleanBase}/tools/pdf-tools-suite`,
+          },
+          {
+            '@type': 'ListItem',
+            position: 3,
+            name: pdfRoute.h1,
+            item: toolUrl,
+          },
+        ],
+      },
+    ];
+
+    if (pdfRoute.faqs.length > 0) {
+      schemas.push({
+        '@context': 'https://schema.org',
+        '@type': 'FAQPage',
+        mainEntity: pdfRoute.faqs.map((faq) => ({
+          '@type': 'Question',
+          name: faq.q,
+          acceptedAnswer: {
+            '@type': 'Answer',
+            text: faq.a,
+          },
+        })),
+      });
+    }
+
+    return schemas;
+  }
+
+  if (classified.categoryLanding) {
+    const cat = classified.categoryLanding;
+    const catUrl = `${cleanBase}${cat.path}`;
+    const catRoutes = Object.values(TOOL_ROUTES).filter((r) => r.categoryGroup === cat.id);
+    const schemas: Record<string, unknown>[] = [
+      getOrganizationSchema(cleanBase),
+      {
+        '@context': 'https://schema.org',
+        '@type': 'CollectionPage',
+        name: cat.h1,
+        url: catUrl,
+        description: cat.seoDescription,
+        isPartOf: {
+          '@id': `${cleanBase}/#website`,
+        },
+      },
+      {
+        '@context': 'https://schema.org',
+        '@type': 'BreadcrumbList',
+        itemListElement: [
+          {
+            '@type': 'ListItem',
+            position: 1,
+            name: 'Home',
+            item: `${cleanBase}/`,
+          },
+          {
+            '@type': 'ListItem',
+            position: 2,
+            name: 'All Tools',
+            item: `${cleanBase}/tools`,
+          },
+          {
+            '@type': 'ListItem',
+            position: 3,
+            name: cat.name,
+            item: catUrl,
+          },
+        ],
+      },
+      {
+        '@context': 'https://schema.org',
+        '@type': 'ItemList',
+        name: cat.name,
+        numberOfItems: catRoutes.length,
+        itemListElement: catRoutes.map((route, idx) => {
+          const t = TOOLS_LIST.find((item) => item.id === route.id);
+          return {
+            '@type': 'ListItem',
+            position: idx + 1,
+            name: t?.name || route.primarySlug,
+            url: `${cleanBase}${route.primaryPath}`,
+          };
+        }),
+      },
+    ];
+
+    if (cat.faqs.length > 0) {
+      schemas.push({
+        '@context': 'https://schema.org',
+        '@type': 'FAQPage',
+        mainEntity: cat.faqs.map((faq) => ({
+          '@type': 'Question',
+          name: faq.q,
+          acceptedAnswer: {
+            '@type': 'Answer',
+            text: faq.a,
+          },
+        })),
+      });
+    }
+
+    return schemas;
+  }
+
+  if (classified.guide) {
+    const guide = classified.guide;
+    const guideUrl = `${cleanBase}${guide.path}`;
+    const schemas: Record<string, unknown>[] = [
+      getOrganizationSchema(cleanBase),
+      {
+        '@context': 'https://schema.org',
+        '@type': 'Article',
+        headline: guide.title,
+        description: guide.seoDescription,
+        url: guideUrl,
+        datePublished: guide.publishedDate,
+        dateModified: guide.updatedDate,
+        image: `${cleanBase}${OG_IMAGE_PATH}`,
+        author: {
+          '@id': `${cleanBase}/#organization`,
+        },
+        publisher: {
+          '@id': `${cleanBase}/#organization`,
+        },
+        mainEntityOfPage: {
+          '@type': 'WebPage',
+          '@id': guideUrl,
+        },
+      },
+      {
+        '@context': 'https://schema.org',
+        '@type': 'BreadcrumbList',
+        itemListElement: [
+          {
+            '@type': 'ListItem',
+            position: 1,
+            name: 'Home',
+            item: `${cleanBase}/`,
+          },
+          {
+            '@type': 'ListItem',
+            position: 2,
+            name: 'Guides',
+            item: `${cleanBase}/guides`,
+          },
+          {
+            '@type': 'ListItem',
+            position: 3,
+            name: guide.title,
+            item: guideUrl,
+          },
+        ],
+      },
+    ];
+
+    if (guide.faqs.length > 0) {
+      schemas.push({
+        '@context': 'https://schema.org',
+        '@type': 'FAQPage',
+        mainEntity: guide.faqs.map((faq) => ({
+          '@type': 'Question',
+          name: faq.q,
+          acceptedAnswer: {
+            '@type': 'Answer',
+            text: faq.a,
+          },
+        })),
+      });
+    }
+
+    return schemas;
   }
 
   if (classified.staticPage) {
@@ -519,6 +885,21 @@ export function buildJsonLdForPath(
       });
     }
 
+    if (page.path === '/guides') {
+      schemas.push({
+        '@context': 'https://schema.org',
+        '@type': 'ItemList',
+        name: 'FreeTools Hub Editorial Guides',
+        numberOfItems: EDITORIAL_GUIDES.length,
+        itemListElement: EDITORIAL_GUIDES.map((guide, idx) => ({
+          '@type': 'ListItem',
+          position: idx + 1,
+          name: guide.title,
+          url: `${cleanBase}${guide.path}`,
+        })),
+      });
+    }
+
     return schemas;
   }
 
@@ -533,7 +914,7 @@ export function getRouteSeoForPath(
   description: string;
   canonicalPath?: string;
   robots: 'index, follow' | 'noindex, follow';
-  ogType: 'website';
+  ogType: 'website' | 'article';
   jsonLd?: Record<string, unknown>[];
   status: 200 | 301 | 404;
 } {
@@ -550,13 +931,50 @@ export function getRouteSeoForPath(
   }
 
   if (classified.toolRoute) {
+    const strategy = TOOL_KEYWORD_STRATEGY[classified.toolRoute.id];
     return {
-      title: classified.toolRoute.seoTitle,
-      description: classified.toolRoute.seoDescription,
+      title: strategy?.seoTitle || classified.toolRoute.seoTitle,
+      description: strategy?.metaDescription || classified.toolRoute.seoDescription,
       canonicalPath: classified.toolRoute.primaryPath,
       robots: 'index, follow',
       ogType: 'website',
       jsonLd: buildJsonLdForPath(classified.toolRoute.primaryPath, baseUrl),
+      status: classified.status,
+    };
+  }
+
+  if (classified.pdfLandingRoute) {
+    return {
+      title: classified.pdfLandingRoute.seoTitle,
+      description: classified.pdfLandingRoute.seoDescription,
+      canonicalPath: classified.pdfLandingRoute.primaryPath,
+      robots: 'index, follow',
+      ogType: 'website',
+      jsonLd: buildJsonLdForPath(classified.pdfLandingRoute.primaryPath, baseUrl),
+      status: classified.status,
+    };
+  }
+
+  if (classified.categoryLanding) {
+    return {
+      title: classified.categoryLanding.seoTitle,
+      description: classified.categoryLanding.seoDescription,
+      canonicalPath: classified.categoryLanding.path,
+      robots: 'index, follow',
+      ogType: 'website',
+      jsonLd: buildJsonLdForPath(classified.categoryLanding.path, baseUrl),
+      status: classified.status,
+    };
+  }
+
+  if (classified.guide) {
+    return {
+      title: classified.guide.seoTitle,
+      description: classified.guide.seoDescription,
+      canonicalPath: classified.guide.path,
+      robots: 'index, follow',
+      ogType: 'article',
+      jsonLd: buildJsonLdForPath(classified.guide.path, baseUrl),
       status: classified.status,
     };
   }

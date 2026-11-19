@@ -138,6 +138,15 @@ export const Footer: React.FC<FooterProps> = ({
               </li>
               <li>
                 <a
+                  href="/categories/uae-calculators"
+                  onClick={(e) => handleLinkClick('/categories/uae-calculators', e)}
+                  className="hover:text-blue-700 dark:hover:text-blue-400 transition-colors"
+                >
+                  {isUrdu ? 'یو اے ای کیلکولیٹرز ہب' : 'UAE Payroll & Gratuity Hub'}
+                </a>
+              </li>
+              <li>
+                <a
                   href="/tools"
                   onClick={(e) => handleLinkClick('/tools', e)}
                   className="font-semibold text-blue-700 dark:text-blue-400 hover:underline inline-flex items-center gap-1"
@@ -149,12 +158,39 @@ export const Footer: React.FC<FooterProps> = ({
             </ul>
           </div>
 
-          {/* Column 3: Popular Utilities */}
+          {/* Column 3: Popular Utilities & PDF Workspaces */}
           <div className="space-y-2.5">
             <h2 className="text-xs font-bold text-slate-900 dark:text-white">
-              {isUrdu ? 'آن لائن یوٹیلیٹیز' : 'Online Utilities'}
+              {isUrdu ? 'آن لائن یوٹیلیٹیز' : 'PDF & Online Utilities'}
             </h2>
             <ul className="space-y-2 text-xs text-slate-600 dark:text-slate-400">
+              <li>
+                <a
+                  href="/tools/merge-pdf"
+                  onClick={(e) => handleLinkClick('/tools/merge-pdf', e)}
+                  className="hover:text-blue-700 dark:hover:text-blue-400 transition-colors"
+                >
+                  {isUrdu ? 'پی ڈی ایف مرج کریں' : 'Merge PDF Files'}
+                </a>
+              </li>
+              <li>
+                <a
+                  href="/tools/compress-pdf"
+                  onClick={(e) => handleLinkClick('/tools/compress-pdf', e)}
+                  className="hover:text-blue-700 dark:hover:text-blue-400 transition-colors"
+                >
+                  {isUrdu ? 'پی ڈی ایف کمپریس کریں' : 'Compress PDF Size'}
+                </a>
+              </li>
+              <li>
+                <a
+                  href="/tools/pdf-to-word"
+                  onClick={(e) => handleLinkClick('/tools/pdf-to-word', e)}
+                  className="hover:text-blue-700 dark:hover:text-blue-400 transition-colors"
+                >
+                  {isUrdu ? 'پی ڈی ایف تا ورڈ (DOCX)' : 'PDF to Word Converter'}
+                </a>
+              </li>
               <li>
                 <a
                   href="/tools/seo-page-analyzer"
@@ -193,31 +229,31 @@ export const Footer: React.FC<FooterProps> = ({
               </li>
               <li>
                 <a
-                  href="/tools/loan-calculator"
-                  onClick={(e) => handleLinkClick('/tools/loan-calculator', e)}
-                  className="hover:text-blue-700 dark:hover:text-blue-400 transition-colors"
+                  href="/categories/pdf-tools"
+                  onClick={(e) => handleLinkClick('/categories/pdf-tools', e)}
+                  className="font-semibold text-blue-700 dark:text-blue-400 hover:underline"
                 >
-                  {isUrdu ? 'قرض و ای ایم آئی کیلکولیٹر' : 'Loan & EMI Calculator'}
-                </a>
-              </li>
-              <li>
-                <a
-                  href="/tools/unit-converter"
-                  onClick={(e) => handleLinkClick('/tools/unit-converter', e)}
-                  className="hover:text-blue-700 dark:hover:text-blue-400 transition-colors"
-                >
-                  {isUrdu ? 'یونیورسل یونٹ کنورٹر' : 'Universal Unit Converter'}
+                  {isUrdu ? 'تمام پی ڈی ایف صفحات' : 'All PDF Tools Hub'}
                 </a>
               </li>
             </ul>
           </div>
 
-          {/* Column 4: Company, Legal & Support */}
+          {/* Column 4: Resources, Legal & Support */}
           <div className="space-y-2.5">
             <h2 className="text-xs font-bold text-slate-900 dark:text-white">
-              {isUrdu ? 'قانونی معلومات اور رابطہ' : 'Information & Legal'}
+              {isUrdu ? 'گائیڈز، قانونی معلومات اور رابطہ' : 'Guides, Information & Legal'}
             </h2>
             <ul className="space-y-2 text-xs text-slate-600 dark:text-slate-400">
+              <li>
+                <a
+                  href="/guides"
+                  onClick={(e) => handleLinkClick('/guides', e)}
+                  className="font-semibold text-blue-700 dark:text-blue-400 hover:underline"
+                >
+                  {isUrdu ? 'تفصیلی گائیڈز اور مضامین' : 'Editorial Guides & Tutorials'}
+                </a>
+              </li>
               <li>
                 <a
                   href="/about"

@@ -3,4 +3,4 @@ Allow: /
 Disallow: /api/
 Disallow: /.netlify/
 
-Sitemap: https://freetoolshub1.netlify.app/sitemap.xml
+Sitemap: https://freetools.mawa.blog/sitemap.xml

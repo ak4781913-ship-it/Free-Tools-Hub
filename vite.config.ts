@@ -4,15 +4,14 @@ import path from 'path';
 import { defineConfig, loadEnv, Plugin } from 'vite';
 import { VitePWA } from 'vite-plugin-pwa';
 
-const DEFAULT_FALLBACK_SITE_ORIGIN = 'https://freetoolshub1.netlify.app';
+const DEFAULT_FALLBACK_SITE_ORIGIN = 'https://freetools.mawa.blog';
 
 function resolvePublicSiteOrigin(env: Record<string, string>): string {
   const candidates = [
     env.VITE_SITE_URL,
     env.SITE_URL,
-    env.URL,
-    env.DEPLOY_PRIME_URL,
     env.APP_URL,
+    env.URL,
   ];
   for (const candidate of candidates) {
     const raw = (candidate || '').trim();
@@ -26,8 +25,13 @@ function resolvePublicSiteOrigin(env: Record<string, string>): string {
         host === 'localhost' ||
         host === '127.0.0.1' ||
         host === '0.0.0.0' ||
+        host.endsWith('.localhost') ||
         host.endsWith('.local') ||
-        host.endsWith('.internal')
+        host.endsWith('.internal') ||
+        host.endsWith('.run.app') ||
+        host.endsWith('.netlify.app') ||
+        host.endsWith('.pages.dev') ||
+        host.endsWith('.hostingersite.com')
       ) {
         continue;
       }

@@ -3,6 +3,10 @@ import { ToolDefinition } from '../../types';
 import { TOOLS_LIST } from '../../data/tools';
 import { TOOL_ROUTES, ToolRouteConfig } from '../../data/toolsRouting';
 import { TOOL_SEO_GUIDES } from '../../data/toolSeoGuides';
+import { TOOL_KEYWORD_STRATEGY } from '../../data/keywordStrategy';
+import { PDF_LANDING_ROUTES, PdfLandingRouteConfig } from '../../data/pdfLandingRoutes';
+import { getCategoryLandingPath } from '../../data/categorySeoData';
+import { getGuidesBySlugs } from '../../data/guidesData';
 import { useLanguage } from '../../context/LanguageContext';
 import { useFavorites } from '../../context/FavoritesContext';
 import {
@@ -11,20 +15,19 @@ import {
   ArrowRight,
   Star,
   ShieldCheck,
-  Zap,
   Info,
   ChevronRight,
+  ChevronDown,
   Share2,
   Check,
-  Sparkles,
   X,
-  Link as LinkIcon,
-  Copy,
   FileDown,
   Loader2,
   BookOpen,
   Minimize2,
   RotateCcw,
+  Copy,
+  HelpCircle,
 } from 'lucide-react';
 import { ShareModal } from './Modals/ShareModal';
 import { ResetToolModal } from './Modals/ResetToolModal';
@@ -42,6 +45,7 @@ import { Print } from '../common/Print';
 interface ToolPageLayoutProps {
   tool: ToolDefinition;
   routeConfig: ToolRouteConfig;
+  pdfLanding?: PdfLandingRouteConfig | null;
   onNavigateTo: (path: string) => void;
   children: React.ReactNode;
   isReaderMode?: boolean;
@@ -51,6 +55,7 @@ interface ToolPageLayoutProps {
 export const ToolPageLayout: React.FC<ToolPageLayoutProps> = ({
   tool,
   routeConfig,
+  pdfLanding = null,
   onNavigateTo,
   children,
   isReaderMode: isReaderModeProp,
@@ -60,6 +65,7 @@ export const ToolPageLayout: React.FC<ToolPageLayoutProps> = ({
   const { isFavorite, toggleFavorite } = useFavorites();
   const isUrdu = language === 'ur';
   const favorited = isFavorite(tool.id);
+  const [openFaqIndex, setOpenFaqIndex] = React.useState<number | null>(0);
   const [internalReaderMode, setInternalReaderMode] = React.useState<boolean>(() => {
     try {
       return localStorage.getItem('freetools_hub_reader_mode') === 'true';
@@ -431,8 +437,20 @@ export const ToolPageLayout: React.FC<ToolPageLayoutProps> = ({
     }
   };
 
-  const toolTitle = isUrdu ? tool.nameUrdu : tool.name;
+  const toolTitle = pdfLanding
+    ? isUrdu
+      ? tool.nameUrdu
+      : pdfLanding.h1
+    : isUrdu
+    ? tool.nameUrdu
+    : tool.name;
   const categoryTitle = isUrdu ? routeConfig.categoryGroupLabelUrdu : routeConfig.categoryGroupLabel;
+  const categoryPath = getCategoryLandingPath(routeConfig.categoryGroup);
+  const toolStrategy = TOOL_KEYWORD_STRATEGY[tool.id];
+  const activeFaqs = pdfLanding ? pdfLanding.faqs : toolStrategy?.faqs || [];
+  const activeRelatedGuides = getGuidesBySlugs(
+    pdfLanding ? pdfLanding.relatedGuideSlugs : toolStrategy?.relatedGuideSlugs || []
+  );
 
   return (
     <div className={`w-full max-w-full min-w-0 min-h-screen bg-slate-50 dark:bg-slate-950 flex flex-col ${isReaderMode ? 'reader-mode-active' : ''}`}>
@@ -629,11 +647,11 @@ export const ToolPageLayout: React.FC<ToolPageLayoutProps> = ({
               </a>
               <span aria-hidden="true" className="text-slate-300 dark:text-slate-700 shrink-0">/</span>
               <a
-                href={`/tools?category=${routeConfig.categoryGroup}`}
+                href={categoryPath}
                 onClick={(e) => {
                   if (!e.metaKey && !e.ctrlKey && !e.shiftKey && e.button === 0) {
                     e.preventDefault();
-                    onNavigateTo(`/tools?category=${routeConfig.categoryGroup}`);
+                    onNavigateTo(categoryPath);
                   }
                 }}
                 className="text-slate-600 dark:text-slate-400 hover:text-blue-700 dark:hover:text-blue-400 font-medium transition-colors truncate max-w-[120px] sm:max-w-[200px]"
@@ -641,9 +659,30 @@ export const ToolPageLayout: React.FC<ToolPageLayoutProps> = ({
                 {categoryTitle}
               </a>
               <span aria-hidden="true" className="text-slate-300 dark:text-slate-700 shrink-0">/</span>
-              <span aria-current="page" className="font-bold text-slate-900 dark:text-white truncate max-w-[150px] sm:max-w-[240px]">
-                {toolTitle}
-              </span>
+              {pdfLanding ? (
+                <>
+                  <a
+                    href={routeConfig.primaryPath}
+                    onClick={(e) => {
+                      if (!e.metaKey && !e.ctrlKey && !e.shiftKey && e.button === 0) {
+                        e.preventDefault();
+                        onNavigateTo(routeConfig.primaryPath);
+                      }
+                    }}
+                    className="text-slate-600 dark:text-slate-400 hover:text-blue-700 dark:hover:text-blue-400 font-medium transition-colors truncate max-w-[140px] sm:max-w-[200px]"
+                  >
+                    {isUrdu ? tool.nameUrdu : tool.name}
+                  </a>
+                  <span aria-hidden="true" className="text-slate-300 dark:text-slate-700 shrink-0">/</span>
+                  <span aria-current="page" className="font-bold text-slate-900 dark:text-white truncate max-w-[160px] sm:max-w-[240px]">
+                    {toolTitle}
+                  </span>
+                </>
+              ) : (
+                <span aria-current="page" className="font-bold text-slate-900 dark:text-white truncate max-w-[150px] sm:max-w-[240px]">
+                  {toolTitle}
+                </span>
+              )}
             </nav>
 
             {/* Quick Actions */}
@@ -977,7 +1016,7 @@ export const ToolPageLayout: React.FC<ToolPageLayoutProps> = ({
             </div>
 
             {/* Structured Tool Documentation & Assumptions (SEO + User Help) */}
-            {TOOL_SEO_GUIDES[tool.id] && (
+            {pdfLanding ? (
               <div className="space-y-5" dir="ltr">
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <div className="p-4 rounded-xl bg-slate-50/80 dark:bg-slate-800/50 border border-slate-200/80 dark:border-slate-800 space-y-1.5">
@@ -985,16 +1024,16 @@ export const ToolPageLayout: React.FC<ToolPageLayoutProps> = ({
                       What This Tool Does
                     </h3>
                     <p className="text-xs text-slate-600 dark:text-slate-300 leading-relaxed">
-                      {TOOL_SEO_GUIDES[tool.id].whatItDoes}
+                      {pdfLanding.whatItDoes}
                     </p>
                   </div>
 
                   <div className="p-4 rounded-xl bg-slate-50/80 dark:bg-slate-800/50 border border-slate-200/80 dark:border-slate-800 space-y-1.5">
                     <h3 className="text-xs font-bold uppercase tracking-wider text-slate-900 dark:text-white">
-                      Who Can Use It
+                      Supported Formats
                     </h3>
                     <p className="text-xs text-slate-600 dark:text-slate-300 leading-relaxed">
-                      {TOOL_SEO_GUIDES[tool.id].whoCanUseIt}
+                      {pdfLanding.supportedFormats}
                     </p>
                   </div>
                 </div>
@@ -1004,41 +1043,143 @@ export const ToolPageLayout: React.FC<ToolPageLayoutProps> = ({
                     Step-by-Step Instructions
                   </h3>
                   <ol className="list-decimal list-inside space-y-1.5 text-xs text-slate-700 dark:text-slate-300 leading-relaxed">
-                    {TOOL_SEO_GUIDES[tool.id].howToUse.map((step, stepIdx) => (
+                    {pdfLanding.howToUse.map((step, stepIdx) => (
                       <li key={stepIdx}>{step}</li>
                     ))}
                   </ol>
                 </div>
 
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  <div className="p-4 rounded-xl bg-slate-50/80 dark:bg-slate-800/50 border border-slate-200/80 dark:border-slate-800 space-y-1.5">
-                    <h3 className="text-xs font-bold uppercase tracking-wider text-slate-900 dark:text-white">
-                      Required Inputs & Validation
-                    </h3>
-                    <p className="text-xs text-slate-600 dark:text-slate-300 leading-relaxed">
-                      {TOOL_SEO_GUIDES[tool.id].requiredInputs}
-                    </p>
-                  </div>
-
-                  <div className="p-4 rounded-xl bg-slate-50/80 dark:bg-slate-800/50 border border-slate-200/80 dark:border-slate-800 space-y-1.5">
-                    <h3 className="text-xs font-bold uppercase tracking-wider text-slate-900 dark:text-white">
-                      Expected Results & Exports
-                    </h3>
-                    <p className="text-xs text-slate-600 dark:text-slate-300 leading-relaxed">
-                      {TOOL_SEO_GUIDES[tool.id].expectedResults}
-                    </p>
-                  </div>
-                </div>
-
                 <div className="p-4 rounded-xl bg-amber-50/60 dark:bg-amber-950/25 border border-amber-200/80 dark:border-amber-900/50 space-y-1.5">
                   <h3 className="text-xs font-bold uppercase tracking-wider text-amber-900 dark:text-amber-300">
-                    Important Limitations & Assumptions
+                    Important Limitations & Browser Processing Notes
                   </h3>
                   <p className="text-xs text-amber-900/90 dark:text-amber-200/90 leading-relaxed">
-                    {TOOL_SEO_GUIDES[tool.id].limitationsAndAssumptions}
+                    {pdfLanding.limitations}
                   </p>
                 </div>
+
+                {pdfLanding.relatedLandingSlugs.length > 0 && (
+                  <div className="space-y-2.5">
+                    <h3 className="text-xs font-bold uppercase tracking-wider text-slate-700 dark:text-slate-300">
+                      Related PDF Workflows
+                    </h3>
+                    <div className="grid grid-cols-1 sm:grid-cols-3 gap-2.5">
+                      {pdfLanding.relatedLandingSlugs
+                        .map((relSlug) => PDF_LANDING_ROUTES.find((r) => r.primarySlug === relSlug))
+                        .filter((r): r is PdfLandingRouteConfig => Boolean(r))
+                        .map((rel) => (
+                          <a
+                            key={rel.primarySlug}
+                            href={rel.primaryPath}
+                            onClick={(e) => {
+                              if (!e.metaKey && !e.ctrlKey && !e.shiftKey && e.button === 0) {
+                                e.preventDefault();
+                                onNavigateTo(rel.primaryPath);
+                              }
+                            }}
+                            className="flex items-center justify-between gap-2 p-3 rounded-xl border border-slate-200 dark:border-slate-800 bg-slate-50/70 dark:bg-slate-800/40 hover:border-blue-400 transition-colors min-w-0"
+                          >
+                            <div className="min-w-0">
+                              <div className="text-xs font-bold text-slate-900 dark:text-white truncate">
+                                {rel.h1}
+                              </div>
+                              <div className="text-[11px] text-slate-500 dark:text-slate-400 truncate">
+                                {rel.supportedFormats}
+                              </div>
+                            </div>
+                            <ChevronRight className="w-4 h-4 text-slate-400 shrink-0" />
+                          </a>
+                        ))}
+                    </div>
+                  </div>
+                )}
               </div>
+            ) : (
+              TOOL_SEO_GUIDES[tool.id] && (
+                <div className="space-y-5" dir="ltr">
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div className="p-4 rounded-xl bg-slate-50/80 dark:bg-slate-800/50 border border-slate-200/80 dark:border-slate-800 space-y-1.5">
+                      <h3 className="text-xs font-bold uppercase tracking-wider text-slate-900 dark:text-white">
+                        What This Tool Does
+                      </h3>
+                      <p className="text-xs text-slate-600 dark:text-slate-300 leading-relaxed">
+                        {TOOL_SEO_GUIDES[tool.id].whatItDoes}
+                      </p>
+                    </div>
+
+                    <div className="p-4 rounded-xl bg-slate-50/80 dark:bg-slate-800/50 border border-slate-200/80 dark:border-slate-800 space-y-1.5">
+                      <h3 className="text-xs font-bold uppercase tracking-wider text-slate-900 dark:text-white">
+                        Who Can Use It
+                      </h3>
+                      <p className="text-xs text-slate-600 dark:text-slate-300 leading-relaxed">
+                        {TOOL_SEO_GUIDES[tool.id].whoCanUseIt}
+                      </p>
+                    </div>
+                  </div>
+
+                  {toolStrategy && (
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                      <div className="p-4 rounded-xl bg-slate-50/80 dark:bg-slate-800/50 border border-slate-200/80 dark:border-slate-800 space-y-1.5">
+                        <h3 className="text-xs font-bold uppercase tracking-wider text-slate-900 dark:text-white">
+                          Supported Formats & Outputs
+                        </h3>
+                        <p className="text-xs text-slate-600 dark:text-slate-300 leading-relaxed">
+                          {toolStrategy.supportedFormats}
+                        </p>
+                      </div>
+
+                      <div className="p-4 rounded-xl bg-slate-50/80 dark:bg-slate-800/50 border border-slate-200/80 dark:border-slate-800 space-y-1.5">
+                        <h3 className="text-xs font-bold uppercase tracking-wider text-slate-900 dark:text-white">
+                          Example Workflow
+                        </h3>
+                        <p className="text-xs text-slate-600 dark:text-slate-300 leading-relaxed">
+                          {toolStrategy.exampleScenario}
+                        </p>
+                      </div>
+                    </div>
+                  )}
+
+                  <div className="p-4 sm:p-5 rounded-xl bg-slate-50/80 dark:bg-slate-800/50 border border-slate-200/80 dark:border-slate-800 space-y-2.5">
+                    <h3 className="text-xs font-bold uppercase tracking-wider text-slate-900 dark:text-white">
+                      Step-by-Step Instructions
+                    </h3>
+                    <ol className="list-decimal list-inside space-y-1.5 text-xs text-slate-700 dark:text-slate-300 leading-relaxed">
+                      {TOOL_SEO_GUIDES[tool.id].howToUse.map((step, stepIdx) => (
+                        <li key={stepIdx}>{step}</li>
+                      ))}
+                    </ol>
+                  </div>
+
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div className="p-4 rounded-xl bg-slate-50/80 dark:bg-slate-800/50 border border-slate-200/80 dark:border-slate-800 space-y-1.5">
+                      <h3 className="text-xs font-bold uppercase tracking-wider text-slate-900 dark:text-white">
+                        Required Inputs & Validation
+                      </h3>
+                      <p className="text-xs text-slate-600 dark:text-slate-300 leading-relaxed">
+                        {TOOL_SEO_GUIDES[tool.id].requiredInputs}
+                      </p>
+                    </div>
+
+                    <div className="p-4 rounded-xl bg-slate-50/80 dark:bg-slate-800/50 border border-slate-200/80 dark:border-slate-800 space-y-1.5">
+                      <h3 className="text-xs font-bold uppercase tracking-wider text-slate-900 dark:text-white">
+                        Expected Results & Exports
+                      </h3>
+                      <p className="text-xs text-slate-600 dark:text-slate-300 leading-relaxed">
+                        {TOOL_SEO_GUIDES[tool.id].expectedResults}
+                      </p>
+                    </div>
+                  </div>
+
+                  <div className="p-4 rounded-xl bg-amber-50/60 dark:bg-amber-950/25 border border-amber-200/80 dark:border-amber-900/50 space-y-1.5">
+                    <h3 className="text-xs font-bold uppercase tracking-wider text-amber-900 dark:text-amber-300">
+                      Important Limitations & Assumptions
+                    </h3>
+                    <p className="text-xs text-amber-900/90 dark:text-amber-200/90 leading-relaxed">
+                      {TOOL_SEO_GUIDES[tool.id].limitationsAndAssumptions}
+                    </p>
+                  </div>
+                </div>
+              )
             )}
 
             {/* Quick Pro Tips Grid */}
@@ -1065,6 +1206,93 @@ export const ToolPageLayout: React.FC<ToolPageLayoutProps> = ({
                 ))}
               </div>
             </div>
+
+            {/* Visible Tool FAQ Accordion (Synced 1:1 with FAQPage JSON-LD) */}
+            {activeFaqs.length > 0 && (
+              <div className="pt-2 space-y-2.5" dir="ltr">
+                <div className="flex items-center gap-2">
+                  <HelpCircle className="w-4 h-4 text-blue-700 dark:text-blue-400 shrink-0" />
+                  <h3 className="text-xs font-bold uppercase tracking-wider text-slate-700 dark:text-slate-300">
+                    Frequently Asked Questions
+                  </h3>
+                </div>
+                <div className="divide-y divide-slate-200 dark:divide-slate-800 rounded-xl border border-slate-200 dark:border-slate-800 bg-slate-50/50 dark:bg-slate-800/30">
+                  {activeFaqs.map((faq, idx) => {
+                    const isOpen = openFaqIndex === idx;
+                    return (
+                      <div key={idx} className="px-4 py-3">
+                        <button
+                          type="button"
+                          onClick={() => setOpenFaqIndex(isOpen ? null : idx)}
+                          aria-expanded={isOpen}
+                          className="w-full flex items-center justify-between gap-3 text-left text-xs font-bold text-slate-900 dark:text-white cursor-pointer"
+                        >
+                          <span>{faq.q}</span>
+                          <ChevronDown
+                            className={`w-4 h-4 text-slate-400 shrink-0 transition-transform ${
+                              isOpen ? 'rotate-180' : ''
+                            }`}
+                          />
+                        </button>
+                        {isOpen && (
+                          <p className="mt-2 text-xs text-slate-600 dark:text-slate-300 leading-relaxed">
+                            {faq.a}
+                          </p>
+                        )}
+                      </div>
+                    );
+                  })}
+                </div>
+              </div>
+            )}
+
+            {/* Related Editorial Guides */}
+            {activeRelatedGuides.length > 0 && (
+              <div className="pt-2 space-y-2.5" dir="ltr">
+                <div className="flex items-center justify-between gap-2">
+                  <h3 className="text-xs font-bold uppercase tracking-wider text-slate-700 dark:text-slate-300">
+                    Recommended Step-by-Step Guides
+                  </h3>
+                  <a
+                    href="/guides"
+                    onClick={(e) => {
+                      if (!e.metaKey && !e.ctrlKey && !e.shiftKey && e.button === 0) {
+                        e.preventDefault();
+                        onNavigateTo('/guides');
+                      }
+                    }}
+                    className="text-xs font-semibold text-blue-700 dark:text-blue-400 hover:underline"
+                  >
+                    All Guides
+                  </a>
+                </div>
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-2.5">
+                  {activeRelatedGuides.map((guide) => (
+                    <a
+                      key={guide.slug}
+                      href={guide.path}
+                      onClick={(e) => {
+                        if (!e.metaKey && !e.ctrlKey && !e.shiftKey && e.button === 0) {
+                          e.preventDefault();
+                          onNavigateTo(guide.path);
+                        }
+                      }}
+                      className="flex items-center justify-between gap-3 p-3.5 rounded-xl border border-slate-200 dark:border-slate-800 bg-slate-50/70 dark:bg-slate-800/40 hover:border-blue-400 transition-colors min-w-0"
+                    >
+                      <div className="min-w-0">
+                        <div className="text-[11px] font-semibold text-blue-700 dark:text-blue-400">
+                          {guide.category} · {guide.readTimeMinutes} min read
+                        </div>
+                        <div className="text-xs font-bold text-slate-900 dark:text-white truncate mt-0.5">
+                          {guide.title}
+                        </div>
+                      </div>
+                      <ChevronRight className="w-4 h-4 text-slate-400 shrink-0" />
+                    </a>
+                  ))}
+                </div>
+              </div>
+            )}
 
             {/* Related Tools in Category (Crawlable Internal Links) */}
             {(() => {
@@ -1127,11 +1355,11 @@ export const ToolPageLayout: React.FC<ToolPageLayoutProps> = ({
               <div className="flex items-center gap-1.5">
                 <span>{isUrdu ? 'کیٹیگری:' : 'Category:'}</span>
                 <a
-                  href={`/tools?category=${routeConfig.categoryGroup}`}
+                  href={categoryPath}
                   onClick={(e) => {
                     if (!e.metaKey && !e.ctrlKey && !e.shiftKey && e.button === 0) {
                       e.preventDefault();
-                      onNavigateTo(`/tools?category=${routeConfig.categoryGroup}`);
+                      onNavigateTo(categoryPath);
                     }
                   }}
                   className="font-semibold text-indigo-600 dark:text-indigo-400 hover:underline"

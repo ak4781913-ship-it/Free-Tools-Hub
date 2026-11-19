@@ -1,6 +1,7 @@
 import React, { useState, useMemo, useEffect } from 'react';
 import { TOOLS_LIST } from '../../data/tools';
 import { TOOL_ROUTES, CATEGORY_GROUPS, ToolCategoryGroup, getToolPrimaryPath } from '../../data/toolsRouting';
+import { CATEGORY_LANDINGS } from '../../data/categorySeoData';
 import { ToolCard } from '../home/ToolCard';
 import { useLanguage } from '../../context/LanguageContext';
 import { useFavorites } from '../../context/FavoritesContext';
@@ -375,6 +376,54 @@ export const ToolsDirectoryPage: React.FC<ToolsDirectoryPageProps> = ({
             </button>
           </div>
         )}
+
+        {/* Dedicated Category Landing Pages & Guides Crawl Strip */}
+        <section className="mt-10 rounded-2xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 p-5 sm:p-6 space-y-4">
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+            <div>
+              <h2 className="text-sm sm:text-base font-bold text-slate-900 dark:text-white">
+                {isUrdu ? 'مخصوص کیٹیگری صفحات اور رہنما گائیڈز' : 'Browse Dedicated Category Hubs & Guides'}
+              </h2>
+              <p className="text-xs text-slate-500 dark:text-slate-400">
+                {isUrdu
+                  ? 'ہر کیٹیگری کے لیے مخصوص تعارفی صفحہ اور تفصیلی گائیڈز:'
+                  : 'Explore indexable category hubs with focused workflows, FAQs, and step-by-step guides.'}
+              </p>
+            </div>
+            <a
+              href="/guides"
+              onClick={(e) => {
+                if (!e.metaKey && !e.ctrlKey && !e.shiftKey && e.button === 0) {
+                  e.preventDefault();
+                  onNavigateTo('/guides');
+                }
+              }}
+              className="text-xs font-semibold text-blue-700 dark:text-blue-400 hover:underline shrink-0"
+            >
+              {isUrdu ? 'تمام گائیڈز پڑھیں →' : 'Read All Guides →'}
+            </a>
+          </div>
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-2.5">
+            {CATEGORY_LANDINGS.map((cat) => (
+              <a
+                key={cat.id}
+                href={cat.path}
+                onClick={(e) => {
+                  if (!e.metaKey && !e.ctrlKey && !e.shiftKey && e.button === 0) {
+                    e.preventDefault();
+                    onNavigateTo(cat.path);
+                  }
+                }}
+                className="flex items-center justify-between gap-2 p-3 rounded-xl border border-slate-200 dark:border-slate-800 bg-slate-50/70 dark:bg-slate-800/40 hover:border-blue-400 transition-colors"
+              >
+                <span className="text-xs font-bold text-slate-900 dark:text-white truncate">
+                  {isUrdu ? cat.nameUrdu : cat.name}
+                </span>
+                <ArrowRight className="w-3.5 h-3.5 text-slate-400 shrink-0 rtl:rotate-180" />
+              </a>
+            ))}
+          </div>
+        </section>
       </div>
     </div>
   );

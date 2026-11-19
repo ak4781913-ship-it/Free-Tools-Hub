@@ -261,14 +261,110 @@
   force = true
 
 [[redirects]]
-  from = "/tools/pdf-editor"
+  from = "/tools/pdf-converter"
   to = "/tools/pdf-tools-suite"
   status = 301
   force = true
 
 [[redirects]]
-  from = "/tools/pdf-converter"
-  to = "/tools/pdf-tools-suite"
+  from = "/tools/combine-pdf"
+  to = "/tools/merge-pdf"
+  status = 301
+  force = true
+
+[[redirects]]
+  from = "/tools/reduce-pdf-size"
+  to = "/tools/compress-pdf"
+  status = 301
+  force = true
+
+[[redirects]]
+  from = "/tools/convert-pdf-to-docx"
+  to = "/tools/pdf-to-word"
+  status = 301
+  force = true
+
+[[redirects]]
+  from = "/tools/convert-pdf-to-xlsx"
+  to = "/tools/pdf-to-excel"
+  status = 301
+  force = true
+
+[[redirects]]
+  from = "/tools/convert-pdf-to-jpeg"
+  to = "/tools/pdf-to-jpg"
+  status = 301
+  force = true
+
+[[redirects]]
+  from = "/tools/images-to-pdf"
+  to = "/tools/jpg-to-pdf"
+  status = 301
+  force = true
+
+[[redirects]]
+  from = "/tools/extract-pdf-pages"
+  to = "/tools/split-pdf"
+  status = 301
+  force = true
+
+[[redirects]]
+  from = "/tools/convert-pdf-to-png"
+  to = "/tools/pdf-to-png"
+  status = 301
+  force = true
+
+[[redirects]]
+  from = "/tools/encrypt-pdf-password"
+  to = "/tools/protect-pdf"
+  status = 301
+  force = true
+
+[[redirects]]
+  from = "/tools/pdf-ocr"
+  to = "/tools/ocr-pdf"
+  status = 301
+  force = true
+
+[[redirects]]
+  from = "/tools/scanned-pdf-ocr"
+  to = "/tools/ocr-pdf"
+  status = 301
+  force = true
+
+[[redirects]]
+  from = "/tools/pdf-editor"
+  to = "/tools/edit-pdf"
+  status = 301
+  force = true
+
+[[redirects]]
+  from = "/tools/interactive-pdf-editor"
+  to = "/tools/edit-pdf"
+  status = 301
+  force = true
+
+[[redirects]]
+  from = "/tools/docx-to-pdf"
+  to = "/tools/word-to-pdf"
+  status = 301
+  force = true
+
+[[redirects]]
+  from = "/tools/xlsx-to-pdf"
+  to = "/tools/excel-to-pdf"
+  status = 301
+  force = true
+
+[[redirects]]
+  from = "/tools/add-watermark"
+  to = "/tools/pdf-watermark"
+  status = 301
+  force = true
+
+[[redirects]]
+  from = "/tools/add-page-numbers"
+  to = "/tools/pdf-page-numbers"
   status = 301
   force = true
 
@@ -276,6 +372,12 @@
 [[redirects]]
   from = "/tools/"
   to = "/tools"
+  status = 301
+  force = true
+
+[[redirects]]
+  from = "/guides/"
+  to = "/guides"
   status = 301
   force = true
 
@@ -306,6 +408,48 @@
 [[redirects]]
   from = "/disclaimer/"
   to = "/disclaimer"
+  status = 301
+  force = true
+
+[[redirects]]
+  from = "/categories/ai-tools/"
+  to = "/categories/ai-tools"
+  status = 301
+  force = true
+
+[[redirects]]
+  from = "/categories/career-cv/"
+  to = "/categories/career-cv"
+  status = 301
+  force = true
+
+[[redirects]]
+  from = "/categories/uae-calculators/"
+  to = "/categories/uae-calculators"
+  status = 301
+  force = true
+
+[[redirects]]
+  from = "/categories/photo-image/"
+  to = "/categories/photo-image"
+  status = 301
+  force = true
+
+[[redirects]]
+  from = "/categories/video-content/"
+  to = "/categories/video-content"
+  status = 301
+  force = true
+
+[[redirects]]
+  from = "/categories/pdf-tools/"
+  to = "/categories/pdf-tools"
+  status = 301
+  force = true
+
+[[redirects]]
+  from = "/categories/other-utilities/"
+  to = "/categories/other-utilities"
   status = 301
   force = true
 
@@ -477,6 +621,156 @@
   status = 301
   force = true
 
+[[redirects]]
+  from = "/tools/merge-pdf/"
+  to = "/tools/merge-pdf"
+  status = 301
+  force = true
+
+[[redirects]]
+  from = "/tools/compress-pdf/"
+  to = "/tools/compress-pdf"
+  status = 301
+  force = true
+
+[[redirects]]
+  from = "/tools/pdf-to-word/"
+  to = "/tools/pdf-to-word"
+  status = 301
+  force = true
+
+[[redirects]]
+  from = "/tools/pdf-to-excel/"
+  to = "/tools/pdf-to-excel"
+  status = 301
+  force = true
+
+[[redirects]]
+  from = "/tools/pdf-to-jpg/"
+  to = "/tools/pdf-to-jpg"
+  status = 301
+  force = true
+
+[[redirects]]
+  from = "/tools/jpg-to-pdf/"
+  to = "/tools/jpg-to-pdf"
+  status = 301
+  force = true
+
+[[redirects]]
+  from = "/tools/split-pdf/"
+  to = "/tools/split-pdf"
+  status = 301
+  force = true
+
+[[redirects]]
+  from = "/tools/pdf-to-png/"
+  to = "/tools/pdf-to-png"
+  status = 301
+  force = true
+
+[[redirects]]
+  from = "/tools/protect-pdf/"
+  to = "/tools/protect-pdf"
+  status = 301
+  force = true
+
+[[redirects]]
+  from = "/tools/ocr-pdf/"
+  to = "/tools/ocr-pdf"
+  status = 301
+  force = true
+
+[[redirects]]
+  from = "/tools/edit-pdf/"
+  to = "/tools/edit-pdf"
+  status = 301
+  force = true
+
+[[redirects]]
+  from = "/tools/word-to-pdf/"
+  to = "/tools/word-to-pdf"
+  status = 301
+  force = true
+
+[[redirects]]
+  from = "/tools/excel-to-pdf/"
+  to = "/tools/excel-to-pdf"
+  status = 301
+  force = true
+
+[[redirects]]
+  from = "/tools/pdf-watermark/"
+  to = "/tools/pdf-watermark"
+  status = 301
+  force = true
+
+[[redirects]]
+  from = "/tools/pdf-page-numbers/"
+  to = "/tools/pdf-page-numbers"
+  status = 301
+  force = true
+
+[[redirects]]
+  from = "/guides/uae-gratuity-calculation-guide-2026/"
+  to = "/guides/uae-gratuity-calculation-guide-2026"
+  status = 301
+  force = true
+
+[[redirects]]
+  from = "/guides/uae-salary-breakdown-basic-vs-allowances/"
+  to = "/guides/uae-salary-breakdown-basic-vs-allowances"
+  status = 301
+  force = true
+
+[[redirects]]
+  from = "/guides/how-to-build-ats-friendly-cv-uae-global/"
+  to = "/guides/how-to-build-ats-friendly-cv-uae-global"
+  status = 301
+  force = true
+
+[[redirects]]
+  from = "/guides/how-to-merge-split-compress-pdf-privately-in-browser/"
+  to = "/guides/how-to-merge-split-compress-pdf-privately-in-browser"
+  status = 301
+  force = true
+
+[[redirects]]
+  from = "/guides/how-to-convert-pdf-to-word-or-excel-locally/"
+  to = "/guides/how-to-convert-pdf-to-word-or-excel-locally"
+  status = 301
+  force = true
+
+[[redirects]]
+  from = "/guides/how-to-ocr-scanned-pdfs-locally/"
+  to = "/guides/how-to-ocr-scanned-pdfs-locally"
+  status = 301
+  force = true
+
+[[redirects]]
+  from = "/guides/how-to-protect-and-unlock-pdfs-safely/"
+  to = "/guides/how-to-protect-and-unlock-pdfs-safely"
+  status = 301
+  force = true
+
+[[redirects]]
+  from = "/guides/how-to-audit-webpage-on-page-seo/"
+  to = "/guides/how-to-audit-webpage-on-page-seo"
+  status = 301
+  force = true
+
+[[redirects]]
+  from = "/guides/how-to-generate-strong-passwords-and-check-entropy/"
+  to = "/guides/how-to-generate-strong-passwords-and-check-entropy"
+  status = 301
+  force = true
+
+[[redirects]]
+  from = "/guides/how-to-write-consistent-ai-image-and-video-prompts/"
+  to = "/guides/how-to-write-consistent-ai-image-and-video-prompts"
+  status = 301
+  force = true
+
 # 3. Route API endpoints to Netlify Functions (strictly evaluated before catch-all 404)
 [[redirects]]
   from = "/api/analyze-seo"
@@ -488,6 +782,12 @@
 [[redirects]]
   from = "/tools"
   to = "/tools.html"
+  status = 200
+  force = true
+
+[[redirects]]
+  from = "/guides"
+  to = "/guides.html"
   status = 200
   force = true
 
@@ -518,6 +818,48 @@
 [[redirects]]
   from = "/disclaimer"
   to = "/disclaimer.html"
+  status = 200
+  force = true
+
+[[redirects]]
+  from = "/categories/ai-tools"
+  to = "/categories/ai-tools.html"
+  status = 200
+  force = true
+
+[[redirects]]
+  from = "/categories/career-cv"
+  to = "/categories/career-cv.html"
+  status = 200
+  force = true
+
+[[redirects]]
+  from = "/categories/uae-calculators"
+  to = "/categories/uae-calculators.html"
+  status = 200
+  force = true
+
+[[redirects]]
+  from = "/categories/photo-image"
+  to = "/categories/photo-image.html"
+  status = 200
+  force = true
+
+[[redirects]]
+  from = "/categories/video-content"
+  to = "/categories/video-content.html"
+  status = 200
+  force = true
+
+[[redirects]]
+  from = "/categories/pdf-tools"
+  to = "/categories/pdf-tools.html"
+  status = 200
+  force = true
+
+[[redirects]]
+  from = "/categories/other-utilities"
+  to = "/categories/other-utilities.html"
   status = 200
   force = true
 
@@ -686,6 +1028,156 @@
 [[redirects]]
   from = "/tools/pdf-tools-suite"
   to = "/tools/pdf-tools-suite.html"
+  status = 200
+  force = true
+
+[[redirects]]
+  from = "/tools/merge-pdf"
+  to = "/tools/merge-pdf.html"
+  status = 200
+  force = true
+
+[[redirects]]
+  from = "/tools/compress-pdf"
+  to = "/tools/compress-pdf.html"
+  status = 200
+  force = true
+
+[[redirects]]
+  from = "/tools/pdf-to-word"
+  to = "/tools/pdf-to-word.html"
+  status = 200
+  force = true
+
+[[redirects]]
+  from = "/tools/pdf-to-excel"
+  to = "/tools/pdf-to-excel.html"
+  status = 200
+  force = true
+
+[[redirects]]
+  from = "/tools/pdf-to-jpg"
+  to = "/tools/pdf-to-jpg.html"
+  status = 200
+  force = true
+
+[[redirects]]
+  from = "/tools/jpg-to-pdf"
+  to = "/tools/jpg-to-pdf.html"
+  status = 200
+  force = true
+
+[[redirects]]
+  from = "/tools/split-pdf"
+  to = "/tools/split-pdf.html"
+  status = 200
+  force = true
+
+[[redirects]]
+  from = "/tools/pdf-to-png"
+  to = "/tools/pdf-to-png.html"
+  status = 200
+  force = true
+
+[[redirects]]
+  from = "/tools/protect-pdf"
+  to = "/tools/protect-pdf.html"
+  status = 200
+  force = true
+
+[[redirects]]
+  from = "/tools/ocr-pdf"
+  to = "/tools/ocr-pdf.html"
+  status = 200
+  force = true
+
+[[redirects]]
+  from = "/tools/edit-pdf"
+  to = "/tools/edit-pdf.html"
+  status = 200
+  force = true
+
+[[redirects]]
+  from = "/tools/word-to-pdf"
+  to = "/tools/word-to-pdf.html"
+  status = 200
+  force = true
+
+[[redirects]]
+  from = "/tools/excel-to-pdf"
+  to = "/tools/excel-to-pdf.html"
+  status = 200
+  force = true
+
+[[redirects]]
+  from = "/tools/pdf-watermark"
+  to = "/tools/pdf-watermark.html"
+  status = 200
+  force = true
+
+[[redirects]]
+  from = "/tools/pdf-page-numbers"
+  to = "/tools/pdf-page-numbers.html"
+  status = 200
+  force = true
+
+[[redirects]]
+  from = "/guides/uae-gratuity-calculation-guide-2026"
+  to = "/guides/uae-gratuity-calculation-guide-2026.html"
+  status = 200
+  force = true
+
+[[redirects]]
+  from = "/guides/uae-salary-breakdown-basic-vs-allowances"
+  to = "/guides/uae-salary-breakdown-basic-vs-allowances.html"
+  status = 200
+  force = true
+
+[[redirects]]
+  from = "/guides/how-to-build-ats-friendly-cv-uae-global"
+  to = "/guides/how-to-build-ats-friendly-cv-uae-global.html"
+  status = 200
+  force = true
+
+[[redirects]]
+  from = "/guides/how-to-merge-split-compress-pdf-privately-in-browser"
+  to = "/guides/how-to-merge-split-compress-pdf-privately-in-browser.html"
+  status = 200
+  force = true
+
+[[redirects]]
+  from = "/guides/how-to-convert-pdf-to-word-or-excel-locally"
+  to = "/guides/how-to-convert-pdf-to-word-or-excel-locally.html"
+  status = 200
+  force = true
+
+[[redirects]]
+  from = "/guides/how-to-ocr-scanned-pdfs-locally"
+  to = "/guides/how-to-ocr-scanned-pdfs-locally.html"
+  status = 200
+  force = true
+
+[[redirects]]
+  from = "/guides/how-to-protect-and-unlock-pdfs-safely"
+  to = "/guides/how-to-protect-and-unlock-pdfs-safely.html"
+  status = 200
+  force = true
+
+[[redirects]]
+  from = "/guides/how-to-audit-webpage-on-page-seo"
+  to = "/guides/how-to-audit-webpage-on-page-seo.html"
+  status = 200
+  force = true
+
+[[redirects]]
+  from = "/guides/how-to-generate-strong-passwords-and-check-entropy"
+  to = "/guides/how-to-generate-strong-passwords-and-check-entropy.html"
+  status = 200
+  force = true
+
+[[redirects]]
+  from = "/guides/how-to-write-consistent-ai-image-and-video-prompts"
+  to = "/guides/how-to-write-consistent-ai-image-and-video-prompts.html"
   status = 200
   force = true
 
